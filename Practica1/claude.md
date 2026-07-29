@@ -60,3 +60,21 @@ Es una guía, no una obligación. Si encuentras un mejor lugar, propónlo.
 - No cambies rutas ni códigos de respuesta.
 - No inventes fragmentos de código para el README: cópialos del proyecto real.
 - No uses lenguaje inflado en la documentación. Describe lo que el código hace, sin adjetivos de más.
+
+---
+
+## 6. Análisis de resultados
+
+Escrito al terminar la refactorización, sobre lo que estas instrucciones produjeron.
+
+### Qué funcionó
+
+- Anterior mente se tenia el codigo sin los principios SOLID es decir un crud que funcionaba pero no se probo nada de los principios solid con este claude.md se le dio la tarea de explicar los 5 principios y ademas que me ayudara a refactorizar codigo, cosas que tube que correguir fuie algo minimo pero que si daba error la parte de `estimated_cost: z.number().min(0)` no lo trabajaba asi si no que permitia numeros negativos, cosas que realizo bien fue la parte de los principios solid ya que esto es un crud de solicitudes puede comprender como este codigo queda mas escalable y mejor refactorizado
+
+
+- **Cosas que tuve que preguntar el por que** Al pedir explicación de la transacción del `PATCH` quedó claro por qué requiere `pool.connect()` y no `pool.query()`. El `Pool` reparte cada consulta en una conexión distinta, así que un `BEGIN` lanzado con `pool.query()` abriría la transacción en una conexión mientras el `UPDATE` se ejecutaría en otra, en autocommit; el `ROLLBACK` no tendría nada que deshacer y el `FOR UPDATE` liberaría el bloqueo al instante en vez de sostenerlo hasta el `COMMIT`. Nada de eso lanza un error: compila, responde 200 y además funciona al probar una petición a la vez, porque el pool tiende a reutilizar la misma conexión. El fallo solo aparecería bajo concurrencia. El código ya usaba `connect()`, pero el riesgo no es visible leyéndolo.
+
+
+### Qué hubo que corregir
+
+`estimated_cost` admitía valores negativos: pasaban Zod, violaban el `CHECK (estimated_cost >= 0)` de la base y el cliente recibía `500` en vez de `400`
