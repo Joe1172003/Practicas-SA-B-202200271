@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Compilado
+dist/
+build/
+
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+.DS_Store
+.idea/
+*.tsbuildinfo
+
+coverage/
