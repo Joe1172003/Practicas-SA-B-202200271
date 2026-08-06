@@ -1,23 +1,3 @@
-/**
- * Wrapper de fetch: el ÚNICO lugar del frontend que habla HTTP.
- *
- * Centraliza tres cosas que, si se olvidaran en una sola petición,
- * romperían la app de formas difíciles de detectar:
- *
- * 1. `credentials: 'include'` — el JWT viaja en una cookie HTTP-only, y como
- *    el frontend (5173) y el backend (3000) son orígenes distintos, el
- *    navegador NO manda la cookie salvo que cada fetch lo pida explícitamente.
- *    Sin esta línea el login "funciona" pero ninguna ruta protegida.
- *
- * 2. Errores uniformes — cualquier respuesta que no sea 2xx se convierte en
- *    un `ErrorApi` con el status y un mensaje legible, así las páginas hacen
- *    un solo try/catch y muestran `error.mensaje` sin preguntarse el formato.
- *
- * 3. La cabecera `X-Token-Renovado` — el backend la manda cuando renovó el
- *    token automáticamente. Aquí se detecta y se avisa al resto de la app
- *    con un evento del navegador (el Navbar lo escucha para mostrar un aviso).
- */
-
 const BASE_URL = import.meta.env.VITE_API_URL as string;
 
 /** Nombre del evento que se dispara cuando el backend renueva la sesión. */
