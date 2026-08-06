@@ -25,8 +25,9 @@ async function bootstrap() {
     }),
   );
 
+
   app.enableCors({
-    origin: config.corsOrigin,
+    origin: config.corsOrigins,
     credentials: true,
     exposedHeaders: ['X-Token-Renovado'],
   });
@@ -34,7 +35,7 @@ async function bootstrap() {
   await app.listen(config.port);
 
   console.log(`API escuchando en http://localhost:${config.port}`);
-  console.log(`Frontend autorizado (CORS): ${config.corsOrigin}`);
+  console.log(`Frontend autorizado cors: ${config.corsOrigins.join(', ')}`);
 }
 
 void bootstrap();

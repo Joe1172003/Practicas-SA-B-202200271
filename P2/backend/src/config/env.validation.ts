@@ -31,7 +31,15 @@ export const envValidationSchema = Joi.object({
     .valid('development', 'production', 'test')
     .default('development'),
   PORT: Joi.number().port().default(3000),
-  CORS_ORIGIN: Joi.string().uri().default('http://localhost:5173'),
+  // Uno o varios orígenes separados por comas. Se valida que cada uno sea una
+  // URL https sin barra final, que es como el navegador manda el `Origin`.
+  CORS_ORIGIN: Joi.string()
+    .pattern(/^https?:\/\/[^\s,/]+(,\s*https?:\/\/[^\s,/]+)*$/)
+    .default('http://localhost:5173')
+    .messages({
+      'string.pattern.base':
+        'CORS_ORIGIN debe ser una o más URLs separadas por comas, sin barra final (ej: http://localhost:5173,http://localhost:5174)',
+    }),
 
   // --- Base de datos ---
   DATABASE_URL: Joi.string()
