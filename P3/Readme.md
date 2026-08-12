@@ -413,6 +413,8 @@ Al ver los diagramas salta algo: columnas como `subido_por`, `usuario_id`, `lote
 
 Tres restricciones hacen cumplir reglas de negocio desde la base, donde nadie las puede saltar:
 
+### Reflejo de las reglas de validación del negocio 
+
 | Restricción | Regla que impone |
 |---|---|
 | `uq_firma_paso (lote_id, paso)` | Un paso del lote no se puede firmar dos veces |
@@ -420,6 +422,9 @@ Tres restricciones hacen cumplir reglas de negocio desde la base, donde nadie la
 | `uq_transaccion_linea (lote_id, linea_csv)` | Cada fila del CSV entra una sola vez |
 
 Un detalle de tipos que en un banco no es detalle: `monto` es DECIMAL, nunca FLOAT. Un flotante acumula error de redondeo, y en doscientas mil filas eso deja de ser teoría y se vuelve un descuadre contable.
+
+tambien el clave mencionar que en algunas tablas del modelo ER se establece campos que son tipo enum es decir contienten diferentes estados como puede ser "Procesado", "Aprobado", "Exlcuido", ect.
+
 
 ### Autenticación y autorización
 
