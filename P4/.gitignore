@@ -1,0 +1,11 @@
+# Dependencias y compilados
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+
+# Log que escribe el microservicio de notificaciones
+notificaciones.log
+
+.env*

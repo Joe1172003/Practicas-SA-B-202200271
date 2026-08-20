@@ -1,0 +1,191 @@
+
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: p4_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    ports:
+      - '${POSTGRES_PUERTO_HOST}:5432'
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data
+      - ./infra/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - red_p4
+
+  #microservicio de autenticacion
+  auth:
+    build:
+      context: ./backend-ts/auth
+    container_name: p4_auth
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3001
+      CORS_ORIGIN: ${CORS_ORIGIN}
+
+      DATABASE_URL: ${DATABASE_URL_AUTH}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS}
+      JWT_RENEWAL_GRACE_SECONDS: ${JWT_RENEWAL_GRACE_SECONDS}
+
+      COOKIE_NAME: ${COOKIE_NAME}
+      COOKIE_SECURE: ${COOKIE_SECURE}
+
+      AES_KEY: ${AES_KEY}
+      BLIND_INDEX_KEY: ${BLIND_INDEX_KEY}
+      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
+
+      URL_NOTIFICACIONES: http://notificaciones:3004
+    ports:
+      - '${PUERTO_AUTH}:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      notificaciones:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - red_p4
+
+  # microservicio de notificaciones
+  notificaciones:
+    build:
+      context: ./notificaciones-py
+    container_name: p4_notificaciones
+    restart: unless-stopped
+    environment:
+      ARCHIVO_LOG: /app/logs/notificaciones.log
+    ports:
+      - '${PUERTO_NOTIFICACIONES}:3004'
+    volumes:
+      - ./notificaciones-py/logs:/app/logs
+
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3004/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - red_p4
+
+  # microservicio de productos
+  productos:
+    build:
+      context: ./backend-ts/productos
+    container_name: p4_productos
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3002
+      DATABASE_URL: ${DATABASE_URL_PRODUCTOS}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+    ports:
+      - '${PUERTO_PRODUCTOS}:3002'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:3002/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - red_p4
+
+  # microservicio de ordenes
+  ordenes:
+    build:
+      context: ./backend-ts/ordenes
+    container_name: p4_ordenes
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3003
+      DATABASE_URL: ${DATABASE_URL_ORDENES}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+
+      # direcciones url para la comunicacion con productos SAGA
+      URL_PRODUCTOS: http://productos:3002
+      URL_NOTIFICACIONES: http://notificaciones:3004
+    ports:
+      - '${PUERTO_ORDENES}:3003'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      productos:
+        condition: service_healthy
+      notificaciones:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:3003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - red_p4
+
+  # gateway
+  gateway:
+    build:
+      context: ./backend-ts/gateway
+    container_name: p4_gateway
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3000
+      CORS_ORIGIN: ${CORS_ORIGIN}
+
+      # URL que usa mi gateway para la comunicacin con mis microservicios
+      URL_AUTH: http://auth:3001
+      URL_PRODUCTOS: http://productos:3002
+      URL_ORDENES: http://ordenes:3003
+      URL_NOTIFICACIONES: http://notificaciones:3004
+    ports:
+      - '${PUERTO_GATEWAY}:3000'
+    depends_on:
+      auth:
+        condition: service_healthy
+      productos:
+        condition: service_healthy
+      ordenes:
+        condition: service_healthy
+      notificaciones:
+        condition: service_healthy
+    networks:
+      - red_p4
+
+# Red propia para que los servicios se llamen entre sí por su nombre
+networks:
+  red_p4:
+    driver: bridge
+
+volumes:
+  datos_postgres:
