@@ -22,5 +22,4 @@ export const envValidationSchema = Joi.object({
   URL_AUTH: Joi.string().uri().required(),
   URL_PRODUCTOS: Joi.string().uri().required(),
   URL_ORDENES: Joi.string().uri().required(),
-  URL_NOTIFICACIONES: Joi.string().uri().required(),
 });

@@ -13,7 +13,6 @@ export interface ServiciosConfig {
   auth: string;
   productos: string;
   ordenes: string;
-  notificaciones: string;
 }
 
 export const serviciosConfig = registerAs(
@@ -22,6 +21,5 @@ export const serviciosConfig = registerAs(
     auth: process.env.URL_AUTH as string,
     productos: process.env.URL_PRODUCTOS as string,
     ordenes: process.env.URL_ORDENES as string,
-    notificaciones: process.env.URL_NOTIFICACIONES as string,
-  }),
+    }),
 );

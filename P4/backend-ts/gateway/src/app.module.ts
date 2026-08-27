@@ -6,7 +6,6 @@ import { envValidationSchema } from './config/env.validation';
 import { serviciosConfig } from './config/servicios.config';
 import { GraphqlProxyModule } from './graphql-proxy/graphql-proxy.module';
 import { HealthModule } from './health/health.module';
-import { NotificacionesProxyModule } from './notificaciones/notificaciones-proxy.module';
 
 /**
  * El gateway no tiene base de datos ni entidades: no es dueño de ningún dato.
@@ -24,7 +23,6 @@ import { NotificacionesProxyModule } from './notificaciones/notificaciones-proxy
 
     AuthProxyModule,
     GraphqlProxyModule,
-    NotificacionesProxyModule,
     HealthModule,
   ],
 })

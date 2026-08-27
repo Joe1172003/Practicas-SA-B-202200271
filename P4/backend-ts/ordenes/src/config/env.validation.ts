@@ -21,5 +21,8 @@ export const envValidationSchema = Joi.object({
   DB_SYNCHRONIZE: Joi.boolean().default(false),
 
   URL_PRODUCTOS: Joi.string().uri().required(),
-  URL_NOTIFICACIONES: Joi.string().uri().required(),
+  // CAMBIO DE LA P5: la direccion del broker reemplaza a la URL del
+  // microservicio de notificaciones.
+  RABBITMQ_URL: Joi.string().uri({ scheme: ['amqp', 'amqps'] }).required(),
+  COLA_NOTIFICACIONES: Joi.string().default('notificaciones'),
 });

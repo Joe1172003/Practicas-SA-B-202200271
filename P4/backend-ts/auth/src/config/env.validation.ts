@@ -70,5 +70,8 @@ export const envValidationSchema = Joi.object({
   BCRYPT_SALT_ROUNDS: Joi.number().integer().min(10).max(15).default(12),
 
   // --- Otros microservicios (agregado en la Práctica 4) ---
-  URL_NOTIFICACIONES: Joi.string().uri().required(),
+  // CAMBIO DE LA P5: la direccion del broker reemplaza a la URL del
+  // microservicio de notificaciones.
+  RABBITMQ_URL: Joi.string().uri({ scheme: ['amqp', 'amqps'] }).required(),
+  COLA_NOTIFICACIONES: Joi.string().default('notificaciones'),
 });

@@ -24,6 +24,37 @@ services:
     networks:
       - red_p4
 
+  # RabbitMQ: el broker de mensajeria (agregado en la P5).
+  # Auth y Ordenes dejan mensajes aqui; Notificaciones los saca cuando puede.
+  rabbitmq:
+    # La etiqueta "management" trae ademas la interfaz web para ver las colas.
+    image: rabbitmq:3-management-alpine
+    container_name: p4_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USUARIO}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      # 5672 es el protocolo AMQP: por aqui hablan los microservicios.
+      - '${RABBITMQ_PUERTO_HOST}:5672'
+      # 15672 es la interfaz web: por aqui entras vos con el navegador.
+      - '${RABBITMQ_PUERTO_UI}:15672'
+    volumes:
+      # Sin este volumen, los mensajes de una cola durable se perderian
+      # igual al reiniciar el contenedor: la cola es durable en disco, y el
+      # disco vive aqui.
+      - datos_rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      # Pregunta si el broker responde. Los servicios que publican esperan
+      # a que esto pase antes de arrancar.
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - red_p4
+
   #microservicio de autenticacion
   auth:
     build:
@@ -49,13 +80,16 @@ services:
       BLIND_INDEX_KEY: ${BLIND_INDEX_KEY}
       BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
 
-      URL_NOTIFICACIONES: http://notificaciones:3004
+      # Antes era URL_NOTIFICACIONES apuntando al microservicio.
+      # Ahora Auth deja el aviso en la cola y no sabe quien lo va a leer.
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      COLA_NOTIFICACIONES: ${COLA_NOTIFICACIONES}
     ports:
       - '${PUERTO_AUTH}:3001'
     depends_on:
       postgres:
         condition: service_healthy
-      notificaciones:
+      rabbitmq:
         condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:3001/health']
@@ -67,6 +101,9 @@ services:
       - red_p4
 
   # microservicio de notificaciones
+  #
+  # CAMBIO DE LA P5: ya no es un servidor HTTP. Ahora solo escucha la cola.
+  # Por eso no tiene "ports": nadie le hace peticiones, el se conecta al broker.
   notificaciones:
     build:
       context: ./notificaciones-py
@@ -74,23 +111,28 @@ services:
     restart: unless-stopped
     environment:
       ARCHIVO_LOG: /app/logs/notificaciones.log
-    ports:
-      - '${PUERTO_NOTIFICACIONES}:3004'
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      COLA_NOTIFICACIONES: ${COLA_NOTIFICACIONES}
+      DATABASE_URL: ${DATABASE_URL_NOTIFICACIONES}
+      ARCHIVO_LATIDO: /tmp/latido
     volumes:
       - ./notificaciones-py/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
+    # Sin servidor HTTP no hay endpoint que consultar, asi que la salud se
+    # mide de otra forma: el consumidor toca un archivo cada vuelta del
+    # bucle, y aqui se comprueba que ese archivo sea reciente. Si el proceso
+    # se colgo, el archivo se queda viejo y el healthcheck falla.
     healthcheck:
-      test:
-        [
-          'CMD',
-          'python',
-          '-c',
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3004/health')",
-        ]
-      interval: 10s
+      test: ['CMD', 'python', '/app/latido.py']
+      interval: 15s
       timeout: 5s
-      retries: 5
-      start_period: 15s
+      retries: 3
+      start_period: 30s
     networks:
       - red_p4
 
@@ -131,9 +173,14 @@ services:
       DATABASE_URL: ${DATABASE_URL_ORDENES}
       DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
 
-      # direcciones url para la comunicacion con productos SAGA
+      # La SAGA sigue siendo sincrona: Ordenes espera la respuesta de
+      # Productos para saber si hay stock. Eso NO cambia.
       URL_PRODUCTOS: http://productos:3002
-      URL_NOTIFICACIONES: http://notificaciones:3004
+
+      # Lo que si cambia: el aviso de orden pagada o cancelada ahora va
+      # a la cola en vez de a una llamada HTTP.
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      COLA_NOTIFICACIONES: ${COLA_NOTIFICACIONES}
     ports:
       - '${PUERTO_ORDENES}:3003'
     depends_on:
@@ -141,7 +188,7 @@ services:
         condition: service_healthy
       productos:
         condition: service_healthy
-      notificaciones:
+      rabbitmq:
         condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:3003/health']
@@ -163,11 +210,12 @@ services:
       PORT: 3000
       CORS_ORIGIN: ${CORS_ORIGIN}
 
-      # URL que usa mi gateway para la comunicacin con mis microservicios
+      # URL que usa mi gateway para la comunicacion con mis microservicios.
+      # Notificaciones ya no aparece: al ser consumidor puro, el gateway no
+      # tiene forma ni motivo de llamarlo.
       URL_AUTH: http://auth:3001
       URL_PRODUCTOS: http://productos:3002
       URL_ORDENES: http://ordenes:3003
-      URL_NOTIFICACIONES: http://notificaciones:3004
     ports:
       - '${PUERTO_GATEWAY}:3000'
     depends_on:
@@ -176,8 +224,6 @@ services:
       productos:
         condition: service_healthy
       ordenes:
-        condition: service_healthy
-      notificaciones:
         condition: service_healthy
     networks:
       - red_p4
@@ -189,3 +235,4 @@ networks:
 
 volumes:
   datos_postgres:
+  datos_rabbitmq:
