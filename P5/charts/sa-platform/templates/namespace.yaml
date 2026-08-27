@@ -1,0 +1,9 @@
+# El chart crea su propio namespace: Helm instala Namespace primero, antes que el resto de objetos.
+apiVersion: v1
+kind: Namespace
+metadata:
+  # required corta la instalacion con un mensaje claro en vez de crear un namespace sin nombre.
+  name: {{ required "Falta global.namespace en values.yaml" .Values.global.namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    entorno: {{ .Values.global.entorno | default "dev" | quote }}

@@ -1,0 +1,18 @@
+{{- $ctx := dict "raiz" . "componente" "auth" -}}
+# Lleva Service porque el gateway le hace peticiones y necesita un nombre fijo, no la IP cambiante del Pod.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  # ClusterIP: alcanzable solo dentro del cluster. Al exterior se sale unicamente por el Ingress.
+  type: ClusterIP
+  selector:
+    {{- include "sa-platform.selector" $ctx | nindent 4 }}
+  ports:
+    - port: {{ .Values.puerto }}
+      targetPort: {{ .Values.puerto }}
+      protocol: TCP

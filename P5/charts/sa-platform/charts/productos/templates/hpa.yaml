@@ -1,0 +1,30 @@
+{{- if .Values.hpa.habilitado }}
+{{- $ctx := dict "raiz" . "componente" "productos" -}}
+# Ajusta las replicas del Deployment segun el uso de CPU medido por metrics-server.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sa-platform.nombre" $ctx }}
+  minReplicas: {{ .Values.hpa.minimo }}
+  maxReplicas: {{ .Values.hpa.maximo }}
+  metrics:
+    # El porcentaje se calcula sobre requests.cpu, no sobre el limite ni sobre el nodo.
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.hpa.umbralCpu }}
+  behavior:
+    scaleDown:
+      # Espera 60s de calma antes de bajar, para no achicar y agrandar en ciclo con picos cortos.
+      stabilizationWindowSeconds: 60
+{{- end }}

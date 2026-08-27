@@ -1,0 +1,48 @@
+{{- $ctx := dict "raiz" . "componente" "auth" "baseDatos" .Values.baseDatos -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.habilitado }}
+  # Con HPA activo no se fija replicas aqui: cada helm upgrade lo devolveria al valor del chart.
+  replicas: {{ .Values.replicas | default 1 }}
+  {{- end }}
+  strategy:
+    {{- include "sa-platform.rollingUpdate" . | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "sa-platform.selector" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa-platform.selector" $ctx | nindent 8 }}
+      annotations:
+        checksum/config: {{ include "sa-platform.checksumConfig" $ctx }}
+    spec:
+      containers:
+        - name: auth
+          image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga | default "IfNotPresent" }}
+          ports:
+            - containerPort: {{ .Values.puerto }}
+          envFrom:
+            # Primero lo publico y despues lo privado: si una clave se repite, gana la ultima de la lista.
+            - configMapRef:
+                name: {{ include "sa-platform.configMap" $ctx }}
+            - secretRef:
+                name: {{ include "sa-platform.nombre" $ctx }}-secreto
+          env:
+            - name: PORT
+              value: {{ .Values.puerto | quote }}
+          {{- include "sa-platform.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}

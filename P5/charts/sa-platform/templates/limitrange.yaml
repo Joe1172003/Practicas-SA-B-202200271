@@ -1,0 +1,28 @@
+{{- if .Values.cuotas.habilitadas }}
+# Con ResourceQuota activo, un contenedor sin requests ni limits es rechazado. Esto le pone valores por defecto.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Release.Name }}-limites
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  limits:
+    - type: Container
+      # Se aplican solo si el contenedor no los declara; los nuestros si los declaran.
+      default:
+        cpu: {{ .Values.limites.porDefecto.limits.cpu | quote }}
+        memory: {{ .Values.limites.porDefecto.limits.memoria | quote }}
+      defaultRequest:
+        cpu: {{ .Values.limites.porDefecto.requests.cpu | quote }}
+        memory: {{ .Values.limites.porDefecto.requests.memoria | quote }}
+      # Techo por contenedor: impide que uno solo se lleve toda la cuota del namespace.
+      max:
+        cpu: {{ .Values.limites.maximo.cpu | quote }}
+        memory: {{ .Values.limites.maximo.memoria | quote }}
+      min:
+        cpu: {{ .Values.limites.minimo.cpu | quote }}
+        memory: {{ .Values.limites.minimo.memoria | quote }}
+{{- end }}

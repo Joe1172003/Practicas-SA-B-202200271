@@ -1,0 +1,32 @@
+# Valores por defecto del subchart. Este bloque es COMO se despliega la base;
+# global.postgres del chart padre es CON QUE credenciales se conecta.
+imagen:
+  repositorio: postgres
+  etiqueta: 15-alpine
+  politicaDescarga: IfNotPresent
+
+puerto: 5432
+
+# Base a la que se conecta el proceso de inicializacion.
+baseInicial: postgres
+
+# Agregar una base nueva es agregar una linea aqui: el ConfigMap las recorre con range.
+basesDatos:
+  - db_auth
+  - db_productos
+  - db_ordenes
+  - db_notificaciones
+  - db_bitacora
+
+almacenamiento:
+  tamano: 1Gi
+  # Vacio usa la StorageClass por defecto; en un cluster de nube habria que nombrarla (gp3, standard-rwo).
+  claseAlmacenamiento: ""
+
+recursos:
+  requests:
+    cpu: 100m
+    memoria: 192Mi
+  limits:
+    cpu: 500m
+    memoria: 512Mi

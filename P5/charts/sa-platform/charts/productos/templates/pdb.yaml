@@ -1,0 +1,16 @@
+{{- if .Values.pdb.habilitado }}
+{{- $ctx := dict "raiz" . "componente" "productos" -}}
+# Limita cuantos Pods puede tumbar a la vez una interrupcion voluntaria, como drenar un nodo.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.pdb.minimoDisponible }}
+  selector:
+    matchLabels:
+      {{- include "sa-platform.selector" $ctx | nindent 6 }}
+{{- end }}

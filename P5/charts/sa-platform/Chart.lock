@@ -1,0 +1,24 @@
+dependencies:
+- name: gateway
+  repository: ""
+  version: 0.1.0
+- name: auth
+  repository: ""
+  version: 0.1.0
+- name: productos
+  repository: ""
+  version: 0.1.0
+- name: ordenes
+  repository: ""
+  version: 0.1.0
+- name: notificaciones
+  repository: ""
+  version: 0.1.0
+- name: postgres
+  repository: ""
+  version: 0.1.0
+- name: rabbitmq
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.0.14
+digest: sha256:8b47bcbc7fd3a79f5257ca32d97dbd4bfc6fe246e509b6195c5b5c7a16ca6af9
+generated: "2026-08-26T15:23:43.6341266-06:00"

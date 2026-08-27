@@ -1,0 +1,136 @@
+{{- if .Values.redAislada.habilitada }}
+# Entrada al gateway: solo desde el Ingress Controller, unico origen legitimo de fuera del cluster.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-entrada-gateway
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # namespaceSelector en vez de podSelector: el Ingress Controller vive fuera de sa-p5.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.gateway.puerto }}
+---
+{{- range $componente, $puerto := dict "auth" 3001 "productos" 3002 "ordenes" 3003 }}
+# Entrada a {{ $componente }}: el range sobre un dict genera una policy por microservicio, cada una con su puerto.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $.Release.Name }}-entrada-{{ $componente }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $componente }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # Regla base: el gateway es el unico autorizado a entrar a los microservicios de negocio.
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: gateway
+              app.kubernetes.io/instance: {{ $.Release.Name }}
+        {{- if eq $componente "productos" }}
+        # Unica excepcion de la plataforma: Ordenes llama a Productos para apartar stock durante la saga.
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ordenes
+              app.kubernetes.io/instance: {{ $.Release.Name }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ $puerto }}
+---
+{{- end }}
+# Entrada a Postgres: los cuatro microservicios con base propia. El gateway no aparece porque nunca consulta la base.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-entrada-postgres
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # range sobre una list y no un dict: los cuatro entran al mismo puerto, no hace falta un valor por nombre.
+        {{- range $c := list "auth" "productos" "ordenes" "notificaciones" }}
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ $c }}
+              app.kubernetes.io/instance: {{ $.Release.Name }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.postgres.puerto }}
+---
+# Entrada a RabbitMQ: los dos que publican (auth, ordenes) y el que consume. Productos y gateway no tocan la cola.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-entrada-rabbitmq
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        {{- range $c := list "auth" "ordenes" "notificaciones" }}
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ $c }}
+              app.kubernetes.io/instance: {{ $.Release.Name }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.rabbitmq.puerto }}
+---
+# Salida de todos los componentes: una conexion necesita permiso en ambos extremos y denegar-todo tambien corta el egress.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-salida-aplicacion
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+spec:
+  # Solo la etiqueta instance, sin name: una sola policy que aplica a todos los Pods del release.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes:
+    - Egress
+  egress:
+    # Salida abierta a proposito: el control real lo hacen las reglas de entrada de cada destino.
+    - to:
+        - podSelector: {}
+{{- end }}

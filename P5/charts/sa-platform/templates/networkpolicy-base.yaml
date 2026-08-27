@@ -1,0 +1,40 @@
+{{- if .Values.redAislada.habilitada }}
+# podSelector vacio significa todos los Pods: cierra entrada y salida del namespace entero de un solo golpe.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-denegar-todo
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Reabre solo el puerto 53 hacia CoreDNS: sin esto, resolver nombres como sa-p5-postgres falla con EAI_AGAIN.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-permitir-dns
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

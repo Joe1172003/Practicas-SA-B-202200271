@@ -1,0 +1,65 @@
+# Perfil de produccion: helm install sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-prod.yaml
+# Dos cambios de fondo: DB_SYNCHRONIZE pasa a false (el esquema se cambia con migraciones, no
+# con lo que el ORM deduzca) y las imagenes se bajan de un registro en vez de cargarse a mano.
+
+global:
+  entorno: production
+
+gateway:
+  replicas: 2
+  imagen:
+    etiqueta: "1.0.0"
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 100m
+      memoria: 128Mi
+    limits:
+      cpu: 500m
+      memoria: 384Mi
+
+auth:
+  replicas: 2
+  imagen:
+    etiqueta: "1.0.0"
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 100m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+productos:
+  replicas: 2
+  imagen:
+    etiqueta: "1.0.0"
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 100m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+ordenes:
+  replicas: 2
+  imagen:
+    etiqueta: "1.0.0"
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 100m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+# Se queda en una replica: con prefetch 1 y ack manual, mas consumidores solo sirven si la cola crece mas rapido de lo que se vacia.
+notificaciones:
+  replicas: 1
+  imagen:
+    etiqueta: "1.0.0"
+    politicaDescarga: IfNotPresent

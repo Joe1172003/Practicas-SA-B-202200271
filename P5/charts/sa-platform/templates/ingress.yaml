@@ -1,0 +1,25 @@
+{{- $ctx := dict "raiz" . "componente" "gateway" -}}
+# Unica puerta de entrada al cluster: todo lo que llegue al host va al Service del gateway.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  # Elige que Ingress Controller atiende estas reglas. En minikube el addon registra la clase nginx.
+  ingressClassName: {{ .Values.ingress.clase | default "nginx" | quote }}
+  rules:
+    - host: {{ required "Falta ingress.host en values.yaml" .Values.ingress.host | quote }}
+      http:
+        paths:
+          # Prefix con "/" atrapa toda ruta: el ruteo fino entre microservicios ya lo hace el gateway.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "sa-platform.nombre" $ctx }}
+                port:
+                  number: {{ .Values.gateway.puerto | default 3000 }}

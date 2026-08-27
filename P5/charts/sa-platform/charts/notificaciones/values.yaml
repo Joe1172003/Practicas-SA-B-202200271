@@ -1,0 +1,22 @@
+# Valores por defecto del subchart. Sin "puerto" porque este componente no escucha en ninguno.
+replicas: 1
+imagen:
+  repositorio: p4-notificaciones
+  etiqueta: latest
+  politicaDescarga: Never
+baseDatos: db_notificaciones
+# Los dos unicos puntos escribibles cuando el sistema de archivos pase a solo lectura.
+archivoLog: /app/logs/notificaciones.log
+archivoLatido: /tmp/latido
+recursos:
+  requests:
+    cpu: 50m
+    memoria: 96Mi
+  limits:
+    cpu: 200m
+    memoria: 256Mi
+
+# Sin HPA: es un consumidor con prefetch 1, escalarlo por CPU no tiene sentido.
+pdb:
+  habilitado: true
+  minimoDisponible: 1

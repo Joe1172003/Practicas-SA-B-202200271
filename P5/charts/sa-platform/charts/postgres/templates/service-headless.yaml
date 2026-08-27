@@ -1,0 +1,17 @@
+{{- $ctx := dict "raiz" . "componente" "postgres" -}}
+# clusterIP None: no reparte trafico, le da a cada replica un nombre propio. El StatefulSet no arranca sin el.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}-headless
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "sa-platform.selector" $ctx | nindent 4 }}
+  ports:
+    - port: {{ .Values.puerto }}
+      targetPort: postgres
+      protocol: TCP

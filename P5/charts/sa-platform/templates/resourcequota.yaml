@@ -1,0 +1,21 @@
+{{- if .Values.cuotas.habilitadas }}
+# Techo total del namespace: ni un bug de escalado ni un pod suelto pueden consumir el nodo entero.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Release.Name }}-cuota
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  hard:
+    # requests es lo que el planificador reserva; limits es el techo que nadie puede pasar.
+    requests.cpu: {{ .Values.cuotas.requests.cpu | quote }}
+    requests.memory: {{ .Values.cuotas.requests.memoria | quote }}
+    limits.cpu: {{ .Values.cuotas.limits.cpu | quote }}
+    limits.memory: {{ .Values.cuotas.limits.memoria | quote }}
+    # Tope de objetos, para que el HPA no pueda crear pods sin fin si algo sale mal.
+    pods: {{ .Values.cuotas.pods | quote }}
+    persistentvolumeclaims: {{ .Values.cuotas.pvcs | quote }}
+{{- end }}

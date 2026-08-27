@@ -1,0 +1,10 @@
+# Dependencias de Helm descargadas. No se versionan: Chart.lock ya fija la
+# version exacta y "helm dependency update" las vuelve a bajar igual.
+charts/sa-platform/charts/*.tgz
+
+# Credenciales reales. El formato esta documentado en values.example.yaml.
+values.secretos.yaml
+*.secretos.yaml
+
+# Salidas de pruebas de carga
+carga/resultados/

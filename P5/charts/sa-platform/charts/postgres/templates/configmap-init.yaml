@@ -1,0 +1,16 @@
+{{- $ctx := dict "raiz" . "componente" "postgres" -}}
+# Se monta en /docker-entrypoint-initdb.d y solo corre la primera vez, sobre un directorio de datos vacio.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}-init
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+data:
+  # La clave es el nombre del archivo que aparece dentro del contenedor.
+  init-db.sql: |
+    -- Una base por microservicio: cada uno es dueno de sus datos.
+    {{- range .Values.basesDatos }}
+    CREATE DATABASE {{ . }};
+    {{- end }}

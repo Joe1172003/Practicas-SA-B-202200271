@@ -1,0 +1,267 @@
+# Valores por defecto. values-dev.yaml y values-prod.yaml solo sobreescriben lo que cambia entre ambientes.
+
+# Lo que va en global lo ven tambien los subcharts, con el mismo nombre y sin quitarle el prefijo.
+global:
+  namespace: sa-p5
+
+  # Lo exigen los charts de Bitnami cuando se cambia su imagen por defecto (ver el bloque rabbitmq).
+  security:
+    allowInsecureImages: true
+
+  # Tiene que ser development, production o test: el env.validation.ts lo valida con Joi.
+  entorno: development
+
+  # Config no sensible. Va a un ConfigMap y de ahi, con envFrom, a los cinco contenedores.
+  # Los valores van entre comillas porque un ConfigMap solo admite texto, nunca numeros sueltos.
+  configuracion:
+    CORS_ORIGIN: http://localhost:5173
+    COLA_NOTIFICACIONES: notificaciones
+    JWT_EXPIRES_IN_SECONDS: "900"
+    JWT_RENEWAL_GRACE_SECONDS: "300"
+    COOKIE_NAME: access_token
+    COOKIE_SECURE: "false"
+    BCRYPT_SALT_ROUNDS: "12"
+
+  # Credenciales. Lo sensible va vacio a proposito y se pasa aparte con
+  # -f values.secretos.yaml, que esta en .gitignore. Ver values.example.yaml.
+  # El host no se escribe: _helpers.tpl arma la URL con el nombre del release.
+  postgres:
+    usuario: postgres
+    password: ""
+    puerto: 5432
+
+  rabbitmq:
+    usuario: sa_p5
+    password: ""
+    puerto: 5672
+
+  llaves:
+    jwtSecret: ""
+    aesKey: ""
+    blindIndexKey: ""
+
+# Va en el chart padre y no en un subchart: la entrada es una decision de toda la plataforma.
+ingress:
+  clase: nginx
+  host: sa-p5.local
+
+# En false no se crea ninguna NetworkPolicy y el cluster vuelve a permitir todo: sirve para depurar.
+redAislada:
+  habilitada: true
+
+# Techo total del namespace. Calculado para que los 7 componentes quepan aunque el HPA los lleve al maximo.
+cuotas:
+  habilitadas: true
+  requests:
+    cpu: "2"
+    memoria: 3Gi
+  limits:
+    cpu: "6"
+    memoria: 6Gi
+  pods: "25"
+  pvcs: "5"
+
+# Valores por defecto y topes por contenedor, que exige tener ResourceQuota activo.
+limites:
+  porDefecto:
+    requests:
+      cpu: 25m
+      memoria: 64Mi
+    limits:
+      cpu: 200m
+      memoria: 256Mi
+  maximo:
+    cpu: "1"
+    memoria: 1Gi
+  minimo:
+    cpu: 10m
+    memoria: 16Mi
+
+# Un bloque por subchart. Helm le entrega a cada uno SU bloque como raiz de
+# .Values, quitandole el prefijo: gateway.puerto aqui es .Values.puerto alla.
+
+gateway:
+  replicas: 1
+  imagen:
+    repositorio: p4-gateway
+    etiqueta: latest
+    # Never obliga a usar la imagen ya cargada en minikube: en Docker Hub no existe.
+    politicaDescarga: Never
+  puerto: 3000
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 96Mi
+    limits:
+      cpu: 300m
+      memoria: 256Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 3
+    umbralCpu: 30
+  pdb:
+    habilitado: true
+    minimoDisponible: 1
+
+
+auth:
+  replicas: 1
+  imagen:
+    repositorio: p4-auth
+    etiqueta: latest
+    politicaDescarga: Never
+  puerto: 3001
+  baseDatos: db_auth
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 3
+    umbralCpu: 30
+  pdb:
+    habilitado: true
+    minimoDisponible: 1
+
+
+productos:
+  replicas: 1
+  imagen:
+    repositorio: p4-productos
+    etiqueta: latest
+    politicaDescarga: Never
+  puerto: 3002
+  baseDatos: db_productos
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 3
+    umbralCpu: 30
+  pdb:
+    habilitado: true
+    minimoDisponible: 1
+
+
+ordenes:
+  replicas: 1
+  imagen:
+    repositorio: p4-ordenes
+    etiqueta: latest
+    politicaDescarga: Never
+  puerto: 3003
+  baseDatos: db_ordenes
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 3
+    umbralCpu: 30
+  pdb:
+    habilitado: true
+    minimoDisponible: 1
+
+
+# Chart mantenido por Bitnami: las claves de este bloque van en ingles porque las definio ese chart.
+rabbitmq:
+  # Este chart usa .Release.Namespace, que es "default". Sin esto el broker se instala fuera de sa-p5.
+  namespaceOverride: sa-p5
+
+  # Bitnami movio sus imagenes a bitnamilegacy y el chart todavia apunta a la ruta vieja, que ya no existe.
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/rabbitmq
+    tag: 4.1.3-debian-12-r1
+    pullPolicy: IfNotPresent
+
+  # Tiene que coincidir con global.rabbitmq de arriba: uno configura el broker y el otro arma la URL.
+  auth:
+    username: sa_p5
+    password: ""
+    # Fija: si Helm la genera al azar, cada upgrade daria una distinta y el broker no reconoceria su disco.
+    erlangCookie: ""
+
+  # ClusterIP y nunca NodePort: el enunciado prohibe exponer el broker afuera.
+  service:
+    type: ClusterIP
+
+  # Su policy abre los puertos sin limitar el origen, y los permisos se suman: anulaba a la nuestra.
+  networkPolicy:
+    enabled: false
+
+  # Una cola durable sigue perdiendo mensajes si el broker reinicia sin disco.
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 640Mi
+
+# Este bloque es COMO se despliega la base; global.postgres de arriba es CON QUE se conecta.
+postgres:
+  imagen:
+    repositorio: postgres
+    etiqueta: 15-alpine
+    politicaDescarga: IfNotPresent
+  puerto: 5432
+  baseInicial: postgres
+  basesDatos:
+    - db_auth
+    - db_productos
+    - db_ordenes
+    - db_notificaciones
+    - db_bitacora
+  almacenamiento:
+    tamano: 1Gi
+    claseAlmacenamiento: ""
+  recursos:
+    requests:
+      cpu: 100m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+notificaciones:
+  replicas: 1
+  imagen:
+    repositorio: p4-notificaciones
+    etiqueta: latest
+    politicaDescarga: Never
+  baseDatos: db_notificaciones
+  # Los dos unicos puntos escribibles cuando el sistema de archivos pase a solo lectura.
+  archivoLog: /app/logs/notificaciones.log
+  archivoLatido: /tmp/latido
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 96Mi
+    limits:
+      cpu: 200m
+      memoria: 256Mi
+  pdb:
+    habilitado: true
+    minimoDisponible: 1

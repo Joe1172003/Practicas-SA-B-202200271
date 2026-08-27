@@ -1,0 +1,31 @@
+# Perfil de desarrollo: helm install sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml
+# Solo lleva lo que cambia respecto a values.yaml: Helm mezcla los dos y gana lo de aqui.
+
+global:
+  entorno: development
+
+# Un solo nodo y poca RAM: una replica alcanza. Never porque las imagenes se cargan con minikube image load.
+gateway:
+  replicas: 1
+  imagen:
+    politicaDescarga: Never
+
+auth:
+  replicas: 1
+  imagen:
+    politicaDescarga: Never
+
+productos:
+  replicas: 1
+  imagen:
+    politicaDescarga: Never
+
+ordenes:
+  replicas: 1
+  imagen:
+    politicaDescarga: Never
+
+notificaciones:
+  replicas: 1
+  imagen:
+    politicaDescarga: Never

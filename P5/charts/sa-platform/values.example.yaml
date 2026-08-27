@@ -1,0 +1,27 @@
+# Plantilla de credenciales: este archivo si se sube al repositorio, values.secretos.yaml no.
+# Copiarlo, renombrarlo a values.secretos.yaml y reemplazar los CAMBIAME.
+# Se pasa de ultimo para que gane sobre los demas:
+#   helm install sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml -f ./P5/charts/sa-platform/values.secretos.yaml
+# El chart usa required: si falta alguno, la instalacion se detiene con un mensaje claro.
+
+global:
+  postgres:
+    password: CAMBIAME
+
+  rabbitmq:
+    password: CAMBIAME
+
+  llaves:
+    # Minimo 32 caracteres: con menos, la firma HS256 del token es debil.
+    jwtSecret: CAMBIAME-cadena-larga-de-al-menos-32-caracteres
+
+    # Exactamente 32 bytes en base64. Se generan con: openssl rand -base64 32
+    aesKey: CAMBIAME=
+    blindIndexKey: CAMBIAME=
+
+# El chart de Bitnami tiene sus propias claves: la password tiene que coincidir con global.rabbitmq.
+rabbitmq:
+  auth:
+    password: CAMBIAME
+    # Fija y no generada al azar: si cambia entre upgrades, el broker no reconoce su propio disco.
+    erlangCookie: CAMBIAME-cookie-erlang

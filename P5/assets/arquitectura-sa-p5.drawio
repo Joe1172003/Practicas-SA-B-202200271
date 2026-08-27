@@ -1,0 +1,371 @@
+<mxfile host="app.diagrams.net" agent="Practica 5">
+  <diagram name="Arquitectura sa-p5" id="arquitectura-sa-p5">
+    <mxGraphModel dx="710" dy="387" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1760" pageHeight="1480" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="titulo" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="Practica 5 - Arquitectura y flujo de comunicacion en el namespace sa-p5" vertex="1">
+          <mxGeometry height="34" width="900" x="40" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitulo" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#666666;" value="Carne 202200271 - Regla que ordena todo el diagrama: Pod -&gt; Service del otro -&gt; Pod del otro. Nunca Pod a Pod directo, y nunca Service a Service." vertex="1">
+          <mxGeometry height="20" width="1100" x="40" y="48" as="geometry" />
+        </mxCell>
+        <mxCell id="externo" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" value="Fuera del cluster&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;navegador / Postman&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="210" x="120" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="ns" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#666666;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;fontStyle=1;fontColor=#666666;" value="Namespace: sa-p5" vertex="1">
+          <mxGeometry height="790" width="1660" x="40" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="grupoApps" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#fafafa;strokeColor=#b3b3b3;verticalAlign=bottom;fontSize=11;fontColor=#808080;" value="Los 5 microservicios de la aplicacion" vertex="1">
+          <mxGeometry height="112" width="1035" x="120" y="352" as="geometry" />
+        </mxCell>
+        <mxCell id="svcGateway" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-gateway" vertex="1">
+          <mxGeometry height="44" width="150" x="140" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="svcAuth" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-auth" vertex="1">
+          <mxGeometry height="44" width="150" x="350" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="svcProductos" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-productos" vertex="1">
+          <mxGeometry height="44" width="150" x="560" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="svcOrdenes" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-ordenes" vertex="1">
+          <mxGeometry height="44" width="150" x="770" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="notaSinService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#999999;fontSize=10;fontColor=#808080;" value="notificaciones NO lleva Service&lt;br&gt;nadie le hace peticiones" vertex="1">
+          <mxGeometry height="44" width="165" x="975" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="Deployment&lt;br&gt;gateway" vertex="1">
+          <mxGeometry height="70" width="160" x="135" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="podGateway" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="Pod" vertex="1">
+          <mxGeometry height="26" width="50" x="190" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="Deployment&lt;br&gt;auth" vertex="1">
+          <mxGeometry height="70" width="160" x="345" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="podAuth" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="Pod" vertex="1">
+          <mxGeometry height="26" width="50" x="400" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="productos" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="Deployment&lt;br&gt;productos" vertex="1">
+          <mxGeometry height="70" width="160" x="555" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="podProductos" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="Pod" vertex="1">
+          <mxGeometry height="26" width="50" x="610" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="ordenes" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="Deployment&lt;br&gt;ordenes" vertex="1">
+          <mxGeometry height="70" width="160" x="765" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="podOrdenes" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="Pod" vertex="1">
+          <mxGeometry height="26" width="50" x="820" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="notificaciones" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="Deployment&lt;br&gt;notificaciones" vertex="1">
+          <mxGeometry height="70" width="160" x="975" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="podNotificaciones" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="Pod" vertex="1">
+          <mxGeometry height="26" width="50" x="1030" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="configMap" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="ConfigMap&lt;br&gt;sa-p5-config&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;NODE_ENV, CORS_ORIGIN,&lt;br&gt;COLA_NOTIFICACIONES...&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="210" x="1240" y="368" as="geometry" />
+        </mxCell>
+        <mxCell id="notaSinSecret" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#999999;fontSize=10;fontColor=#808080;" value="gateway NO lleva Secret&lt;br&gt;no toca la base ni firma tokens" vertex="1">
+          <mxGeometry height="46" width="170" x="135" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="secretAuth" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;auth-secreto" vertex="1">
+          <mxGeometry height="46" width="125" x="345" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="secretProductos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;productos-secreto" vertex="1">
+          <mxGeometry height="46" width="125" x="555" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="secretOrdenes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;ordenes-secreto" vertex="1">
+          <mxGeometry height="46" width="125" x="765" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="secretNotificaciones" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;notificaciones-secreto" vertex="1">
+          <mxGeometry height="46" width="125" x="975" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="svcPostgres" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-postgres" vertex="1">
+          <mxGeometry height="44" width="150" x="420" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="svcRabbitmq" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="Service&lt;br&gt;sa-p5-rabbitmq" vertex="1">
+          <mxGeometry height="44" width="150" x="880" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="StatefulSet&lt;br&gt;postgres" vertex="1">
+          <mxGeometry height="76" width="190" x="400" y="712" as="geometry" />
+        </mxCell>
+        <mxCell id="podPostgres" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="postgres-0" vertex="1">
+          <mxGeometry height="28" width="90" x="450" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="rabbitmq" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;spacingTop=4;fontSize=12;fontStyle=1;" value="StatefulSet&lt;br&gt;rabbitmq" vertex="1">
+          <mxGeometry height="76" width="190" x="860" y="712" as="geometry" />
+        </mxCell>
+        <mxCell id="podRabbitmq" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;" value="rabbitmq-0" vertex="1">
+          <mxGeometry height="28" width="90" x="910" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="secretPostgres" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;postgres-secreto" vertex="1">
+          <mxGeometry height="46" width="145" x="170" y="727" as="geometry" />
+        </mxCell>
+        <mxCell id="secretRabbitmq" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" value="Secret&lt;br&gt;sa-p5-rabbitmq&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;lo crea el chart de Bitnami&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="170" x="1180" y="722" as="geometry" />
+        </mxCell>
+        <mxCell id="cmInit" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" value="ConfigMap&lt;br&gt;postgres-init&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;crea las 5 bases&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="145" x="170" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="pvcPostgres" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#b1ddf0;strokeColor=#10739e;fontSize=10;verticalAlign=middle;" value="PVC&lt;br&gt;datos-sa-p5-postgres-0&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;1Gi&lt;/font&gt;" vertex="1">
+          <mxGeometry height="76" width="170" x="410" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="pvcRabbitmq" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#b1ddf0;strokeColor=#10739e;fontSize=10;verticalAlign=middle;" value="PVC&lt;br&gt;data-sa-p5-rabbitmq-0&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;1Gi&lt;/font&gt;" vertex="1">
+          <mxGeometry height="76" width="170" x="870" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="eExterno" edge="1" parent="1" source="externo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontColor=#b85450;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcGateway" value="aun sin Ingress (Fase 6 pendiente)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcGw" edge="1" parent="1" source="svcGateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gateway" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcAuth" edge="1" parent="1" source="svcAuth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="auth" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcProd" edge="1" parent="1" source="svcProductos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="productos" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcOrd" edge="1" parent="1" source="svcOrdenes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ordenes" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcPg" edge="1" parent="1" source="svcPostgres" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="postgres" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSvcRmq" edge="1" parent="1" source="svcRabbitmq" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="rabbitmq" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eGwAuth" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=2;fontSize=10;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcAuth" value="HTTP">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="312" y="381" />
+              <mxPoint x="312" y="252" />
+              <mxPoint x="425" y="252" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eGwProd" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=2;fontSize=10;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcProductos" value="GraphQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="325" y="398" />
+              <mxPoint x="325" y="238" />
+              <mxPoint x="635" y="238" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eGwOrd" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=2;fontSize=10;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcOrdenes" value="GraphQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="338" y="415" />
+              <mxPoint x="338" y="224" />
+              <mxPoint x="845" y="224" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eOrdProd" edge="1" parent="1" source="ordenes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#000000;strokeWidth=2;fontSize=10;exitX=0.15;exitY=0;exitDx=0;exitDy=0;entryX=0.604;entryY=0.045;entryDx=0;entryDy=0;entryPerimeter=0;" target="svcProductos" value="HTTP sincrono (saga de stock)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="788.97" y="208.03" />
+              <mxPoint x="650" y="208.03" />
+              <mxPoint x="650" y="282.03" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eAuthPg" edge="1" parent="1" source="auth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=10;fontColor=#10739e;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" target="svcPostgres" value="SQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="489" y="580" />
+              <mxPoint x="458" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eProdPg" edge="1" parent="1" source="productos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=10;fontColor=#10739e;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcPostgres" value="SQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="699" y="592" />
+              <mxPoint x="495" y="592" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eOrdPg" edge="1" parent="1" source="ordenes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=10;fontColor=#10739e;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" target="svcPostgres" value="SQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="909" y="604" />
+              <mxPoint x="532" y="604" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eNotPg" edge="1" parent="1" source="notificaciones" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=10;fontColor=#10739e;exitX=0.35;exitY=1;exitDx=0;exitDy=0;entryX=0.9;entryY=0;entryDx=0;entryDy=0;" target="svcPostgres" value="SQL">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1031" y="592" />
+              <mxPoint x="555" y="592" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eAuthRmq" edge="1" parent="1" source="auth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d79b00;strokeWidth=2;fontSize=10;fontColor=#d79b00;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" target="svcRabbitmq" value="publica mensaje">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="528" y="430" />
+              <mxPoint x="528" y="568" />
+              <mxPoint x="918" y="568" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eOrdRmq" edge="1" parent="1" source="ordenes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d79b00;strokeWidth=2;fontSize=10;fontColor=#d79b00;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="svcRabbitmq" value="publica mensaje">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="948" y="430" />
+              <mxPoint x="948" y="556" />
+              <mxPoint x="955" y="556" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eNotRmq" edge="1" parent="1" source="notificaciones" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d79b00;strokeWidth=2;fontSize=10;fontColor=#d79b00;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=0;entryDx=0;entryDy=0;" target="svcRabbitmq" value="consume mensaje">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1119" y="544" />
+              <mxPoint x="1008" y="544" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eCmApps" edge="1" parent="1" source="configMap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=10;fontColor=#808080;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="grupoApps" value="envFrom&lt;br&gt;(a los 5)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecAuth" edge="1" parent="1" source="secretAuth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=9;fontColor=#808080;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="auth" value="envFrom">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecProd" edge="1" parent="1" source="secretProductos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=9;fontColor=#808080;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="productos" value="envFrom">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecOrd" edge="1" parent="1" source="secretOrdenes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=9;fontColor=#808080;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="ordenes" value="envFrom">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecNot" edge="1" parent="1" source="secretNotificaciones" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=9;fontColor=#808080;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="notificaciones" value="envFrom">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecPg" edge="1" parent="1" source="secretPostgres" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="postgres" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eSecRmq" edge="1" parent="1" source="secretRabbitmq" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="rabbitmq" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCmInit" edge="1" parent="1" source="cmInit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=9;fontColor=#808080;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="postgres" value="monta">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ePvcPg" edge="1" parent="1" source="postgres" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=9;fontColor=#10739e;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pvcPostgres" value="volumeClaimTemplates">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ePvcRmq" edge="1" parent="1" source="rabbitmq" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#10739e;strokeWidth=2;fontSize=9;fontColor=#10739e;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pvcRabbitmq" value="volumeClaimTemplates">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legendaBox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" value="" vertex="1">
+          <mxGeometry height="270" width="620" x="40" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="legendaTitulo" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;" value="LEYENDA" vertex="1">
+          <mxGeometry height="22" width="200" x="58" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="lgDep" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
+          <mxGeometry height="20" width="40" x="58" y="1042" as="geometry" />
+        </mxCell>
+        <mxCell id="lgDepT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Deployment (con su Pod adentro)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1042" as="geometry" />
+        </mxCell>
+        <mxCell id="lgSts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="" vertex="1">
+          <mxGeometry height="20" width="40" x="58" y="1074" as="geometry" />
+        </mxCell>
+        <mxCell id="lgStsT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="StatefulSet (Pod con nombre fijo)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1074" as="geometry" />
+        </mxCell>
+        <mxCell id="lgSvc" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="20" width="40" x="58" y="1106" as="geometry" />
+        </mxCell>
+        <mxCell id="lgSvcT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Service (direccion estable)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1106" as="geometry" />
+        </mxCell>
+        <mxCell id="lgCm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="20" width="40" x="58" y="1138" as="geometry" />
+        </mxCell>
+        <mxCell id="lgCmT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="ConfigMap (config no sensible)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1138" as="geometry" />
+        </mxCell>
+        <mxCell id="lgSec" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="" vertex="1">
+          <mxGeometry height="20" width="40" x="58" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="lgSecT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Secret (credenciales)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="lgPvc" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=6;fillColor=#b1ddf0;strokeColor=#10739e;" value="" vertex="1">
+          <mxGeometry height="24" width="40" x="58" y="1202" as="geometry" />
+        </mxCell>
+        <mxCell id="lgPvcT" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="PersistentVolumeClaim (disco)" vertex="1">
+          <mxGeometry height="20" width="240" x="106" y="1202" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA1" edge="1" parent="1" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1052" as="sourcePoint" />
+            <mxPoint x="418" y="1052" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA1T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Llamada sincrona (HTTP / GraphQL)" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1042" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA2" edge="1" parent="1" style="endArrow=classic;html=1;strokeColor=#10739e;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1084" as="sourcePoint" />
+            <mxPoint x="418" y="1084" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA2T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Consulta SQL / uso de disco" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1074" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA3" edge="1" parent="1" style="endArrow=classic;html=1;strokeColor=#d79b00;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1116" as="sourcePoint" />
+            <mxPoint x="418" y="1116" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA3T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Mensajeria asincrona (RabbitMQ)" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1106" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA4" edge="1" parent="1" style="endArrow=classic;html=1;strokeColor=#82b366;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1148" as="sourcePoint" />
+            <mxPoint x="418" y="1148" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA4T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="El Service enruta hacia su Pod" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1138" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA5" edge="1" parent="1" style="endArrow=classic;html=1;dashed=1;strokeColor=#999999;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1180" as="sourcePoint" />
+            <mxPoint x="418" y="1180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA5T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Inyeccion de configuracion (envFrom)" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="lgA6" edge="1" parent="1" style="endArrow=classic;html=1;dashed=1;strokeColor=#b85450;strokeWidth=2;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="368" y="1212" as="sourcePoint" />
+            <mxPoint x="418" y="1212" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lgA6T" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" value="Entrada desde fuera del cluster" vertex="1">
+          <mxGeometry height="20" width="230" x="426" y="1202" as="geometry" />
+        </mxCell>
+        <mxCell id="expBox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" value="" vertex="1">
+          <mxGeometry height="440" width="1010" x="690" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="expTitulo" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;" value="PARA QUE SIRVE CADA OBJETO" vertex="1">
+          <mxGeometry height="22" width="400" x="710" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="expTexto" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;spacingLeft=4;" value="&lt;b&gt;DEPLOYMENT&lt;/b&gt; - Mantiene vivas N copias identicas de un Pod. Si una muere, la reemplaza por otra nueva, con nombre&lt;br&gt;distinto y disco nuevo. Se usa para lo que NO guarda datos: si un Pod da igual cual sea, va en un Deployment.&lt;br&gt;&lt;br&gt;&lt;b&gt;SERVICE&lt;/b&gt; - Nombre y direccion IP fijos dentro del cluster que apuntan a los Pods de un componente. Los Pods cambian&lt;br&gt;de IP cada vez que se recrean; el Service no. No tiene logica: solo reenvia. Ademas respeta la readiness probe, asi que&lt;br&gt;no manda trafico a un Pod que todavia esta arrancando. Nadie llama a un Pod directamente.&lt;br&gt;&lt;br&gt;&lt;b&gt;STATEFULSET&lt;/b&gt; - Igual que un Deployment, pero cada replica tiene nombre fijo y numerado (postgres-0) y su propio&lt;br&gt;disco. Cuando el Pod se recrea, vuelve con el MISMO nombre y se le reengancha el MISMO disco, con los datos intactos.&lt;br&gt;Para bases de datos y brokers.&lt;br&gt;&lt;br&gt;&lt;b&gt;CONFIGMAP&lt;/b&gt; - Guarda configuracion NO sensible en pares clave-valor. Se inyecta como variables de entorno con&lt;br&gt;envFrom. Cambiar un valor aqui no obliga a reconstruir la imagen del contenedor.&lt;br&gt;&lt;br&gt;&lt;b&gt;SECRET&lt;/b&gt; - Lo mismo que un ConfigMap, pero para credenciales. Aqui hay uno por componente, cada uno solo con lo&lt;br&gt;que ese componente necesita: si todos compartieran uno, productos tendria la llave AES de auth sin ninguna razon.&lt;br&gt;&lt;br&gt;&lt;b&gt;PERSISTENTVOLUMECLAIM (PVC)&lt;/b&gt; - La peticion de disco. El StatefulSet crea uno por replica con volumeClaimTemplates.&lt;br&gt;NO se borra cuando el Pod muere, ni con helm uninstall. Por eso los datos sobreviven al borrado del Pod." vertex="1">
+          <mxGeometry height="390" width="975" x="710" y="1040" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

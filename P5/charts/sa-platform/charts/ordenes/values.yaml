@@ -1,0 +1,28 @@
+# Valores por defecto del subchart. El padre los sobreescribe desde su bloque "ordenes".
+replicas: 1
+imagen:
+  repositorio: p4-ordenes
+  etiqueta: latest
+  politicaDescarga: Never
+puerto: 3003
+baseDatos: db_ordenes
+recursos:
+  requests:
+    cpu: 50m
+    memoria: 128Mi
+  limits:
+    cpu: 300m
+    memoria: 320Mi
+
+# minimo 1 y no 2 porque en un nodo con 4GB dos replicas fijas de cada componente no caben.
+# umbral 30 y no 70 para que el escalado se dispare y sea demostrable con una carga moderada.
+hpa:
+  habilitado: true
+  minimo: 1
+  maximo: 3
+  umbralCpu: 30
+
+# Con una sola replica bloquea el drenado del nodo, pero en minikube no se drena nunca.
+pdb:
+  habilitado: true
+  minimoDisponible: 1

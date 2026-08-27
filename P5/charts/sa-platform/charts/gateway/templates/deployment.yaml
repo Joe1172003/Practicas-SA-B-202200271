@@ -1,0 +1,53 @@
+{{- $ctx := dict "raiz" . "componente" "gateway" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.habilitado }}
+  # Con HPA activo no se fija replicas aqui: cada helm upgrade lo devolveria al valor del chart.
+  replicas: {{ .Values.replicas | default 1 }}
+  {{- end }}
+  strategy:
+    {{- include "sa-platform.rollingUpdate" . | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "sa-platform.selector" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa-platform.selector" $ctx | nindent 8 }}
+      annotations:
+        # Si cambia la config compartida cambia este hash, y el Deployment reemplaza los Pods solo.
+        checksum/config: {{ include "sa-platform.checksumConfig" $ctx }}
+    spec:
+      containers:
+        - name: gateway
+          image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga | default "IfNotPresent" }}
+          ports:
+            - containerPort: {{ .Values.puerto }}
+          envFrom:
+            # Solo el ConfigMap: el gateway no toca la base ni firma tokens, asi que no necesita Secret.
+            - configMapRef:
+                name: {{ include "sa-platform.configMap" $ctx }}
+          env:
+            # Un env explicito le gana al envFrom, asi que aqui va lo propio de este componente.
+            - name: PORT
+              value: {{ .Values.puerto | quote }}
+            # range para no repetir tres veces la misma linea con distinto nombre y puerto.
+            {{- range $nombre, $puerto := dict "AUTH" 3001 "PRODUCTOS" 3002 "ORDENES" 3003 }}
+            - name: URL_{{ $nombre }}
+              value: "http://{{ $.Release.Name }}-{{ lower $nombre }}:{{ $puerto }}"
+            {{- end }}
+          {{- include "sa-platform.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}

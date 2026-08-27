@@ -1,0 +1,24 @@
+{{- $ctx := dict "raiz" . -}}
+# Config compartida y no sensible. Los cinco Deployments la inyectan entera con envFrom.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sa-platform.configMap" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/part-of: sa-platform
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  NODE_ENV: {{ .Values.global.entorno | quote }}
+
+  # Se deduce del entorno y no se configura a mano: en produccion TypeORM no debe alterar tablas solo.
+  {{- if eq .Values.global.entorno "production" }}
+  DB_SYNCHRONIZE: "false"
+  {{- else }}
+  DB_SYNCHRONIZE: "true"
+  {{- end }}
+
+  # range sobre el mapa de values: agregar una variable nueva no obliga a tocar esta plantilla.
+  {{- range $clave, $valor := .Values.global.configuracion }}
+  {{ $clave }}: {{ $valor | quote }}
+  {{- end }}

@@ -1,0 +1,108 @@
+{{- $ctx := dict "raiz" . "componente" "postgres" -}}
+# StatefulSet y no Deployment: cada replica conserva su nombre y su volumen aunque el Pod se recree.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  # Service headless que le da identidad de red a cada replica. Obligatorio.
+  serviceName: {{ include "sa-platform.nombre" $ctx }}-headless
+
+  # Una sola: escalar Postgres asi crearia bases separadas, no un cluster.
+  replicas: 1
+
+  selector:
+    matchLabels:
+      {{- include "sa-platform.selector" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa-platform.selector" $ctx | nindent 8 }}
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga | default "IfNotPresent" }}
+          ports:
+            # Nombrado para que los Services lo referencien sin numero fijo.
+            - name: postgres
+              containerPort: {{ .Values.puerto }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                # Trae una sola clave del Secret, no todas como envFrom.
+                secretKeyRef:
+                  name: {{ include "sa-platform.nombre" $ctx }}-secreto
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "sa-platform.nombre" $ctx }}-secreto
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: {{ .Values.baseInicial | quote }}
+            # Subcarpeta, no la raiz: evita el lost+found que deja el volumen.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: datos
+              mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          # pg_isready confirma que el servidor acepta conexiones.
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.global.postgres.usuario | quote }}
+                - -d
+                - {{ .Values.baseInicial | quote }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.global.postgres.usuario | quote }}
+                - -d
+                - {{ .Values.baseInicial | quote }}
+            # Mas holgada que la readiness: no matar por una ocupacion breve.
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}
+      volumes:
+        # Configuracion, no datos: se regenera con cada helm upgrade.
+        - name: init
+          configMap:
+            name: {{ include "sa-platform.nombre" $ctx }}-init
+
+  # Molde que crea un PersistentVolumeClaim por replica. No se borra al morir el Pod: por eso los datos sobreviven.
+  volumeClaimTemplates:
+    - metadata:
+        name: datos
+      spec:
+        # Un solo nodo escribe: dos escribiendo el mismo archivo lo corrompen.
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.almacenamiento.claseAlmacenamiento }}
+        storageClassName: {{ .Values.almacenamiento.claseAlmacenamiento | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.almacenamiento.tamano | quote }}
