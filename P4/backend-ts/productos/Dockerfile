@@ -27,16 +27,7 @@ COPY --from=compilacion /app/dist ./dist
 
 EXPOSE 3002
 
-# CAMBIO DE LA P5: correr como usuario sin privilegios.
-#
-# Por defecto un contenedor corre como root. Si alguien logra escaparse del
-# contenedor, lo hace siendo administrador de la maquina. Kubernetes lo va a
-# exigir con "runAsNonRoot: true", y sin este USER el pod ni siquiera
-# arrancaria.
-#
-# La imagen de node ya trae un usuario "node" con uid 1000. Kubernetes
-# compara numeros y no nombres, asi que basta con que sea distinto de 0.
-RUN chown -R node:node /app
-USER node
+RUN chown -R 1000:1000 /app
+USER 1000
 
 CMD ["node", "dist/main"]

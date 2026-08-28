@@ -1,18 +1,3 @@
-"""
-Microservicio de NOTIFICACIONES.
-
-CAMBIO GRANDE DE LA P5: antes era un servidor web que esperaba que le
-llamaran. Ahora es un consumidor: se conecta a RabbitMQ y saca mensajes de
-una cola cuando puede.
-
-La diferencia practica es la que pide el enunciado: si este proceso esta
-apagado, Auth y Ordenes siguen funcionando igual y sus avisos quedan
-esperando en la cola. Al encenderlo, los procesa todos sin perder ninguno.
-
-Sigue sin mandar correos reales: imprime, escribe en el log y guarda en la
-base de datos.
-"""
-
 import json
 import os
 import sys
@@ -25,7 +10,6 @@ import pika
 import psycopg2
 from psycopg2.extras import Json
 
-# --- Configuracion, toda por variables de entorno ---
 RABBITMQ_URL = os.environ["RABBITMQ_URL"]
 COLA = os.environ.get("COLA_NOTIFICACIONES", "notificaciones")
 DATABASE_URL = os.environ["DATABASE_URL"]
@@ -39,11 +23,17 @@ ARCHIVO_LATIDO = Path(os.environ.get("ARCHIVO_LATIDO", "/tmp/latido"))
 # ser bastante menor que LATIDO_TOLERANCIA de latido.py, que son 300s.
 SEGUNDOS_ENTRE_LATIDOS = int(os.environ.get("LATIDO_INTERVALO", "30"))
 
-TIPOS_VALIDOS = ("usuario_registrado", "orden_pagada", "orden_cancelada")
+# resumen_bitacora lo publica el cronjob de la P5, no un microservicio.
+TIPOS_VALIDOS = (
+    "usuario_registrado",
+    "orden_pagada",
+    "orden_cancelada",
+    "resumen_bitacora",
+)
 
 
 def crear_tabla(conexion) -> None:
-    """La tabla se crea sola al arrancar, como hace TypeORM en los otros."""
+    
     with conexion.cursor() as cursor:
         cursor.execute(
             """
@@ -61,8 +51,7 @@ def crear_tabla(conexion) -> None:
 
 
 def armar_mensaje(tipo: str, datos: dict[str, Any]) -> str:
-    """Convierte la notificacion en el texto que veria el usuario."""
-
+    
     if tipo == "usuario_registrado":
         nombre = datos.get("nombre", "usuario")
         return f"¡Bienvenido a la tienda, {nombre}! Tu cuenta quedo creada exitosamente."
@@ -73,6 +62,15 @@ def armar_mensaje(tipo: str, datos: dict[str, Any]) -> str:
         return (
             f"Tu pago se confirmo. Orden {orden} por Q{total}. "
             f"Ya estamos preparando tu pedido."
+        )
+
+    if tipo == "resumen_bitacora":
+        carne = datos.get("carne", "?")
+        total = datos.get("totalEjecuciones", 0)
+        horas = len(datos.get("porHora", []))
+        return (
+            f"Resumen de bitacora del carne {carne}: {total} ejecuciones "
+            f"repartidas en {horas} hora(s)."
         )
 
     orden = datos.get("ordenId", "?")
@@ -90,7 +88,6 @@ def escribir_en_log(linea: str) -> None:
 
 
 def tocar_latido() -> None:
-    """Actualiza la fecha del archivo de latido. Lo lee el healthcheck."""
     try:
         ARCHIVO_LATIDO.parent.mkdir(parents=True, exist_ok=True)
         ARCHIVO_LATIDO.touch()
@@ -101,7 +98,7 @@ def tocar_latido() -> None:
 
 def procesar(conexion, cuerpo: bytes) -> None:
     """
-    Trabaja un mensaje. Si algo aqui truena, el mensaje NO se confirma y
+    Trabaja un mensaje. Si algo aqui truena, el mensaje no se confirma y
     RabbitMQ lo devuelve a la cola para volver a intentarlo.
     """
     notificacion = json.loads(cuerpo)
@@ -172,7 +169,7 @@ def escuchar(conexion_bd) -> None:
             canal_actual.basic_nack(delivery_tag=metodo.delivery_tag, requeue=True)
             return
 
-        # ACK MANUAL: recien aqui, con el mensaje ya guardado, se le dice a
+        # recien aqui, con el mensaje ya guardado, se le dice a
         # RabbitMQ que puede borrarlo. Si el proceso se cayera antes de esta
         # linea, el mensaje seguiria en la cola.
         canal_actual.basic_ack(delivery_tag=metodo.delivery_tag)
