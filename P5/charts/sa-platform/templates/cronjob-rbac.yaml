@@ -1,0 +1,56 @@
+{{- range $componente, $baseDatos := dict "bitacora" "db_bitacora" "resumen" "db_bitacora" }}
+{{- $ctx := dict "raiz" $ "componente" $componente "baseDatos" $baseDatos -}}
+# Cuenta propia por cronjob, con su Secret. Ninguno usa la cuenta "default".
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: [{{ printf "%s-secreto" (include "sa-platform.nombre" $ctx) | quote }}]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "sa-platform.nombre" $ctx }}
+    namespace: {{ $.Values.global.namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "sa-platform.nombre" $ctx }}
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}-secreto
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+type: Opaque
+stringData:
+  DATABASE_URL: {{ include "sa-platform.urlPostgres" $ctx | quote }}
+  {{- if eq $componente "resumen" }}
+  # Solo el cronjob 2 publica en la cola; el 1 unicamente escribe en la base.
+  RABBITMQ_URL: {{ include "sa-platform.urlRabbit" $ctx | quote }}
+  {{- end }}
+---
+{{- end }}

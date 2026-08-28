@@ -1,0 +1,52 @@
+{{- $ctx := dict "raiz" . "componente" "bitacora" -}}
+# Cronjob 1: cada 2 minutos escribe la fecha GMT-6 y el carne en db_bitacora.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjobs.bitacora.horario | quote }}
+  # Forbid: si la ejecucion anterior sigue viva, esta se salta en vez de correr en paralelo.
+  concurrencyPolicy: Forbid
+  # Cuantas ejecuciones viejas se conservan para poder revisar sus logs.
+  successfulJobsHistoryLimit: {{ .Values.cronjobs.historialExito }}
+  failedJobsHistoryLimit: {{ .Values.cronjobs.historialFallo }}
+  # Si el cluster estuvo caido mas de este tiempo, se saltea en vez de disparar todo junto al volver.
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      # Cuantas veces se reintenta un Job que salio con codigo distinto de 0.
+      backoffLimit: {{ .Values.cronjobs.reintentos }}
+      template:
+        metadata:
+          labels:
+            {{- include "sa-platform.selector" $ctx | nindent 12 }}
+        spec:
+          # Never y no OnFailure: el reintento lo maneja backoffLimit creando un Pod nuevo.
+          restartPolicy: Never
+          serviceAccountName: {{ include "sa-platform.nombre" $ctx }}
+          securityContext:
+            {{- include "sa-platform.seguridadPod" (dict "uid" 10002) | nindent 12 }}
+          containers:
+            - name: bitacora
+              image: "{{ .Values.cronjobs.bitacora.imagen.repositorio }}:{{ .Values.cronjobs.bitacora.imagen.etiqueta }}"
+              imagePullPolicy: {{ .Values.cronjobs.bitacora.imagen.politicaDescarga | default "IfNotPresent" }}
+              securityContext:
+                {{- include "sa-platform.seguridadContenedor" . | nindent 16 }}
+              env:
+                - name: CARNE
+                  value: {{ .Values.cronjobs.carne | quote }}
+              envFrom:
+                # Su propio Secret, solo con la conexion a db_bitacora.
+                - secretRef:
+                    name: {{ include "sa-platform.nombre" $ctx }}-secreto
+              resources:
+                requests:
+                  cpu: {{ .Values.cronjobs.recursos.requests.cpu | quote }}
+                  memory: {{ .Values.cronjobs.recursos.requests.memoria | quote }}
+                limits:
+                  cpu: {{ .Values.cronjobs.recursos.limits.cpu | quote }}
+                  memory: {{ .Values.cronjobs.recursos.limits.memoria | quote }}

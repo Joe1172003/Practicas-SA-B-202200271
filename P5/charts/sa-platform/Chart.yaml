@@ -4,8 +4,8 @@ description: Plataforma de microservicios de la practica 5
 type: application
 
 # version es la del empaquetado y appVersion la de la aplicacion: se incrementan por separado.
-version: 0.3.0
-appVersion: "1.0.0"
+version: 0.4.0
+appVersion: "1.2.0"
 
 # repository vacio significa que el subchart ya vive en la carpeta charts/ y no hay que descargarlo.
 dependencies:

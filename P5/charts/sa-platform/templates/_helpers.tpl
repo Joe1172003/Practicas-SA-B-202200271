@@ -76,3 +76,26 @@ rollingUpdate:
   maxUnavailable: 0
   maxSurge: 1
 {{- end -}}
+
+{{/* Seguridad a nivel de Pod: quien es el proceso. Uso: dict "uid" 1000 */}}
+{{- define "sa-platform.seguridadPod" -}}
+{{/* runAsNonRoot rechaza el Pod si la imagen corre como root; runAsUser fija cual usuario sin privilegios. */}}
+runAsNonRoot: true
+runAsUser: {{ .uid }}
+runAsGroup: {{ .uid }}
+{{/* fsGroup hace que los volumenes montados pertenezcan a ese grupo, si no el proceso no podria escribir. */}}
+fsGroup: {{ .uid }}
+seccompProfile:
+  type: RuntimeDefault
+{{- end -}}
+
+{{/* Seguridad a nivel de contenedor: que puede hacer el proceso una vez adentro. */}}
+{{- define "sa-platform.seguridadContenedor" -}}
+{{/* Impide que el proceso gane mas permisos de los que arranco, aunque el binario tenga setuid. */}}
+allowPrivilegeEscalation: false
+{{/* Sistema de archivos de solo lectura: si alguien entra, no puede dejar nada escrito. */}}
+readOnlyRootFilesystem: true
+capabilities:
+  drop:
+    - ALL
+{{- end -}}

@@ -22,6 +22,11 @@ spec:
       labels:
         {{- include "sa-platform.selector" $ctx | nindent 8 }}
     spec:
+      # Cuenta propia y no la "default": es lo que exige el enunciado.
+      serviceAccountName: {{ include "sa-platform.nombre" $ctx }}
+      # uid 70 es el usuario postgres de la imagen ALPINE. La variante Debian usa 999.
+      securityContext:
+        {{- include "sa-platform.seguridadPod" (dict "uid" .Values.uidPostgres) | nindent 8 }}
       containers:
         - name: postgres
           image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
@@ -47,12 +52,20 @@ spec:
             # Subcarpeta, no la raiz: evita el lost+found que deja el volumen.
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
+          securityContext:
+            {{- include "sa-platform.seguridadContenedor" . | nindent 12 }}
           volumeMounts:
             - name: datos
               mountPath: /var/lib/postgresql/data
             - name: init
               mountPath: /docker-entrypoint-initdb.d
               readOnly: true
+            # Con readOnlyRootFilesystem, Postgres necesita estas dos rutas escribibles
+            # para el socket y los archivos temporales de cada consulta.
+            - name: socket
+              mountPath: /var/run/postgresql
+            - name: temporal
+              mountPath: /tmp
           # pg_isready confirma que el servidor acepta conexiones.
           readinessProbe:
             exec:
@@ -91,6 +104,10 @@ spec:
         - name: init
           configMap:
             name: {{ include "sa-platform.nombre" $ctx }}-init
+        - name: socket
+          emptyDir: {}
+        - name: temporal
+          emptyDir: {}
 
   # Molde que crea un PersistentVolumeClaim por replica. No se borra al morir el Pod: por eso los datos sobreviven.
   volumeClaimTemplates:

@@ -2,7 +2,7 @@
 replicas: 1
 imagen:
   repositorio: p4-ordenes
-  etiqueta: latest
+  etiqueta: 1.1.0
   politicaDescarga: Never
 puerto: 3003
 baseDatos: db_ordenes

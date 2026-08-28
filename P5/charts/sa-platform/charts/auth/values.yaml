@@ -2,7 +2,7 @@
 replicas: 1
 imagen:
   repositorio: p4-auth
-  etiqueta: latest
+  etiqueta: 1.1.0
   politicaDescarga: Never
 puerto: 3001
 # Nombre de su base dentro del unico Postgres: cada microservicio es dueno de la suya.

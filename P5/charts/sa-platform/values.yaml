@@ -1,4 +1,4 @@
-# Valores por defecto. values-dev.yaml y values-prod.yaml solo sobreescriben lo que cambia entre ambientes.
+﻿# Valores por defecto. values-dev.yaml y values-prod.yaml solo sobreescriben lo que cambia entre ambientes.
 
 # Lo que va en global lo ven tambien los subcharts, con el mismo nombre y sin quitarle el prefijo.
 global:
@@ -16,7 +16,7 @@ global:
   configuracion:
     CORS_ORIGIN: http://localhost:5173
     COLA_NOTIFICACIONES: notificaciones
-    JWT_EXPIRES_IN_SECONDS: "900"
+    JWT_EXPIRES_IN_SECONDS: "1800"
     JWT_RENEWAL_GRACE_SECONDS: "300"
     COOKIE_NAME: access_token
     COOKIE_SECURE: "false"
@@ -77,14 +77,50 @@ limites:
     cpu: 10m
     memoria: 16Mi
 
+# Los dos cronjobs encadenados: bitacora escribe en la base, resumen la lee y publica en la cola.
+cronjobs:
+  carne: "202200271"
+  # Cuantas ejecuciones viejas se conservan para poder revisar sus logs.
+  historialExito: 3
+  historialFallo: 3
+  # Reintentos de un Job que salio con codigo distinto de 0.
+  reintentos: 2
+
+  bitacora:
+    horario: "*/2 * * * *"
+    imagen:
+      repositorio: p5-cron-bitacora
+      etiqueta: 1.0.1
+      politicaDescarga: Never
+
+  resumen:
+    horario: "*/10 * * * *"
+    imagen:
+      repositorio: p5-cron-resumen
+      etiqueta: 1.0.0
+      politicaDescarga: Never
+
+  # Scripts cortos que abren una conexion y terminan: no necesitan mucho.
+  recursos:
+    requests:
+      cpu: 25m
+      memoria: 64Mi
+    limits:
+      cpu: 200m
+      memoria: 128Mi
+
 # Un bloque por subchart. Helm le entrega a cada uno SU bloque como raiz de
 # .Values, quitandole el prefijo: gateway.puerto aqui es .Values.puerto alla.
+#
+# Las imagenes van con version y no con "latest": minikube image load no
+# reemplaza una imagen si el tag ya existe, asi que un cambio de codigo con
+# latest se queda sin aplicar y el pod sigue corriendo lo viejo.
 
 gateway:
   replicas: 1
   imagen:
     repositorio: p4-gateway
-    etiqueta: latest
+    etiqueta: 1.1.0
     # Never obliga a usar la imagen ya cargada en minikube: en Docker Hub no existe.
     politicaDescarga: Never
   puerto: 3000
@@ -109,7 +145,7 @@ auth:
   replicas: 1
   imagen:
     repositorio: p4-auth
-    etiqueta: latest
+    etiqueta: 1.1.0
     politicaDescarga: Never
   puerto: 3001
   baseDatos: db_auth
@@ -134,7 +170,7 @@ productos:
   replicas: 1
   imagen:
     repositorio: p4-productos
-    etiqueta: latest
+    etiqueta: 1.1.0
     politicaDescarga: Never
   puerto: 3002
   baseDatos: db_productos
@@ -159,7 +195,7 @@ ordenes:
   replicas: 1
   imagen:
     repositorio: p4-ordenes
-    etiqueta: latest
+    etiqueta: 1.1.0
     politicaDescarga: Never
   puerto: 3003
   baseDatos: db_ordenes
@@ -227,6 +263,8 @@ postgres:
     etiqueta: 15-alpine
     politicaDescarga: IfNotPresent
   puerto: 5432
+  # uid del usuario postgres dentro de la imagen. Alpine usa 70;
+  uidPostgres: 70
   baseInicial: postgres
   basesDatos:
     - db_auth
@@ -249,7 +287,7 @@ notificaciones:
   replicas: 1
   imagen:
     repositorio: p4-notificaciones
-    etiqueta: latest
+    etiqueta: 1.2.0
     politicaDescarga: Never
   baseDatos: db_notificaciones
   # Los dos unicos puntos escribibles cuando el sistema de archivos pase a solo lectura.

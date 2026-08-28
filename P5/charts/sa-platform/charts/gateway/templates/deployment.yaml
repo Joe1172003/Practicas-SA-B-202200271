@@ -24,6 +24,10 @@ spec:
         # Si cambia la config compartida cambia este hash, y el Deployment reemplaza los Pods solo.
         checksum/config: {{ include "sa-platform.checksumConfig" $ctx }}
     spec:
+      # Cuenta propia y no la "default": es lo que exige el enunciado.
+      serviceAccountName: {{ include "sa-platform.nombre" $ctx }}
+      securityContext:
+        {{- include "sa-platform.seguridadPod" (dict "uid" 1000) | nindent 8 }}
       containers:
         - name: gateway
           image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
@@ -43,7 +47,13 @@ spec:
             - name: URL_{{ $nombre }}
               value: "http://{{ $.Release.Name }}-{{ lower $nombre }}:{{ $puerto }}"
             {{- end }}
+          securityContext:
+            {{- include "sa-platform.seguridadContenedor" . | nindent 12 }}
           {{- include "sa-platform.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}
+          volumeMounts:
+            # Unico punto escribible: Node necesita /tmp aunque la app no escriba archivos.
+            - name: temporal
+              mountPath: /tmp
           resources:
             requests:
               cpu: {{ .Values.recursos.requests.cpu | quote }}
@@ -51,3 +61,6 @@ spec:
             limits:
               cpu: {{ .Values.recursos.limits.cpu | quote }}
               memory: {{ .Values.recursos.limits.memoria | quote }}
+      volumes:
+        - name: temporal
+          emptyDir: {}

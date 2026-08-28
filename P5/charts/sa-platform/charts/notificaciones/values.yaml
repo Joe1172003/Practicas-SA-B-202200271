@@ -2,7 +2,7 @@
 replicas: 1
 imagen:
   repositorio: p4-notificaciones
-  etiqueta: latest
+  etiqueta: 1.2.0
   politicaDescarga: Never
 baseDatos: db_notificaciones
 # Los dos unicos puntos escribibles cuando el sistema de archivos pase a solo lectura.

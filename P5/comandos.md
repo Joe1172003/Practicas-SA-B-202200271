@@ -1,47 +1,22 @@
-# Comandos — Práctica 5
+# Comandos
 
-Notas de trabajo, no la documentación final (esa se hace aparte). Sirve para
-no perder el hilo de qué comando hace qué y qué llevamos construido.
-
----
-
-## 1. Qué llevamos hecho (resumen por fase)
-
-| Fase | Contenido | Estado |
-|---|---|---|
-| 0 | minikube con `--cni=calico`, addons `ingress` y `metrics-server`, Helm bajado a 3.20.0 | ✅ |
-| 1 | P4 modificado en sitio: RabbitMQ agregado al `docker-compose.yml`, Auth/Ordenes publican por `amqplib`, Notificaciones pasó a consumidor puro con `pika`, los 5 Dockerfiles corren no-root | ✅ |
-| 2 | Primer `helm install`: namespace `sa-p5` creado por el chart, `_helpers.tpl` con los primeros named templates, subchart `gateway` | ✅ |
-| 3 | Subcharts de `auth`, `productos`, `ordenes`, `notificaciones`. ConfigMap compartido, un Secret por componente, anotación `checksum/config`, `values-dev.yaml`/`values-prod.yaml`/`values.example.yaml` | ✅ |
-| 4 | Subchart `postgres`: StatefulSet + PVC + Service headless, script de init con `range` creando 5 bases. Evidencia de persistencia tras borrar el pod | ✅ |
-| 5 | RabbitMQ como dependencia **externa** (chart de Bitnami), con imagen redirigida a `bitnamilegacy` y `namespaceOverride: sa-p5`. Evidencia del flujo asíncrono y de acumulación sin pérdida con el consumidor caído | ✅ |
-| 6 | Ingress + NetworkPolicies |✅ |
-| 7 | Probes, HPA, ResourceQuota, LimitRange, PDB, RollingUpdate sin downtime | ⏳ Pendiente |
-| 8 | RBAC + `securityContext` no-root | ⏳ Pendiente |
-| 9 | Los 2 cronjobs encadenados | ⏳ Pendiente |
-| 10 | Carga con k6, `helm upgrade`/`rollback`/`history` | ⏳ Pendiente |
-
----
-
-## 2. Comandos para levantar el entorno desde cero
+## 1. Comandos para levantar el entorno desde cero
 
 ```powershell
 # 1. Arrancar Docker Desktop, esperar a que responda
 docker info
 
-# 2. Arrancar el clúster (primera vez, fija el perfil con estas flags;
-#    despues basta con "minikube start" a secas)
+# 2. Arrancar el clúster Nota: despues basta con "minikube start"
 minikube start --driver=docker --cni=calico --memory=4096 --cpus=4
 
-# 3. Habilitar addons (una sola vez, quedan guardados en el perfil)
+# 3. Habilitar addons Nota: una sola vez, quedan guardados en el perfil
 minikube addons enable ingress
 minikube addons enable metrics-server
 
-# 4. Construir las 5 imagenes desde el codigo de P4
+# 4. Construir las 5 imagenes desde el codigo de la P4
 docker compose -f P4/docker-compose.yml build
 
-# 5. Cargarlas dentro de minikube (su almacen de imagenes es aparte del
-#    de Docker Desktop)
+# 5. Cargarlas dentro de minikube (su almacen de imagenes es aparte del de Docker Desktop)
 minikube image load p4-gateway:latest
 minikube image load p4-auth:latest
 minikube image load p4-productos:latest
@@ -50,12 +25,12 @@ minikube image load p4-notificaciones:latest
 minikube image load postgres:15-alpine
 minikube image load bitnamilegacy/rabbitmq:4.1.3-debian-12-r1
 
-# 6. Resolver dependencias del chart. Descarga postgres (local) y rabbitmq
-#    (de Bitnami) y genera/actualiza Chart.lock
+# 6. Resolver dependencias del chart. 
+# Descarga postgres (local) y rabbitmq (de Bitnami) y genera/actualiza Chart.lock
 helm dependency update ./P5/charts/sa-platform
 
-# 7. Crear el archivo de credenciales (una sola vez). NO se versiona.
-#    Copiar values.example.yaml, renombrarlo y reemplazar los CAMBIAME.
+# 7. Crear el archivo de credenciales (una sola vez). Nota: no se versiona.
+#  Copiar values.example.yaml, renombrarlo y reemplazar los CAMBIAME.
 copy P5\charts\sa-platform\values.example.yaml P5\charts\sa-platform\values.secretos.yaml
 
 # 8. Validar antes de instalar
@@ -63,34 +38,32 @@ helm lint ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml -f 
 
 # 9. Instalar (o actualizar si el release ya existe)
 helm install sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml -f ./P5/charts/sa-platform/values.secretos.yaml
-# si ya existe:
+
+# Si ya existe:
 helm upgrade sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml -f ./P5/charts/sa-platform/values.secretos.yaml
 
 # 10. Abrir el acceso por Ingress. EN UNA TERMINAL APARTE Y COMO ADMINISTRADOR,
-#     dejarlo corriendo mientras se use el entorno.
 minikube tunnel
 ```
 
-### Sobre `values.secretos.yaml`
+### Sobre los `values.secretos.yaml`
 
-Las contraseñas y llaves no van en `values.yaml`: ahí quedan vacías y el chart
-falla con `required` si no se pasan aparte. El archivo real está en
-`.gitignore`; `values.example.yaml` documenta el formato con valores ficticios.
+En `values.yaml` las contraseñas y llaves quedan vacías a propósito. Si me olvido
+de pasar este archivo aparte, el chart no instala nada: `required` corta la
+instalación con un mensaje que dice cuál falta.
 
-Es requisito de la sección 8.1 del enunciado: no puede haber credenciales
-reales versionadas en el repositorio.
+El archivo de verdad está en `.gitignore` y nunca sube al repo. Lo que sí subo es
+`values.example.yaml`, que tiene la misma estructura pero con puros CAMBIAME esto es solo para ejemplo.
 
 ### Sobre `minikube tunnel`
 
-Hace falta solo en Windows con el driver de Docker: el cluster vive dentro de un
-contenedor y su red (`192.168.49.0/24`) no es alcanzable desde el anfitrion. El
-tunnel abre esa ruta y le presta el puerto 80. En un cluster real el Ingress
-Controller tendria IP publica y esto no existiria.
+Esto me hace falta por correr minikube sobre Docker en Windows. El clúster vive
+dentro de un contenedor y su red (`192.168.49.0/24`) no se alcanza desde mi
+máquina, así que el túnel abre esa ruta y le presta el puerto 80. En un clúster
+de verdad el Ingress Controller tendría IP pública y nada de esto existiria.
 
-Pide permisos de administrador porque el puerto 80 esta por debajo de 1024.
-
-El archivo `C:\Windows\System32\drivers\etc\hosts` necesita esta linea, una sola
-vez (no se borra al reiniciar):
+Pide permisos de administrador porque el 80 está por debajo de 1024.
+Para esto cree lo que es  el archivo `C:\Windows\System32\drivers\etc\hosts` necesita esta línea, una sola vez. No se borra al reiniciar:
 
 ```
 127.0.0.1 sa-p5.local
@@ -105,62 +78,217 @@ Invoke-RestMethod -Uri "http://sa-p5.local/health"  # con el tunnel corriendo
 
 ---
 
-## 3. Qué podés ver ahora mismo en minikube
+## 2. Comandos para ver pod, deployments, services, secret, configmap entre otros
 
+### ver pods
 ```powershell
 kubectl get pods -n sa-p5
 ```
-Los 7 Pods actuales:
 
-| Pod | Qué es |
-|---|---|
-| `sa-p5-gateway-...` | Deployment, nombre con hash al azar |
-| `sa-p5-auth-...` | Deployment |
-| `sa-p5-productos-...` | Deployment |
-| `sa-p5-ordenes-...` | Deployment |
-| `sa-p5-notificaciones-...` | Deployment — consumidor puro, sin Service |
-| `sa-p5-postgres-0` | **StatefulSet** — nombre fijo con índice, no hash |
-| `sa-p5-rabbitmq-0` | **StatefulSet** — dependencia externa (chart de Bitnami) |
-
+### ver statefulset o pvc
 ```powershell
 kubectl get statefulset,pvc -n sa-p5
 ```
-`sa-p5-postgres` (`datos-sa-p5-postgres-0`, 1Gi) y `sa-p5-rabbitmq` (`data-sa-p5-rabbitmq-0`, 1Gi). Ambos PVC sobreviven aunque borres el Pod — comprobado con Postgres.
 
+#### ver servicios
 ```powershell
 kubectl get svc -n sa-p5
 ```
-- `sa-p5-gateway`, `sa-p5-auth`, `sa-p5-productos`, `sa-p5-ordenes` — `ClusterIP` normales
-- `sa-p5-postgres` / `sa-p5-rabbitmq` — `ClusterIP` normal, el host que usan los microservicios
-- `sa-p5-postgres-headless` / `sa-p5-rabbitmq-headless` — `ClusterIP: None`, identidad de red para el StatefulSet
-- `notificaciones` no tiene Service: es consumidor puro, nadie le hace peticiones
-- Ninguno es `NodePort` ni `LoadBalancer` (requisito E)
 
+### ver configmap, secretos
 ```powershell
 kubectl get configmap,secret -n sa-p5
 ```
-- `sa-p5-config` — el ConfigMap compartido (variables no sensibles)
-- `sa-p5-auth-secreto`, `sa-p5-productos-secreto`, `sa-p5-ordenes-secreto`, `sa-p5-notificaciones-secreto`, `sa-p5-postgres-secreto` — un Secret por componente, cada uno con solo lo que ese componente necesita
-- `sa-p5-postgres-init` — ConfigMap con el script que crea las 5 bases
 
+### ver el namespace
 ```powershell
 kubectl get namespace sa-p5
 ```
-Creado por el propio chart (`templates/namespace.yaml`), no a mano.
+> Nota: lo crea el propio chart en `templates/namespace.yaml`. Nunca corrí un `kubectl create namespace`.
+
+### para ver mis upgrade y mis rollback
 
 ```powershell
 helm list -A
 ```
-Un release: `sa-p5`, revisión actual 6 (namespace de release: `default`, por el problema del huevo-y-la-gallina con el namespace que el chart crea).
 
 ```powershell
 helm history sa-p5
 ```
-El historial de las 4 revisiones hechas hasta ahora — la base para la Fase 10 (`helm rollback`).
+
+## 3. Probar los cronjobs 
+
+### Ver que existen y su configuración
+
+```powershell
+kubectl get cronjob -n sa-p5
+```
+Me muestra el horario, si está suspendido y cuándo corrió la última vez.
+
+```powershell
+kubectl describe cronjob sa-p5-bitacora -n sa-p5
+```
+Este me da todo junto: `Concurrency Policy: Forbid`, los límites de historial y
+el `backoffLimit`.
+
+### Forzar una ejecución sin esperar el horario
+
+Para probarlo no quiero quedarme esperando 2 o 10 minutos, así que lo disparo a
+mano:
+
+```powershell
+kubectl create job prueba-bitacora --from=cronjob/sa-p5-bitacora -n sa-p5
+kubectl create job prueba-resumen --from=cronjob/sa-p5-resumen -n sa-p5
+```
+
+### Ver los logs de esa ejecución
+
+```powershell
+kubectl logs -n sa-p5 job/prueba-bitacora
+kubectl logs -n sa-p5 job/prueba-resumen
+```
+En el primero veo la fila insertada con la hora en `-06:00`. En el segundo, el
+resumen ya agrupado por hora.
+
+### Verificar los datos directo en la base
+
+```powershell
+kubectl exec -n sa-p5 sa-p5-postgres-0 -- psql -U postgres -d db_bitacora -c "SELECT * FROM bitacora ORDER BY id DESC LIMIT 5;"
+```
+
+### Verificar que el resumen llegó a RabbitMQ y se consumió
+
+```powershell
+kubectl logs -n sa-p5 deploy/sa-p5-notificaciones --tail=10
+kubectl exec -n sa-p5 sa-p5-postgres-0 -- psql -U postgres -d db_notificaciones -c "SELECT * FROM notificaciones WHERE tipo='resumen_bitacora' ORDER BY id DESC LIMIT 3;"
+```
+
+### Ver el historial de ejecuciones automáticas (las reales, cada 2/10 min)
+
+```powershell
+kubectl get jobs -n sa-p5
+```
+
+Los que se llaman `sa-p5-bitacora-XXXXXXXX` no los creé yo, los dispara el
+CronJob solo. Nunca pasan de 3 por el `successfulJobsHistoryLimit`: cuando
+aparece el cuarto, Kubernetes borra el más viejo.
+
+### Limpiar los Jobs de prueba después
+
+```powershell
+kubectl delete job prueba-bitacora prueba-resumen -n sa-p5
+```
+
+### Demostrar `backoffLimit` - reintentos ante fallo
+
+Apago RabbitMQ un rato y fuerzo el cronjob de resumen. Como no puede publicar,
+falla y ahí se ven los reintentos.
+
+```powershell
+kubectl scale statefulset sa-p5-rabbitmq -n sa-p5 --replicas=0
+kubectl create job prueba-fallo --from=cronjob/sa-p5-resumen -n sa-p5
+kubectl get pods -n sa-p5 -l job-name=prueba-fallo -w
+```
+Con `backoffLimit: 2` salen hasta 3 Pods: el original y dos reintentos, todos
+fallando mientras el broker esté abajo. Después lo levanto y limpio:
+```powershell
+kubectl scale statefulset sa-p5-rabbitmq -n sa-p5 --replicas=1
+kubectl delete job prueba-fallo -n sa-p5
+```
 
 ---
 
-## 4. Comandos de diagnóstico usados seguido
+## 4. Prueba de carga con k6
+
+El script está en `P5/carga/k6-carga.js`. Sube la concurrencia por escalones, de
+20 a 60 y después a 120 usuarios virtuales, para darle tiempo al HPA de reaccionar.
+
+### Ejecutarlo
+
+Lo corro dentro del clúster, así no tengo que instalar k6 en Windows ni depender
+del túnel:
+
+```powershell
+Get-Content P5/carga/k6-carga.js | kubectl run k6 -n default --rm -i --image=grafana/k6:0.49.0 --restart=Never -- run -
+```
+
+Ojo con la ruta: es relativa, así que hay que estar parado en la raíz del
+proyecto. Si lo corro desde otra carpeta, `Get-Content` no encuentra el archivo.
+
+En otra terminal, para ver el escalado en vivo:
+
+```powershell
+kubectl get hpa -n sa-p5 -w
+kubectl get pods -n sa-p5 -l app.kubernetes.io/name=gateway -w
+```
+
+### Lo que dio
+
+| Métrica | Valor |
+|---|---|
+| Peticiones totales | 106,853 |
+| Peticiones por segundo | 508.64 RPS |
+| Latencia p95 | 92.87 ms |
+| Latencia promedio | 16.59 ms |
+| Tasa de error | 0.00 % |
+| Concurrencia máxima | 120 usuarios virtuales |
+
+### Cómo escaló
+
+```
+Antes de la carga : cpu:   2%/30%   a  1 replica
+Durante el pico   : cpu: 522%/30%   a  3 replicas
+Al cesar la carga : cpu:   2%/30%   a  3 replicas (ventana de estabilizacion)
+60s despues       : cpu:   2%/30%   a  1 replica
+```
+
+---
+
+## 5. Ciclo de vida con Helm: upgrade y rollback (requisito A)
+
+### Las versiones publicadas
+
+| Revisión | Chart | App | Qué pasó |
+|---|---|---|---|
+| 19 | `0.4.0` | 1.2.0 | Upgrade con un cambio real de configuración |
+| 20 | `0.5.0` | 1.3.0 | Versión rota a propósito (imagen inexistente) |
+| 21 | `0.4.0` | 1.2.0 | `Rollback to 19` |
+
+```powershell
+helm history sa-p5
+```
+
+### Provocar el fallo y hacer rollback
+
+Subo la `version` del chart y apunto el gateway a una imagen que no existe:
+
+```yaml
+# Chart.yaml
+version: 0.5.0
+appVersion: "1.3.0"
+
+# values.yaml, bloque gateway
+etiqueta: 9.9.9-inexistente
+```
+
+```powershell
+helm upgrade sa-p5 ./P5/charts/sa-platform -f ./P5/charts/sa-platform/values-dev.yaml -f ./P5/charts/sa-platform/values.secretos.yaml
+kubectl get pods -n sa-p5 -l app.kubernetes.io/name=gateway
+```
+
+El pod nuevo se queda en `ErrImageNeverPull` y el viejo sigue `1/1 Running`. Lo
+interesante es que el servicio nunca dejó de responder `HTTP 200`: Kubernetes no
+mata el pod bueno hasta que el nuevo pase su readiness, y como nunca pasó, el
+despliegue se quedó atascado sin tumbar nada. Un deploy fallido y cero caída.
+
+```powershell
+helm rollback sa-p5 19
+helm history sa-p5
+```
+
+---
+
+## 6. Comandos de diagnóstico usados seguido
 
 ```powershell
 # Logs de un Deployment (toma el pod actual solo)
@@ -189,5 +317,11 @@ kubectl exec -n sa-p5 sa-p5-rabbitmq-0 -c rabbitmq -- rabbitmqctl list_queues na
 
 # Simular el consumidor caido
 kubectl scale deploy/sa-p5-notificaciones -n sa-p5 --replicas=0
+# levartar el consumidor caido
 kubectl scale deploy/sa-p5-notificaciones -n sa-p5 --replicas=1
+```
+
+## Para ver mi cola de mensajes
+```
+kubectl exec -n sa-p5 sa-p5-postgres-0 -- psql -U postgres -d db_notificaciones -c "SELECT * FROM notificaciones ORDER BY id DESC LIMIT 10;"
 ```

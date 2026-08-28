@@ -1,0 +1,47 @@
+{{- $ctx := dict "raiz" . "componente" "ordenes" -}}
+# ServiceAccount propio: el enunciado prohibe usar el "default", que en muchos clusters trae mas permisos de la cuenta.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+---
+# Minimo privilegio: solo leer su propia configuracion, nombrada una por una con resourceNames.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    # Sin resourceNames podria leer CUALQUIER configmap del namespace.
+    resourceNames: [{{ include "sa-platform.configMap" $ctx | quote }}]
+    # Solo get: no puede listar, ni crear, ni borrar, ni ver los de otros componentes.
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    # Solo el suyo: no puede leer las credenciales de los demas componentes.
+    resourceNames: [{{ printf "%s-secreto" (include "sa-platform.nombre" $ctx) | quote }}]
+    verbs: ["get"]
+---
+# Une la cuenta con el rol. Sin este objeto el Role existe pero no aplica a nadie.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "sa-platform.nombre" $ctx }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "sa-platform.etiquetas" $ctx | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "sa-platform.nombre" $ctx }}
+    namespace: {{ .Values.global.namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "sa-platform.nombre" $ctx }}
+  apiGroup: rbac.authorization.k8s.io

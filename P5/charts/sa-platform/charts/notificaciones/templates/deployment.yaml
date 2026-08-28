@@ -21,6 +21,11 @@ spec:
       annotations:
         checksum/config: {{ include "sa-platform.checksumConfig" $ctx }}
     spec:
+      # Cuenta propia y no la "default": es lo que exige el enunciado.
+      serviceAccountName: {{ include "sa-platform.nombre" $ctx }}
+      # uid 10001 y no 1000: es el que crea su Dockerfile con useradd.
+      securityContext:
+        {{- include "sa-platform.seguridadPod" (dict "uid" 10001) | nindent 8 }}
       containers:
         - name: notificaciones
           image: "{{ .Values.imagen.repositorio }}:{{ .Values.imagen.etiqueta }}"
@@ -36,6 +41,8 @@ spec:
             # El consumidor lo toca en cada vuelta del bucle: sin servidor HTTP, la probe se hara con exec sobre este archivo.
             - name: ARCHIVO_LATIDO
               value: {{ .Values.archivoLatido | quote }}
+          securityContext:
+            {{- include "sa-platform.seguridadContenedor" . | nindent 12 }}
           # Probes por exec y no por httpGet: sin servidor HTTP no hay endpoint /health que consultar.
           # latido.py sale con codigo 0 si el archivo es reciente y 1 si no.
           startupProbe:

@@ -76,8 +76,9 @@ spec:
     - Ingress
   ingress:
     - from:
-        # range sobre una list y no un dict: los cuatro entran al mismo puerto, no hace falta un valor por nombre.
-        {{- range $c := list "auth" "productos" "ordenes" "notificaciones" }}
+        # range sobre una list y no un dict: todos entran al mismo puerto, no hace falta un valor por nombre.
+        # Los dos cronjobs tambien: bitacora escribe y resumen lee.
+        {{- range $c := list "auth" "productos" "ordenes" "notificaciones" "bitacora" "resumen" }}
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: {{ $c }}
@@ -104,7 +105,7 @@ spec:
     - Ingress
   ingress:
     - from:
-        {{- range $c := list "auth" "ordenes" "notificaciones" }}
+        {{- range $c := list "auth" "ordenes" "notificaciones" "resumen" }}
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: {{ $c }}

@@ -7,6 +7,9 @@ imagen:
 
 puerto: 5432
 
+# uid del usuario postgres dentro de la imagen. Alpine usa 70; la variante Debian usa 999.
+uidPostgres: 70
+
 # Base a la que se conecta el proceso de inicializacion.
 baseInicial: postgres
 
