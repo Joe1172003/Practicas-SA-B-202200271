@@ -1,0 +1,140 @@
+# Overlay para GKE. Se aplica encima de values.yaml y values-dev.yaml del chart de mi practica P5,
+
+# Lo que no cambia: el chart entero, las NetworkPolicies, el HPA, los cronjobs,
+# el RBAC y los securityContext. Todo eso funciona igual en la nube.
+
+# Host publico. nip.io resuelve cualquier IP.nip.io a esa misma IP, asi que
+# da un nombre real sin tener que comprar un dominio.
+# La IP sale del Service del ingress-nginx: kubectl get svc -n ingress-nginx
+ingress:
+  clase: nginx
+  host: 34.59.174.240.nip.io
+
+# imagenes y recursos de los microservicios. Se bajan de Artifact Registry de Google Cloud
+gateway:
+  imagen:
+    repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p4-gateway
+    etiqueta: 1.1.0
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 96Mi
+    limits:
+      cpu: 300m
+      memoria: 256Mi
+  # Umbral 70 y no 30: con requests de 15m, el 30% seria 4.5m y escalaria por nada.
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+auth:
+  imagen:
+    repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p4-auth
+    etiqueta: 1.1.0
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+productos:
+  imagen:
+    repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p4-productos
+    etiqueta: 1.1.0
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+ordenes:
+  imagen:
+    repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p4-ordenes
+    etiqueta: 1.1.0
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+notificaciones:
+  imagen:
+    repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p4-notificaciones
+    etiqueta: 1.2.0
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 96Mi
+    limits:
+      cpu: 200m
+      memoria: 256Mi
+
+cronjobs:
+  bitacora:
+    imagen:
+      repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p5-cron-bitacora
+      etiqueta: 1.0.1
+      politicaDescarga: IfNotPresent
+  resumen:
+    imagen:
+      repositorio: us-central1-docker.pkg.dev/sa-p6-202200271/sa-p6/p5-cron-resumen
+      etiqueta: 1.0.0
+      politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 10m
+      memoria: 64Mi
+    limits:
+      cpu: 200m
+      memoria: 128Mi
+
+
+postgres:
+  almacenamiento:
+    claseAlmacenamiento: standard-rwo
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+rabbitmq:
+  persistence:
+    storageClass: standard-rwo
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 640Mi
