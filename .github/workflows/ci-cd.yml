@@ -153,7 +153,7 @@ jobs:
       # Los tres modulos guardan su ejecucion detras de __main__, asi que
       # importarlos con las variables puestas es seguro y comprueba que las
       # dependencias declaradas alcanzan para cargarlos.
-      - name: notificaciones · importa y arma mensajes
+      - name: notificaciones · importa
         working-directory: P4/notificaciones-py
         env:
           RABBITMQ_URL: amqp://prueba:prueba@localhost:5672
@@ -162,7 +162,11 @@ jobs:
           ARCHIVO_LATIDO: /tmp/latido
         run: |
           pip install --quiet -r requirements.txt
-          python -c "import main, latido; print('notificaciones importa correctamente')"
+          # latido.py queda fuera: es un script standalone que se invoca como
+          # healthcheck de Docker, no un modulo pensado para importarse. Al
+          # importarlo corre su chequeo de una vez y aborta si no encuentra
+          # el archivo de latido, que en el runner nunca va a existir.
+          python -c "import main; print('notificaciones importa correctamente')"
 
       - name: bitacora · importa y lee su carne
         working-directory: P5/cronjobs/bitacora
