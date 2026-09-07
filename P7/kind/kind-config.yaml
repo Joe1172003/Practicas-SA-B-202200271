@@ -1,0 +1,21 @@
+# Cluster de un solo nodo para el pipeline. Se crea y se destruye dentro del
+# runner de GitHub Actions, asi que no necesita alta disponibilidad.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: sa-p7
+nodes:
+  - role: control-plane
+    # La etiqueta ingress-ready y el mapeo del puerto 80 son lo que pide el
+    # manifiesto oficial de ingress-nginx para kind. Con los dos, un curl a
+    # localhost desde el runner entra por el Ingress igual que entraria por
+    # la IP publica en GKE.
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP

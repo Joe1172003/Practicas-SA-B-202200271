@@ -1,0 +1,149 @@
+# Overlay para el cluster kind efimero que levanta el pipeline.
+#
+# Se aplica encima de values.yaml y reemplaza a values-dev.yaml, que no se usa
+# aqui: ese perfil fija politicaDescarga: Never porque estaba pensado para
+# minikube, y si se colara despues de este archivo el kubelet no descargaria
+# nada. Con un solo overlay no hay orden que recordar.
+#
+# Las etiquetas de imagen NO van aqui: las pone el pipeline con --set-string,
+# para que exista una sola fuente de verdad de la version.
+
+global:
+  entorno: development
+
+ingress:
+  clase: nginx
+  # No hay DNS en el runner. El pipeline consulta con:
+  #   curl -H "Host: sa-p7.local" http://localhost/health
+  host: sa-p7.local
+
+# Las imagenes ya estan dentro del nodo (kind load), asi que IfNotPresent las
+# encuentra sin salir a la red.
+gateway:
+  replicas: 1
+  imagen:
+    repositorio: ghcr.io/joe1172003/p4-gateway
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 96Mi
+    limits:
+      cpu: 300m
+      memoria: 256Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+auth:
+  replicas: 1
+  imagen:
+    repositorio: ghcr.io/joe1172003/p4-auth
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+productos:
+  replicas: 1
+  imagen:
+    repositorio: ghcr.io/joe1172003/p4-productos
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+ordenes:
+  replicas: 1
+  imagen:
+    repositorio: ghcr.io/joe1172003/p4-ordenes
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 128Mi
+    limits:
+      cpu: 300m
+      memoria: 320Mi
+  hpa:
+    habilitado: true
+    minimo: 1
+    maximo: 2
+    umbralCpu: 70
+
+notificaciones:
+  replicas: 1
+  imagen:
+    repositorio: ghcr.io/joe1172003/p4-notificaciones
+    politicaDescarga: IfNotPresent
+  recursos:
+    requests:
+      cpu: 15m
+      memoria: 96Mi
+    limits:
+      cpu: 200m
+      memoria: 256Mi
+
+cronjobs:
+  bitacora:
+    imagen:
+      repositorio: ghcr.io/joe1172003/p5-cron-bitacora
+      politicaDescarga: IfNotPresent
+  resumen:
+    imagen:
+      repositorio: ghcr.io/joe1172003/p5-cron-resumen
+      politicaDescarga: IfNotPresent
+  # El LimitRange del chart exige un minimo de 10m de CPU: no bajar de ahi.
+  recursos:
+    requests:
+      cpu: 10m
+      memoria: 64Mi
+    limits:
+      cpu: 200m
+      memoria: 128Mi
+
+postgres:
+  # Vacio a proposito: kind trae local-path como StorageClass por defecto y el
+  # chart omite storageClassName cuando este valor va vacio.
+  almacenamiento:
+    tamano: 1Gi
+    claseAlmacenamiento: ""
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 192Mi
+    limits:
+      cpu: 500m
+      memoria: 512Mi
+
+rabbitmq:
+  persistence:
+    enabled: true
+    size: 1Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 640Mi

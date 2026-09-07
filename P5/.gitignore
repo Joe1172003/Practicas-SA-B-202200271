@@ -8,3 +8,8 @@ values.secretos.yaml
 
 # Salidas de pruebas de carga
 carga/resultados/
+
+# Excepcion: el subchart de RabbitMQ SI se versiona. Bitnami ya movio sus
+# imagenes una vez (de rabbitmq a bitnamilegacy/rabbitmq) y el pipeline no
+# puede depender de que su repositorio responda el dia del despliegue.
+!charts/sa-platform/charts/rabbitmq-16.0.14.tgz
