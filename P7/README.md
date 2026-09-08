@@ -16,6 +16,11 @@ imágenes, desplegar) ahora corre solo con cada commit. El pipeline vive en
 
 ![Diagrama del pipeline](diagrama-pipeline.png)
 
+
+# Evidencia de ejecución - pipeline 
+![Evidencia de ejecucion pipeline](./Evidencia-pipeline.png)
+
+
 ## Qué dispara qué
 
 No todo corre siempre. El evento decide hasta dónde llega el pipeline:
