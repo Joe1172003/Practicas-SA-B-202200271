@@ -1,15 +1,3 @@
-# Pipeline CI/CD de la Practica 7.
-#
-# Cuatro etapas encadenadas: build -> test -> dockerizacion -> despliegue.
-# Un solo archivo a proposito, para que las cuatro se vean como un solo grafo
-# en la pestana Actions.
-#
-# Que dispara que:
-#   pull request  -> build + test              (no publica nada, no despliega)
-#   push a main   -> build + test + imagenes + despliegue en un kind efimero
-#   tag v*.*.*    -> build + test + imagenes + despliegue en el GKE real
-#   ejecucion manual -> igual que un tag, para desplegar cuando yo quiera
-
 name: CI/CD
 
 on:
@@ -21,13 +9,10 @@ on:
   workflow_dispatch:
     inputs:
       apagar_al_terminar:
-        description: 'Escalar el node pool de GKE a 0 al terminar (ahorro de costo)'
+        description: 'Escalar el node pool de GKE a 0 al terminar'
         type: boolean
         default: false
 
-# Una corrida a la vez por rama. En pull requests si se cancela la anterior,
-# pero nunca en main ni en un tag: cancelar un helm upgrade a medias deja el
-# cluster en un estado raro.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -36,13 +21,8 @@ permissions:
   contents: read
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # 0. Una sola fuente de verdad para la version que se construye y se despliega
-  # ---------------------------------------------------------------------------
-  # Sin este job, el job de docker calcularia una etiqueta y el de despliegue
-  # otra, y el cluster terminaria pidiendo una imagen que no existe.
   preparacion:
-    name: 0 · Preparacion (version)
+    name: 0 Preparacion - version
     runs-on: ubuntu-latest
     outputs:
       etiqueta: ${{ steps.version.outputs.etiqueta }}
@@ -54,9 +34,9 @@ jobs:
           REGISTRO="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}"
 
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            ETIQUETA="${GITHUB_REF_NAME#v}"      # v1.0.0 -> 1.0.0
+            ETIQUETA="${GITHUB_REF_NAME#v}"      
           else
-            ETIQUETA="sha-${GITHUB_SHA::7}"      # trazable al commit exacto
+            ETIQUETA="sha-${GITHUB_SHA::7}"      
           fi
 
           echo "etiqueta=$ETIQUETA" >> "$GITHUB_OUTPUT"
@@ -65,16 +45,12 @@ jobs:
           echo "### Version de esta corrida: \`$ETIQUETA\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Registro: \`$REGISTRO\`" >> "$GITHUB_STEP_SUMMARY"
 
-  # ---------------------------------------------------------------------------
-  # 1. BUILD
-  # ---------------------------------------------------------------------------
+  # Build
   build-node:
-    name: 1 · Build · ${{ matrix.servicio }}
+    name: 1 - Build - ${{ matrix.servicio }}
     needs: preparacion
     runs-on: ubuntu-latest
     strategy:
-      # Sin fail-fast: si se rompen tres servicios quiero ver los tres errores
-      # en la misma corrida, no de a uno.
       fail-fast: false
       matrix:
         servicio: [gateway, auth, productos, ordenes]
@@ -82,9 +58,9 @@ jobs:
       run:
         working-directory: P4/backend-ts/${{ matrix.servicio }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 # checkout del repo
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4 # se instala la version de node que usa el Dockerfile
         with:
           node-version: '22' # la misma que usa node:22-alpine en el Dockerfile
           cache: npm
@@ -94,7 +70,7 @@ jobs:
       - run: npm run build
 
   build-python:
-    name: 1 · Build · python
+    name: 1 - Build - python
     needs: preparacion
     runs-on: ubuntu-latest
     steps:
@@ -102,10 +78,8 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # la misma que python:3.11-slim
+          python-version: '3.11'
 
-      # compileall y no import: estos modulos leen os.environ al importarse,
-      # asi que importarlos sin variables reventaria con KeyError.
       - name: Validar sintaxis de los tres servicios Python
         run: |
           python -m compileall -q \
@@ -113,11 +87,9 @@ jobs:
             P5/cronjobs/bitacora \
             P5/cronjobs/resumen
 
-  # ---------------------------------------------------------------------------
-  # 2. TEST
-  # ---------------------------------------------------------------------------
+# test 
   test-node:
-    name: 2 · Test · ${{ matrix.servicio }}
+    name: 2 - Test - ${{ matrix.servicio }}
     needs: build-node
     runs-on: ubuntu-latest
     strategy:
@@ -140,7 +112,7 @@ jobs:
       - run: npm test
 
   test-python:
-    name: 2 · Test · python
+    name: 2 - Test - python
     needs: build-python
     runs-on: ubuntu-latest
     steps:
@@ -150,10 +122,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Los tres modulos guardan su ejecucion detras de __main__, asi que
-      # importarlos con las variables puestas es seguro y comprueba que las
-      # dependencias declaradas alcanzan para cargarlos.
-      - name: notificaciones · importa
+      - name: notificaciones - importa
         working-directory: P4/notificaciones-py
         env:
           RABBITMQ_URL: amqp://prueba:prueba@localhost:5672
@@ -168,7 +137,7 @@ jobs:
           # el archivo de latido, que en el runner nunca va a existir.
           python -c "import main; print('notificaciones importa correctamente')"
 
-      - name: bitacora · importa y lee su carne
+      - name: bitacora - importa y lee su carne
         working-directory: P5/cronjobs/bitacora
         env:
           DATABASE_URL: postgresql://prueba:prueba@localhost:5432/db
@@ -177,7 +146,7 @@ jobs:
           pip install --quiet -r requirements.txt
           python -c "import main; assert main.CARNE == '202200271'; print('bitacora importa correctamente')"
 
-      - name: resumen · importa
+      - name: resumen - importa
         working-directory: P5/cronjobs/resumen
         env:
           DATABASE_URL: postgresql://prueba:prueba@localhost:5432/db
@@ -187,12 +156,10 @@ jobs:
           pip install --quiet -r requirements.txt
           python -c "import main; print('resumen importa correctamente')"
 
-  # ---------------------------------------------------------------------------
-  # 3. DOCKERIZACION
-  # ---------------------------------------------------------------------------
-  # No corre en pull requests: un PR se valida, no publica.
+  # Docker build y push a GHCR. Se hace en paralelo para cada imagen, y solo
+  # si no es un PR: los PRs no pueden escribir en el registro.
   docker:
-    name: 3 · Imagen · ${{ matrix.imagen }}
+    name: 3 - Imagen - ${{ matrix.imagen }}
     needs: [preparacion, test-node, test-python]
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -211,7 +178,6 @@ jobs:
             contexto: P4/backend-ts/productos
           - imagen: p4-ordenes
             contexto: P4/backend-ts/ordenes
-          # Ojo: notificaciones NO vive bajo backend-ts.
           - imagen: p4-notificaciones
             contexto: P4/notificaciones-py
           - imagen: p5-cron-bitacora
@@ -228,7 +194,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      # aqui se genera la metadata de la imagen, incluyendo etiquetas y labels
       - id: meta
         uses: docker/metadata-action@v5
         with:
@@ -241,26 +207,25 @@ jobs:
           labels: |
             org.opencontainers.image.title=${{ matrix.imagen }}
             org.opencontainers.image.revision=${{ github.sha }}
-
+      
+      # aqui se construye y publica la imagen en GHCR
       - uses: docker/build-push-action@v6
         with:
           # Cada Dockerfile espera como contexto su propia carpeta.
           context: ${{ matrix.contexto }}
           push: true
-          # Sin esto GHCR muestra un "unknown/unknown" fantasma junto al paquete.
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.imagen }}
           cache-to: type=gha,mode=max,scope=${{ matrix.imagen }}
 
-  # ---------------------------------------------------------------------------
-  # 4a. DESPLIEGUE en un cluster kind efimero (gratis, corre en cada push)
-  # ---------------------------------------------------------------------------
-  # Este job no usa ni un secreto: las credenciales del cluster desechable se
-  # generan al vuelo, asi que no puede fallar por configuracion faltante.
+
+  # kulster kind efimero para probar el chart de Helm y que los pods se levanten correctamente.
+  # Se hace en paralelo con el despliegue real a GKE 
+  # pero solo si es un push a main: los PRs no pueden crear clusters efimeros.
   deploy-kind:
-    name: 4 · Despliegue K8s (kind efimero)
+    name: 4 - Despliegue K8s (kind efimero)
     needs: [preparacion, docker]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -269,9 +234,9 @@ jobs:
       packages: read
     env:
       RELEASE: sa-p7
-      NS: sa-p5
+      NS: sa-p5 # nombre del namespace dentro del cluster
       TAG: ${{ needs.preparacion.outputs.etiqueta }}
-      REG: ${{ needs.preparacion.outputs.registro }}
+      REG: ${{ needs.preparacion.outputs.registro }} # trae la direccion del registro de GHCR, que es donde se subieron las imagenes
     steps:
       - uses: actions/checkout@v4
 
@@ -284,16 +249,12 @@ jobs:
 
       - name: Instalar el Ingress Controller
         run: |
-          # El namespace se llama ingress-nginx, que es exactamente lo que ya
-          # esperan las NetworkPolicies escritas en la P5.
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.3/deploy/static/provider/kind/deploy.yaml
           kubectl -n ingress-nginx wait --for=condition=ready pod \
             -l app.kubernetes.io/component=controller --timeout=180s
 
       - name: Precargar las imagenes de terceros
         run: |
-          # Docker Hub limita por IP y los runners comparten IP: sin reintentos
-          # esto falla cada tanto sin razon.
           for imagen in postgres:15-alpine bitnamilegacy/rabbitmq:4.1.3-debian-12-r1; do
             for intento in 1 2 3; do
               docker pull "docker.io/$imagen" && break || sleep 20
@@ -324,15 +285,12 @@ jobs:
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
           helm repo update
-          # build respeta el Chart.lock; update lo regenera si quedo desfasado.
+          # build respeta el Chart.lock, update lo regenera si quedo desfasado.
           helm dependency build ./P5/charts/sa-platform \
             || helm dependency update ./P5/charts/sa-platform
 
       - name: Generar credenciales desechables
         run: |
-          # El cluster se destruye al terminar el job, asi que estas claves
-          # viven minutos. La de RabbitMQ se calcula una sola vez porque el
-          # chart exige que global.rabbitmq y rabbitmq.auth coincidan.
           CLAVE_RABBIT=$(openssl rand -hex 16)
           cat > "$RUNNER_TEMP/secretos-kind.yaml" <<EOF
           global:
@@ -352,8 +310,6 @@ jobs:
 
       - name: Validar que el chart renderiza
         run: |
-          # Falla en segundos si falta una dependencia o un valor obligatorio,
-          # en vez de esperar 15 minutos a que expire el helm upgrade.
           helm template "$RELEASE" ./P5/charts/sa-platform \
             -f ./P7/values-kind.yaml \
             -f "$RUNNER_TEMP/secretos-kind.yaml" \
@@ -368,8 +324,6 @@ jobs:
 
       - name: Desplegar con Helm
         run: |
-          # --set-string y no --set: Helm convierte 1.0 en 1 y el pod terminaria
-          # pidiendo una etiqueta que no existe.
           helm upgrade --install "$RELEASE" ./P5/charts/sa-platform \
             -f ./P7/values-kind.yaml \
             -f "$RUNNER_TEMP/secretos-kind.yaml" \
@@ -412,11 +366,9 @@ jobs:
           kubectl -n "$NS" logs "sts/$RELEASE-postgres" --tail=60 || true
           kubectl -n "$NS" logs "sts/$RELEASE-rabbitmq" --tail=60 || true
 
-  # ---------------------------------------------------------------------------
-  # 4b. DESPLIEGUE en el GKE real (solo con un tag o a mano)
-  # ---------------------------------------------------------------------------
+  # Despliegue real a GKE. Solo se hace si es un push a main con tag vX.Y.Z o un workflow_dispatch.
   deploy-gke:
-    name: 4 · Despliegue K8s (GKE real)
+    name: 4 - Despliegue K8s - GKE real
     needs: [preparacion, docker]
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -430,8 +382,6 @@ jobs:
       PROYECTO: sa-p6-202200271
       CLUSTER: sa-p6
       ZONA: us-central1-a
-      # Tiene que ser el mismo nombre que instalo la P6, o Helm intentaria
-      # instalar de cero encima de lo que ya existe.
       RELEASE: sa-p6
       NS: sa-p5
       TAG: ${{ needs.preparacion.outputs.etiqueta }}
@@ -448,7 +398,7 @@ jobs:
 
       - name: Encender los nodos si estan apagados
         run: |
-          # El node pool queda en 0 para no pagar cuando no se usa.
+          # se pregunta a gcp cuantos nodos hay encendidos, y si no hay ninguno se escala a 2
           ACTUALES=$(gcloud container clusters describe "$CLUSTER" --zone "$ZONA" \
                        --format="value(currentNodeCount)")
           echo "Nodos encendidos ahora: ${ACTUALES:-0}"
@@ -478,16 +428,11 @@ jobs:
         env:
           BLOB: ${{ secrets.HELM_VALUES_SECRETOS }}
         run: |
-          # Llega en base64 y aterriza en RUNNER_TEMP, que esta fuera del
-          # checkout: nunca toca el arbol de git.
           printf '%s' "$BLOB" | base64 -d > "$RUNNER_TEMP/secretos.yaml"
           test -s "$RUNNER_TEMP/secretos.yaml"
 
       - name: Desplegar con Helm
         run: |
-          # Mismos archivos que uso la P6, mas el overlay de GHCR al final para
-          # que solo cambie de donde salen las imagenes. Sin -n, igual que la
-          # P6: el release vive en el namespace default.
           helm upgrade --install "$RELEASE" ./P5/charts/sa-platform \
             -f ./P5/charts/sa-platform/values-dev.yaml \
             -f ./P6/values-cloud.yaml \

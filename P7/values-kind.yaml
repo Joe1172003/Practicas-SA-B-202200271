@@ -1,20 +1,8 @@
-# Overlay para el cluster kind efimero que levanta el pipeline.
-#
-# Se aplica encima de values.yaml y reemplaza a values-dev.yaml, que no se usa
-# aqui: ese perfil fija politicaDescarga: Never porque estaba pensado para
-# minikube, y si se colara despues de este archivo el kubelet no descargaria
-# nada. Con un solo overlay no hay orden que recordar.
-#
-# Las etiquetas de imagen NO van aqui: las pone el pipeline con --set-string,
-# para que exista una sola fuente de verdad de la version.
-
 global:
   entorno: development
 
 ingress:
   clase: nginx
-  # No hay DNS en el runner. El pipeline consulta con:
-  #   curl -H "Host: sa-p7.local" http://localhost/health
   host: sa-p7.local
 
 # Las imagenes ya estan dentro del nodo (kind load), asi que IfNotPresent las
@@ -113,7 +101,6 @@ cronjobs:
     imagen:
       repositorio: ghcr.io/joe1172003/p5-cron-resumen
       politicaDescarga: IfNotPresent
-  # El LimitRange del chart exige un minimo de 10m de CPU: no bajar de ahi.
   recursos:
     requests:
       cpu: 10m
@@ -123,8 +110,6 @@ cronjobs:
       memoria: 128Mi
 
 postgres:
-  # Vacio a proposito: kind trae local-path como StorageClass por defecto y el
-  # chart omite storageClassName cuando este valor va vacio.
   almacenamiento:
     tamano: 1Gi
     claseAlmacenamiento: ""
