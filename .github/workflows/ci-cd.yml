@@ -339,7 +339,9 @@ jobs:
       - name: Verificar que los pods quedaron listos
         run: |
           kubectl -n "$NS" wait --for=condition=ready pod \
-            -l app.kubernetes.io/instance="$RELEASE" --timeout=300s
+            -l app.kubernetes.io/instance="$RELEASE" \
+            --field-selector=status.phase=Running \
+            --timeout=300s
           kubectl -n "$NS" get pods,svc,pvc,ingress -o wide
 
       - name: Verificar que el gateway responde por el Ingress
