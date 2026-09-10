@@ -227,7 +227,7 @@ jobs:
   deploy-kind:
     name: 4 - Despliegue K8s (kind efimero)
     needs: [preparacion, docker]
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
