@@ -7,6 +7,7 @@ export class HealthController {
     return {
       estado: 'ok',
       servicio: 'api-gateway',
+      version: 'p7-cicd',
       hora: new Date().toISOString(),
     };
   }
