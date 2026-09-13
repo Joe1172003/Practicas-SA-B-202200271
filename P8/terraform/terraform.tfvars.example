@@ -1,0 +1,2 @@
+# Copiar como terraform.tfvars (ese no se sube) y poner el correo real.
+usuario_consola = "tu-correo@gmail.com"
