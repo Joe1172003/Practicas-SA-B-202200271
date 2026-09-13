@@ -14,7 +14,7 @@ Todo el ciclo que en la Practica 5 y la Practica 6 hice a mano (compilar, probar
 imágenes, desplegar) ahora corre solo con cada commit. El pipeline vive en
 [`.github/workflows/ci-cd.yml`](../.github/workflows/ci-cd.yml).
 
-![Diagrama del pipeline](diagrama-pipeline.png)
+![Diagrama del pipeline](diagrama-pipeline-sin-GKE.png)
 
 
 # Evidencia de ejecución - pipeline 
@@ -28,16 +28,17 @@ No todo corre siempre. El evento decide hasta dónde llega el pipeline:
 | Evento | Build | Test | Imágenes | Despliegue |
 |---|:--:|:--:|:--:|:--:|
 | Pull request a `main` | sí | sí | no | no |
-| Push a `main` | sí | sí | sí | kind |
-| Tag `v*.*.*` | sí | sí | sí | GKE |
-| Botón *Run workflow* | sí | sí | sí | GKE |
+| Push a `main` | sí | sí | sí, con `sha-` | kind |
+| Tag `v1.*.*` | sí | sí | sí, con la versión | kind |
+| Botón *Run workflow* | sí | sí | sí | kind |
 
 Un Pull Request se valida pero no publica nada. Esa es la diferencia que evita
 ensuciar el registro con imágenes de código que todavía nadie revisó.
 
-El GKE no se despliega en cada push porque cobra por hora de nodo encendido.
-Llega a producción solo cuando yo lo decido: con un tag de versión o con el
-botón manual.
+Los tags de esta práctica son la serie 1. El repositorio lo comparto con la
+Práctica 8, que publica la serie 2: si esta escuchara cualquier `v*`, un tag
+de la P8 la despertaría y volvería a subir la misma versión con otro digest,
+pisando la imagen que la P8 firmó.
 
 ## Etapa 0: preparación
 
@@ -71,16 +72,14 @@ Cada test espera a su build. No tiene sentido probar código que ni compila.
 ## Etapa 3: dockerización
 
 7 líneas en paralelo, una por imagen. Cada una construye desde su propia
-carpeta y publica en GitHub Container Registry (GHCR) con varias etiquetas a la vez: la del commit, `latest`, y las de versión si el disparador fue un tag.
+carpeta y publica en GitHub Container Registry (GHCR). Con un push a `main` la
+etiqueta es la del commit; con un tag, la versión completa y la corta (`1.0.1`
+y `1.0`).
 
-Todas las etiquetas apuntan a la misma imagen. El despliegue usa la del
-commit, que no cambia nunca; `latest` queda solo como comodidad.
+No publico `latest`. Es una etiqueta que cambia de imagen cada vez, y con ella
+no hay forma de saber qué código está corriendo.
 
 ## Etapa 4: despliegue
-
-Hay dos destinos y el evento elige cuál.
-
-### kind, en cada push a main
 
 `deploy-kind` levanta un clúster de Kubernetes desechable dentro del propio
 runner, instala el Ingress Controller, baja las 7 imágenes de GHCR y las
@@ -95,55 +94,34 @@ Este job no usa ningún secreto. Las credenciales del clúster desechable se
 generan al vuelo con `openssl`, así que no puede fallar por configuración
 faltante.
 
-### GKE, con un tag o a mano
+Uso `helm install` y `kubectl create`, no `upgrade` ni `apply`: el clúster
+nace vacío en cada corrida, así que no hay nada que actualizar.
 
-`deploy-gke` actualiza el clúster real de la Practica 6. No reinstala nada:
-hace `helm upgrade` sobre el mismo release `sa-p6`, así Postgres y RabbitMQ
-conservan sus discos y sus datos.
+## El despliegue a GKE que retiré
 
-1. Se autentica en GCP con la llave de una service account.
-2. Si el node pool está en 0 (lo apago cuando no lo uso), lo sube a 2 nodos.
-3. Arma el archivo de secretos para Helm en una carpeta temporal del runner,
-   fuera del repositorio.
-4. Corre `helm upgrade` con los mismos valores de la Practica 6 más
-   [`values-gke.yaml`](values-gke.yaml), que solo cambia el origen de las
-   imágenes: antes Artifact Registry, ahora GHCR.
-5. Borra el archivo de secretos, aunque el despliegue haya fallado.
-6. Verifica con `rollout status` del gateway y un `curl` a la IP pública.
+El pipeline tuvo un segundo destino: el clúster GKE de la Practica 6. Con un
+tag, se autenticaba en GCP con la llave de una service account de rol
+`roles/container.admin` y hacía `helm upgrade` sobre el release `sa-p6`.
+Funcionó, y la evidencia está abajo.
 
-El comando no lleva `-n sa-p5`. En la Practica 6 instalé el release sin ese flag y quedó registrado en el namespace `default`, si el pipeline buscara en
-`sa-p5`, Helm no lo encontraría e intentaría instalar de cero encima de lo
-que ya corre.
-
-Tiene una casilla opcional para escalar los nodos a 0 al terminar. Ese paso
-corre aunque algo falle antes, así un despliegue roto no me deja un clúster
-encendido cobrando.
+Lo saqué al empezar la Práctica 8, porque ese diseño tenía un problema de
+fondo: el pipeline guardaba una llave de administrador del clúster real.
+Cualquiera que comprometiera el repositorio tenía el clúster. Borré el job, los
+dos secretos (`GCP_SA_KEY` y `HELM_VALUES_SECRETOS`) y la llave de la service
+account. En la P8 ningún workflow toca un clúster: el pipeline solo propone la
+nueva versión y ArgoCD es el único que la aplica.
 
 ## Credenciales
 
-El workflow no tiene ninguna credencial escrita. Publicar en GHCR usa el
-`GITHUB_TOKEN` que GitHub genera en cada corrida, y kind no necesita nada.
-Solo el GKE usa dos secretos del repositorio:
-
-| Secreto | Qué tiene | Dónde se usa |
-|---|---|---|
-| `GCP_SA_KEY` | La llave JSON de la service account `github-actions-p7` | `google-github-actions/auth` |
-| `HELM_VALUES_SECRETOS` | Mi `values.secretos.yaml` en base64 | El paso que arma los secretos para Helm |
-
-La service account tiene un solo rol, `roles/container.admin`.
-`container.developer` sería más acotado, pero no alcanza: el chart crea Roles
-y RoleBindings, y ese rol no puede crear objetos RBAC. Tampoco podría escalar
-el node pool.
-
-`HELM_VALUES_SECRETOS` tiene que ser el mismo archivo que usé en la Practica 6. Postgres solo lee su contraseña la primera vez que inicializa el disco: con
-otra, el upgrade dejaría a auth, productos, órdenes y notificaciones sin
-acceso a la base.
-
+El workflow no usa ningún secreto del repositorio. Publicar en GHCR usa el
+`GITHUB_TOKEN` que GitHub genera en cada corrida, y kind genera sus propias
+credenciales al vuelo.
 
 ## Evidencia del despliegue en GKE
 
-El historial del release muestra quién desplegó cada versión. Las revisiones
-1 y 2 las hice a mano en la P6; la 3 la hizo el pipeline:
+Antes de retirarlo, el historial del release mostraba quién desplegó cada
+versión. Las revisiones 1 y 2 las hice a mano en la P6; la 3 la hizo el
+pipeline:
 
 ![Helm history](./heml-history.png)
 
@@ -161,5 +139,5 @@ imagen cambió.
 |---|---|
 | [`.github/workflows/ci-cd.yml`](../.github/workflows/ci-cd.yml) | El pipeline completo |
 | [`values-kind.yaml`](values-kind.yaml) | Valores de Helm para el clúster efímero |
-| [`values-gke.yaml`](values-gke.yaml) | Valores de Helm para el GKE de la Practica 6 |
+| [`values-gke.yaml`](values-gke.yaml) | Valores que usaba el despliegue a GKE retirado; queda como registro |
 | [`kind/kind-config.yaml`](kind/kind-config.yaml) | Clúster de un nodo con el puerto 80 abierto |
