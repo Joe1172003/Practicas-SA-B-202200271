@@ -17,7 +17,12 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+# Despues borro npm: la imagen final solo necesita node para arrancar, y el npm
+# que trae node:22-alpine arrastra un tar con una vulnerabilidad critica
+# (CVE-2026-59873) que hace que Trivy bloquee la version.
+RUN npm ci --omit=dev \
+    && npm cache clean --force \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 COPY --from=compilacion /app/dist ./dist
 
