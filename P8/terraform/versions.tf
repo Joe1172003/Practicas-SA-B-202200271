@@ -8,5 +8,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 3.2"
     }
+    # Para instalar ArgoCD con su chart oficial en vez de copiar sus manifiestos.
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.3"
+    }
   }
 }

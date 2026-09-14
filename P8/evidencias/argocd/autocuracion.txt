@@ -1,0 +1,35 @@
+Prueba de autocuracion (selfHeal) - 13/09/2026, 21:15 hora de Guatemala (03:15 UTC)
+Cambio manual, saltandose el repo GitOps:
+  kubectl -n sa-p8 set image deployment/gateway gateway=ghcr.io/joe1172003/p4-gateway:1.0.0
+
+== Eventos de la app gateway en ArgoCD ==
+HORA_UTC               RAZON                MENSAJE
+2026-09-14T03:15:41Z   OperationStarted     Initiated automated sync to 'a4196542900517e86ddfc41e96818cdac1009ba2, 56ffd3296232e054e6d1915d663a879e57f76675'
+2026-09-14T03:15:41Z   ResourceUpdated      Updated sync status: Synced -> OutOfSync
+2026-09-14T03:15:42Z   ResourceUpdated      Updated health status: Healthy -> Progressing
+2026-09-14T03:15:43Z   OperationCompleted   Partial sync operation to  succeeded
+2026-09-14T03:15:43Z   ResourceUpdated      Updated sync status: OutOfSync -> Synced
+2026-09-14T03:15:43Z   ResourceUpdated      Updated health status: Progressing -> Healthy
+
+== Quien inicio la sincronizacion ==
+initiatedBy: {"automated":true}
+inicio: 2026-09-14T03:15:41Z  fin: 2026-09-14T03:15:43Z
+resultado: successfully synced (all tasks run)
+
+== ReplicaSets del gateway: el de 1.0.0 nacio y ArgoCD lo bajo a 0 ==
+HORA_UTC               RAZON                     MENSAJE
+2026-09-14T03:03:54Z   ScalingReplicaSet         Scaled up replica set gateway-77ff96684c from 0 to 1
+2026-09-14T03:04:09Z   ScalingReplicaSet         Scaled up replica set gateway-77ff96684c from 1 to 2
+2026-09-14T03:15:41Z   ScalingReplicaSet         Scaled up replica set gateway-df48c4684 from 0 to 1
+2026-09-14T03:15:43Z   ScalingReplicaSet         Scaled down replica set gateway-df48c4684 from 1 to 0
+REPLICASET           IMAGEN                                REPLICAS
+gateway-77ff96684c   ghcr.io/joe1172003/p4-gateway:1.0.1   2
+gateway-df48c4684    ghcr.io/joe1172003/p4-gateway:1.0.0   0
+
+== Estado final ==
+POD                        IMAGEN                                FASE
+gateway-77ff96684c-kmfvj   ghcr.io/joe1172003/p4-gateway:1.0.1   Running
+gateway-77ff96684c-m5dw7   ghcr.io/joe1172003/p4-gateway:1.0.1   Running
+NAME      SYNC STATUS   HEALTH STATUS
+gateway   Synced        Healthy
+raiz      Synced        Healthy
