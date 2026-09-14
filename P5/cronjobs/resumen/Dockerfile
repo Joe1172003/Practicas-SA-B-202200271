@@ -10,6 +10,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Parches de seguridad de Debian que python:3.11-slim todavia no trae. Sin esto
+# Trivy encuentra 3 vulnerabilidades criticas en perl-base y bloquea la version.
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=compilacion /dependencias /usr/local
 
 COPY main.py ./
