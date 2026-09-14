@@ -1,0 +1,69 @@
+Plataforma completa desplegada por ArgoCD - 14/09/2026 13:49 hora de Guatemala (19:49 UTC)
+
+== Applications de ArgoCD (namespace argocd) ==
+NAME             SYNC STATUS   HEALTH STATUS
+auth             Synced        Healthy
+cronjobs         Synced        Healthy
+gateway          Synced        Healthy
+notificaciones   Synced        Healthy
+ordenes          Synced        Healthy
+postgres         Synced        Healthy
+productos        Synced        Healthy
+rabbitmq         Synced        Healthy
+raiz             Synced        Healthy
+
+== Secretos: ArgoCD aplica el SealedSecret cifrado y el controlador crea el Secret ==
+NAME                     STATUS   SYNCED   AGE
+auth-secreto                      True     4m21s
+bitacora-secreto                  True     4m25s
+notificaciones-secreto            True     4m24s
+ordenes-secreto                   True     4m21s
+postgres-secreto                  True     11m
+productos-secreto                 True     4m26s
+rabbitmq-secreto                  True     11m
+resumen-secreto                   True     4m25s
+
+== Pods en sa-p8 ==
+POD                              IMAGEN                                                FASE        REINICIOS
+auth-76559d9669-646fs            ghcr.io/joe1172003/p4-auth:1.0.1                      Running     0
+auth-76559d9669-fw2v5            ghcr.io/joe1172003/p4-auth:1.0.1                      Running     0
+auth-76559d9669-h4v27            ghcr.io/joe1172003/p4-auth:1.0.1                      Running     0
+bitacora-29823586-82fb4          ghcr.io/joe1172003/p5-cron-bitacora:1.0.1             Succeeded   0
+bitacora-29823588-txpdc          ghcr.io/joe1172003/p5-cron-bitacora:1.0.1             Succeeded   0
+gateway-77ff96684c-kmfvj         ghcr.io/joe1172003/p4-gateway:1.0.1                   Running     0
+gateway-77ff96684c-m5dw7         ghcr.io/joe1172003/p4-gateway:1.0.1                   Running     0
+notificaciones-6f7d684f4-mj8fh   ghcr.io/joe1172003/p4-notificaciones:1.0.1            Running     0
+ordenes-6dd554f9c9-q677v         ghcr.io/joe1172003/p4-ordenes:1.0.1                   Running     0
+ordenes-6dd554f9c9-xkqb7         ghcr.io/joe1172003/p4-ordenes:1.0.1                   Running     0
+postgres-0                       postgres:15-alpine                                    Running     0
+productos-75976df656-9bc78       ghcr.io/joe1172003/p4-productos:1.0.1                 Running     0
+productos-75976df656-zgvgc       ghcr.io/joe1172003/p4-productos:1.0.1                 Running     0
+rabbitmq-0                       docker.io/bitnamilegacy/rabbitmq:4.1.3-debian-12-r1   Running     0
+
+== Flujo de punta a punta por el Ingress (http://34.59.174.240.nip.io) ==
+ 1. GET /health                        HTTP 200   192 ms  ok
+ 2. POST /auth/register (CLIENTE)      HTTP 201  1509 ms  rol CLIENTE
+ 3. POST /auth/login                   HTTP 200  1371 ms  cookie de sesion: si
+ 4. GET /auth/me                       HTTP 200   243 ms  correo coincide: True
+ 5. GraphQL productos                  HTTP 200  1234 ms  3 productos; elijo 'Celular Samsung A54' stock 24
+ 6. GraphQL crearOrden                 HTTP 200   795 ms  {'id': 'f0d228b5-8c4a-412b-b5c6-96481b0745b7', 'estado': 'PENDIENTE', 'total': 2300.5}
+ 7. GraphQL confirmarPago (saga)       HTTP 200   272 ms  {'id': 'f0d228b5-8c4a-412b-b5c6-96481b0745b7', 'estado': 'PAGADA', 'motivo': None}
+ 8. GraphQL misOrdenes                 HTTP 200  1208 ms  [{'id': 'f0d228b5-8c4a-412b-b5c6-96481b0745b7', 'estado': 'PAGADA', 'total': 2300.5}]
+ 9. GraphQL producto (despues)         HTTP 200   198 ms  stock 24 -> 23, apartado 0
+10. POST /auth/logout                  HTTP 200   171 ms  
+11. GET /auth/me sin sesion            HTTP 401  1188 ms  (tiene que ser 401)
+
+== Cadena de cronjobs: bitacora escribe cada 2 min, resumen lee cada 10 y publica en RabbitMQ ==
+NAME                STATUS     COMPLETIONS   DURATION   AGE
+bitacora-29823586   Complete   1/1           10s        4m35s
+bitacora-29823588   Complete   1/1           5s         2m35s
+bitacora-29823590   Complete   1/1           6s         35s
+resumen-29823590    Complete   1/1           8s         35s
+
+-- log de resumen-29823590
+Resumen publicado: 3 ejecuciones en 1 hora(s).
+  2026-09-15T01:00:00 -> 3
+-- notificaciones recibe los mensajes de auth, ordenes y resumen por RabbitMQ
+      2   NOTIFICACION [orden_pagada]
+      1   NOTIFICACION [resumen_bitacora]
+      3   NOTIFICACION [usuario_registrado]

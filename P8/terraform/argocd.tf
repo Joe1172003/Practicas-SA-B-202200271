@@ -102,8 +102,9 @@ resource "helm_release" "argocd_apps" {
 
       # La raiz solo puede crear Applications en argocd, nada mas.
       raiz = {
+        # Sin dos puntos en description: el chart no le pone comillas y
+        # romperia el YAML.
         namespace   = "argocd"
-        # Sin dos puntos: el chart no le pone comillas y romperia el YAML.
         description = "App of apps que lee la carpeta apps del repo GitOps"
         sourceRepos = [var.repo_gitops]
         destinations = [{
