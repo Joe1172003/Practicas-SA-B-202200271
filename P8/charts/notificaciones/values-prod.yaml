@@ -1,0 +1,3 @@
+# GKE: tambien una sola replica y sin PDB. Es un consumidor de cola, no recibe
+# trafico; y un PDB con una sola replica bloquea el drenado del nodo, como en la P6.
+replicas: 1

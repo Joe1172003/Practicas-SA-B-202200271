@@ -1,0 +1,27 @@
+# Quien puede entrarle al broker: los dos que publican (auth y ordenes), el que
+# consume (notificaciones) y el cronjob resumen. Gateway y productos no la tocan.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: entrada-rabbitmq
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/part-of: sa-p8
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        {{- range list "auth" "ordenes" "notificaciones" "resumen" }}
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ . }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 5672

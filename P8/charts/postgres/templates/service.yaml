@@ -1,0 +1,18 @@
+# El que usan los microservicios. Respeta la readiness: no manda conexiones a
+# una base que todavia arranca.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "sa.selector" . | nindent 4 }}
+  ports:
+    - name: postgres
+      port: {{ .Values.puerto }}
+      targetPort: postgres
+      protocol: TCP

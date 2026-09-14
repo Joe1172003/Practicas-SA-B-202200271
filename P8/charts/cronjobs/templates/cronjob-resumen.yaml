@@ -1,0 +1,53 @@
+{{- $ctx := dict "raiz" . "componente" "resumen" -}}
+# Cronjob 2: cada 10 minutos agrupa la bitacora por hora y publica el resumen en la cola.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: resumen
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cron.etiquetas" $ctx | nindent 4 }}
+spec:
+  schedule: {{ .Values.resumen.horario | quote }}
+  # Si la ejecucion anterior sigue viva, esta se salta en vez de correr en paralelo.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: {{ .Values.historialExito }}
+  failedJobsHistoryLimit: {{ .Values.historialFallo }}
+  # Si el cluster estuvo apagado, no dispara todas las ejecuciones perdidas juntas.
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.reintentos }}
+      template:
+        metadata:
+          labels:
+            {{- include "cron.etiquetas" $ctx | nindent 12 }}
+        spec:
+          # Never: el reintento lo maneja backoffLimit creando un Pod nuevo.
+          restartPolicy: Never
+          # La cuenta la crea Terraform, con permiso de leer solo resumen-secreto.
+          serviceAccountName: resumen
+          securityContext:
+            {{- include "cron.seguridadPod" (dict "uid" .Values.resumen.uid) | nindent 12 }}
+          containers:
+            - name: resumen
+              image: {{ include "cron.imagen" (dict "raiz" . "repositorio" .Values.resumen.repositorio) | quote }}
+              imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
+              securityContext:
+                {{- include "cron.seguridadContenedor" . | nindent 16 }}
+              env:
+                - name: CARNE
+                  value: {{ .Values.carne | quote }}
+                - name: COLA_NOTIFICACIONES
+                  value: {{ .Values.colaNotificaciones | quote }}
+              envFrom:
+                # DATABASE_URL y RABBITMQ_URL: a diferencia de bitacora, tambien publica en la cola.
+                - secretRef:
+                    name: resumen-secreto
+              resources:
+                requests:
+                  cpu: {{ .Values.recursos.requests.cpu | quote }}
+                  memory: {{ .Values.recursos.requests.memoria | quote }}
+                limits:
+                  cpu: {{ .Values.recursos.limits.cpu | quote }}
+                  memory: {{ .Values.recursos.limits.memoria | quote }}

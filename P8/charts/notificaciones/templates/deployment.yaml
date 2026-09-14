@@ -1,0 +1,83 @@
+# Sin Service ni puerto: nadie lo llama, el saca los mensajes de la cola. Por
+# eso tampoco tiene NetworkPolicy de entrada: la base de Terraform ya no deja
+# entrar a nadie.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa.etiquetas" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ toYaml .Values.configuracion | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Chart.Name }}
+      # uid 10001 y no 1000: es el que crea su Dockerfile con useradd.
+      securityContext:
+        {{- include "sa.seguridadPod" (dict "uid" 10001) | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "sa.imagen" . | quote }}
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
+            - secretRef:
+                name: {{ .Chart.Name }}-secreto
+          env:
+            - name: ARCHIVO_LOG
+              value: {{ .Values.archivoLog | quote }}
+            # El consumidor toca este archivo en cada vuelta: sin HTTP, la salud se mide asi.
+            - name: ARCHIVO_LATIDO
+              value: {{ .Values.archivoLatido | quote }}
+          securityContext:
+            {{- include "sa.seguridadContenedor" . | nindent 12 }}
+          # Probes por exec: latido.py sale con 0 si el latido es reciente y con 1 si no.
+          startupProbe:
+            exec:
+              command: ["python", "/app/latido.py"]
+            periodSeconds: 3
+            failureThreshold: 20
+          readinessProbe:
+            exec:
+              command: ["python", "/app/latido.py"]
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: ["python", "/app/latido.py"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: {{ .Values.archivoLog | dir }}
+            - name: temporal
+              mountPath: {{ .Values.archivoLatido | dir }}
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: temporal
+          emptyDir: {}

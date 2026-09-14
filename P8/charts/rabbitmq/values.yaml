@@ -1,0 +1,57 @@
+# Bitnami exige esto cuando se cambia su imagen por defecto (ver image abajo).
+global:
+  security:
+    allowInsecureImages: true
+
+# Todo lo que va bajo rabbitmq lo lee el chart de Bitnami, por eso las claves
+# van en ingles: las definio ese chart.
+rabbitmq:
+  # Nombre fijo: los servicios lo encuentran como rabbitmq:5672.
+  fullnameOverride: rabbitmq
+
+  # Bitnami movio sus imagenes a bitnamilegacy y la ruta vieja ya no existe.
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/rabbitmq
+    tag: 4.1.3-debian-12-r1
+    pullPolicy: IfNotPresent
+
+  auth:
+    username: sa_p8
+    # La contrasena y la cookie salen de rabbitmq-secreto, que lo crea Sealed
+    # Secrets. Ninguna credencial pasa por estos valores.
+    existingPasswordSecret: rabbitmq-secreto
+    existingSecretPasswordKey: rabbitmq-password
+    existingErlangSecret: rabbitmq-secreto
+    existingSecretErlangKey: rabbitmq-erlang-cookie
+
+  # La cuenta y su Role los crea Terraform, con los mismos permisos que traia Bitnami.
+  serviceAccount:
+    create: false
+    name: rabbitmq
+  rbac:
+    create: false
+
+  # Su policy abre los puertos a cualquiera y los permisos se suman: anularia la nuestra.
+  networkPolicy:
+    enabled: false
+
+  service:
+    type: ClusterIP
+
+  # Una cola durable igual pierde mensajes si el broker reinicia sin disco.
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 640Mi
+
+  commonLabels:
+    app.kubernetes.io/part-of: sa-p8

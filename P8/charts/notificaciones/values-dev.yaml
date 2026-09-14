@@ -1,0 +1,2 @@
+# minikube: una replica.
+replicas: 1

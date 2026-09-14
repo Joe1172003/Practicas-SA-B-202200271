@@ -1,0 +1,51 @@
+{{- $ctx := dict "raiz" . "componente" "bitacora" -}}
+# Cronjob 1: cada 2 minutos guarda la fecha GMT-6 y el carne en db_bitacora.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: bitacora
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cron.etiquetas" $ctx | nindent 4 }}
+spec:
+  schedule: {{ .Values.bitacora.horario | quote }}
+  # Si la ejecucion anterior sigue viva, esta se salta en vez de correr en paralelo.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: {{ .Values.historialExito }}
+  failedJobsHistoryLimit: {{ .Values.historialFallo }}
+  # Si el cluster estuvo apagado, no dispara todas las ejecuciones perdidas juntas.
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.reintentos }}
+      template:
+        metadata:
+          labels:
+            {{- include "cron.etiquetas" $ctx | nindent 12 }}
+        spec:
+          # Never: el reintento lo maneja backoffLimit creando un Pod nuevo.
+          restartPolicy: Never
+          # La cuenta la crea Terraform, con permiso de leer solo bitacora-secreto.
+          serviceAccountName: bitacora
+          securityContext:
+            {{- include "cron.seguridadPod" (dict "uid" .Values.bitacora.uid) | nindent 12 }}
+          containers:
+            - name: bitacora
+              image: {{ include "cron.imagen" (dict "raiz" . "repositorio" .Values.bitacora.repositorio) | quote }}
+              imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
+              securityContext:
+                {{- include "cron.seguridadContenedor" . | nindent 16 }}
+              env:
+                - name: CARNE
+                  value: {{ .Values.carne | quote }}
+              envFrom:
+                # Solo DATABASE_URL: este unicamente escribe en la base.
+                - secretRef:
+                    name: bitacora-secreto
+              resources:
+                requests:
+                  cpu: {{ .Values.recursos.requests.cpu | quote }}
+                  memory: {{ .Values.recursos.requests.memoria | quote }}
+                limits:
+                  cpu: {{ .Values.recursos.limits.cpu | quote }}
+                  memory: {{ .Values.recursos.limits.memoria | quote }}

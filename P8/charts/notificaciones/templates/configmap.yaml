@@ -1,0 +1,12 @@
+# Configuracion no sensible. El nombre es el que autoriza el Role de Terraform.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+data:
+  {{- range $clave, $valor := .Values.configuracion }}
+  {{ $clave }}: {{ $valor | quote }}
+  {{- end }}

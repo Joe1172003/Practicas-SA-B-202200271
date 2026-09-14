@@ -1,0 +1,11 @@
+apiVersion: v2
+name: rabbitmq
+description: Broker de mensajes. Envuelve el chart de Bitnami para que use la cuenta y el Secret de la plataforma
+type: application
+version: 1.0.0
+# El chart de Bitnami queda guardado en charts/ (lo baja helm dependency update),
+# asi el despliegue no depende de que el repositorio de Bitnami responda.
+dependencies:
+  - name: rabbitmq
+    version: 16.0.14
+    repository: https://charts.bitnami.com/bitnami

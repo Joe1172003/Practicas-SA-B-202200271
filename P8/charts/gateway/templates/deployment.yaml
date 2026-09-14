@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.habilitado }}
+  # Con HPA no se fija replicas: cada sincronizacion lo devolveria a este valor.
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # El Pod nuevo tiene que estar listo antes de bajar el viejo: sin caida.
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa.etiquetas" . | nindent 8 }}
+      annotations:
+        # Si cambia la configuracion cambia este hash y los Pods se reemplazan solos.
+        checksum/config: {{ toYaml .Values.configuracion | sha256sum }}
+    spec:
+      # La cuenta la crea Terraform con permiso de leer solo gateway-config.
+      serviceAccountName: {{ .Chart.Name }}
+      securityContext:
+        {{- include "sa.seguridadPod" (dict "uid" 1000) | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "sa.imagen" . | quote }}
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.puerto }}
+          envFrom:
+            # Sin Secret: el gateway no toca la base ni firma tokens.
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
+          env:
+            - name: PORT
+              value: {{ .Values.puerto | quote }}
+          securityContext:
+            {{- include "sa.seguridadContenedor" . | nindent 12 }}
+          {{- include "sa.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}
+          volumeMounts:
+            # Unico punto escribible: Node necesita /tmp aunque la app no escriba archivos.
+            - name: temporal
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}
+      volumes:
+        - name: temporal
+          emptyDir: {}

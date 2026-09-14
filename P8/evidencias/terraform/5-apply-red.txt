@@ -1,0 +1,23 @@
+﻿kubernetes_network_policy_v1.salida_interna: Creating...
+kubernetes_network_policy_v1.denegar_todo: Creating...
+kubernetes_network_policy_v1.permitir_dns: Creating...
+kubernetes_network_policy_v1.permitir_dns: Creation complete after 0s [id=sa-p8/permitir-dns]
+kubernetes_network_policy_v1.denegar_todo: Creation complete after 0s [id=sa-p8/denegar-todo]
+kubernetes_network_policy_v1.salida_interna: Creation complete after 0s [id=sa-p8/salida-interna]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+namespace_plataforma = "sa-p8"
+service_accounts = [
+  "auth",
+  "bitacora",
+  "gateway",
+  "notificaciones",
+  "ordenes",
+  "postgres",
+  "productos",
+  "resumen",
+  "rabbitmq",
+]

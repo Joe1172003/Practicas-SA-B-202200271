@@ -1,0 +1,26 @@
+# Valores comunes a los dos ambientes.
+
+imagen:
+  repositorio: ghcr.io/joe1172003/p4-notificaciones
+  # Vacia a proposito: la version la pone el repositorio GitOps.
+  etiqueta: ""
+  politicaDescarga: IfNotPresent
+
+replicas: 1
+
+recursos:
+  requests:
+    cpu: 15m
+    memoria: 96Mi
+  limits:
+    cpu: 200m
+    memoria: 256Mi
+
+# Los dos unicos puntos escribibles con el disco en solo lectura.
+archivoLog: /app/logs/notificaciones.log
+archivoLatido: /tmp/latido
+
+# Va al ConfigMap notificaciones-config. DATABASE_URL y RABBITMQ_URL llevan
+# contrasenas y van en el Secret notificaciones-secreto.
+configuracion:
+  COLA_NOTIFICACIONES: notificaciones

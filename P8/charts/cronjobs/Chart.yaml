@@ -1,0 +1,7 @@
+apiVersion: v2
+name: cronjobs
+description: Los dos cronjobs encadenados, bitacora escribe en la base y resumen publica en la cola
+type: application
+# Version del empaquetado del chart. La version de la aplicacion no va aca:
+# sale del tag de git y la fija el repositorio GitOps en imagen.etiqueta.
+version: 1.0.0

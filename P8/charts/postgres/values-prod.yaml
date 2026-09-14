@@ -1,0 +1,3 @@
+# GKE: disco persistente de verdad, el mismo tipo que use en la P6.
+almacenamiento:
+  claseAlmacenamiento: standard-rwo

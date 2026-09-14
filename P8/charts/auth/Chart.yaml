@@ -1,0 +1,7 @@
+apiVersion: v2
+name: auth
+description: "Autenticacion: registro, login y sesiones con JWT"
+type: application
+# Version del empaquetado del chart. La version de la aplicacion no va aca:
+# sale del tag de git y la fija el repositorio GitOps en imagen.etiqueta.
+version: 1.0.0

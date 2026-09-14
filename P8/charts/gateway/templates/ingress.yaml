@@ -1,0 +1,22 @@
+# Unica puerta de entrada al cluster: todo lo que llega al host va al gateway.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.clase | quote }}
+  rules:
+    - host: {{ required "Falta ingress.host: va en values-dev.yaml o values-prod.yaml" .Values.ingress.host | quote }}
+      http:
+        paths:
+          # El ruteo fino entre microservicios lo hace el gateway, no el Ingress.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Chart.Name }}
+                port:
+                  name: http

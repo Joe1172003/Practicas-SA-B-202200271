@@ -1,0 +1,3 @@
+# GKE: se guardan 3 de cada una, para poder revisar los logs si algo falla.
+historialExito: 3
+historialFallo: 3

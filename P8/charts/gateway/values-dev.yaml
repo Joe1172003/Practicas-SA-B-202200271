@@ -1,0 +1,3 @@
+# minikube: una sola replica y sin autoescalado, que la maquina local no da para mas.
+ingress:
+  host: sa-p8.local

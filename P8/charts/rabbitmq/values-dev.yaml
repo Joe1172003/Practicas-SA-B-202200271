@@ -1,0 +1,4 @@
+# minikube: la StorageClass por defecto.
+rabbitmq:
+  persistence:
+    storageClass: ""

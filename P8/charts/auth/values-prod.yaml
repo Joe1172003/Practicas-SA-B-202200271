@@ -1,0 +1,10 @@
+# GKE. Minimo 2 replicas: con una sola, el PDB impide drenar el nodo, que es lo
+# que trabo el apagado del cluster en la P6.
+hpa:
+  habilitado: true
+
+pdb:
+  habilitado: true
+
+configuracion:
+  NODE_ENV: production

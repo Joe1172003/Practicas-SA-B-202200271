@@ -1,0 +1,3 @@
+# minikube: guardar solo la ultima ejecucion, para no llenar la maquina de Pods terminados.
+historialExito: 1
+historialFallo: 1

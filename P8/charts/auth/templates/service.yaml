@@ -1,0 +1,17 @@
+# Nombre estable por el que lo encuentra el gateway, sin importar que Pod responda.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "sa.selector" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.puerto }}
+      targetPort: http
+      protocol: TCP

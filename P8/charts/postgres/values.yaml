@@ -1,0 +1,36 @@
+# Valores comunes a los dos ambientes.
+
+imagen:
+  repositorio: postgres
+  # Imagen oficial de Docker Hub: esta version es la de Postgres, no la de mi
+  # plataforma, por eso si va fija aca y no la pone el repositorio GitOps.
+  etiqueta: 15-alpine
+  politicaDescarga: IfNotPresent
+
+puerto: 5432
+# uid del usuario postgres en la imagen alpine. En la variante debian es 999.
+uid: 70
+# Solo para pg_isready. La contrasena va en el Secret postgres-secreto.
+usuario: postgres
+baseInicial: postgres
+
+# Una base por microservicio: cada uno es dueno de sus datos.
+basesDatos:
+  - db_auth
+  - db_productos
+  - db_ordenes
+  - db_notificaciones
+  - db_bitacora
+
+almacenamiento:
+  tamano: 1Gi
+  # Vacio usa la StorageClass por defecto del cluster.
+  claseAlmacenamiento: ""
+
+recursos:
+  requests:
+    cpu: 50m
+    memoria: 192Mi
+  limits:
+    cpu: 500m
+    memoria: 512Mi

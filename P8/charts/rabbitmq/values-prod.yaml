@@ -1,0 +1,4 @@
+# GKE: disco persistente de verdad.
+rabbitmq:
+  persistence:
+    storageClass: standard-rwo

@@ -1,0 +1,24 @@
+# Quien puede entrarle al gateway: solo el Ingress Controller, que es el unico
+# origen legitimo de afuera. La base de denegar todo la pone Terraform.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: entrada-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # namespaceSelector y no podSelector: el Ingress Controller vive fuera de sa-p8.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.puerto }}

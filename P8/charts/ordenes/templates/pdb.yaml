@@ -1,0 +1,16 @@
+{{- if .Values.pdb.habilitado }}
+# Cuantos Pods tienen que seguir vivos cuando se drena un nodo. Solo tiene
+# sentido con 2 o mas replicas: con una sola bloquearia el drenado.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.pdb.minimoDisponible }}
+  selector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+{{- end }}

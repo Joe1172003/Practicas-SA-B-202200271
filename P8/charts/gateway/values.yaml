@@ -1,0 +1,44 @@
+# Valores comunes a los dos ambientes. Lo que cambia entre minikube y GKE va en
+# values-dev.yaml y values-prod.yaml.
+
+imagen:
+  repositorio: ghcr.io/joe1172003/p4-gateway
+  # Vacia a proposito: la version la pone el repositorio GitOps. Si falta, o si
+  # alguien pone latest, el chart falla en vez de desplegar algo que no se sabe que es.
+  etiqueta: ""
+  politicaDescarga: IfNotPresent
+
+puerto: 3000
+replicas: 1
+
+recursos:
+  requests:
+    cpu: 15m
+    memoria: 96Mi
+  limits:
+    cpu: 300m
+    memoria: 256Mi
+
+hpa:
+  habilitado: false
+  minimo: 2
+  maximo: 3
+  # 70 y no 30: con requests de 15m, el 30% seria 4.5m y escalaria por nada.
+  umbralCpu: 70
+
+pdb:
+  habilitado: false
+  minimoDisponible: 1
+
+# Va entera al ConfigMap gateway-config. Solo lo que el gateway lee de verdad.
+configuracion:
+  NODE_ENV: development
+  CORS_ORIGIN: http://localhost:5173
+  # Los nombres son fijos: cada servicio vive en su chart con su propio nombre.
+  URL_AUTH: http://auth:3001
+  URL_PRODUCTOS: http://productos:3002
+  URL_ORDENES: http://ordenes:3003
+
+ingress:
+  clase: nginx
+  host: ""

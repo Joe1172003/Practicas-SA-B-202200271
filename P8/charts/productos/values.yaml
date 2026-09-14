@@ -1,0 +1,39 @@
+# Valores comunes a los dos ambientes. Lo que cambia entre minikube y GKE va en
+# values-dev.yaml y values-prod.yaml.
+
+imagen:
+  repositorio: ghcr.io/joe1172003/p4-productos
+  # Vacia a proposito: la version la pone el repositorio GitOps. Si falta, o si
+  # alguien pone latest, el chart falla en vez de desplegar algo que no se sabe que es.
+  etiqueta: ""
+  politicaDescarga: IfNotPresent
+
+puerto: 3002
+replicas: 1
+
+recursos:
+  requests:
+    cpu: 15m
+    memoria: 128Mi
+  limits:
+    cpu: 300m
+    memoria: 320Mi
+
+hpa:
+  habilitado: false
+  minimo: 2
+  maximo: 3
+  # 70 y no 30: con requests de 15m, el 30% seria 4.5m y escalaria por nada.
+  umbralCpu: 70
+
+pdb:
+  habilitado: false
+  minimoDisponible: 1
+
+# Va entera al ConfigMap productos-config. Lo sensible (DATABASE_URL)
+# no esta aca: va en el Secret productos-secreto.
+configuracion:
+  NODE_ENV: development
+  # true tambien en produccion: el codigo no tiene migraciones y TypeORM es lo
+  # unico que crea las tablas en una base nueva.
+  DB_SYNCHRONIZE: "true"

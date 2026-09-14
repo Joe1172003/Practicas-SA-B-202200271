@@ -1,0 +1,155 @@
+﻿kubernetes_namespace_v1.herramientas["argo-rollouts"]: Refreshing state... [id=argo-rollouts]
+kubernetes_namespace_v1.plataforma: Refreshing state... [id=sa-p8]
+kubernetes_namespace_v1.herramientas["sealed-secrets"]: Refreshing state... [id=sealed-secrets]
+kubernetes_namespace_v1.herramientas["argocd"]: Refreshing state... [id=argocd]
+kubernetes_namespace_v1.ingress_nginx: Refreshing state... [id=ingress-nginx]
+kubernetes_namespace_v1.herramientas["kyverno"]: Refreshing state... [id=kyverno]
+kubernetes_cluster_role_binding_v1.consola_admin: Refreshing state... [id=consola-admin]
+kubernetes_resource_quota_v1.plataforma: Refreshing state... [id=sa-p8/cuota]
+kubernetes_limit_range_v1.plataforma: Refreshing state... [id=sa-p8/limites]
+kubernetes_service_account_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_service_account_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_service_account_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_service_account_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_service_account_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_service_account_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_service_account_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_binding_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_role_binding_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_binding_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_binding_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_binding_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_binding_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_binding_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_binding_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_binding_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # kubernetes_network_policy_v1.denegar_todo will be created
+  + resource "kubernetes_network_policy_v1" "denegar_todo" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p8"
+            }
+          + name             = "denegar-todo"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Ingress",
+              + "Egress",
+            ]
+
+          + pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.permitir_dns will be created
+  + resource "kubernetes_network_policy_v1" "permitir_dns" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p8"
+            }
+          + name             = "permitir-dns"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Egress",
+            ]
+
+          + egress {
+              + ports {
+                  + port     = "53"
+                  + protocol = "UDP"
+                }
+              + ports {
+                  + port     = "53"
+                  + protocol = "TCP"
+                }
+              + to {
+                  + namespace_selector {
+                      + match_labels = {
+                          + "kubernetes.io/metadata.name" = "kube-system"
+                        }
+                    }
+                }
+            }
+
+          + pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.salida_interna will be created
+  + resource "kubernetes_network_policy_v1" "salida_interna" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p8"
+            }
+          + name             = "salida-interna"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Egress",
+            ]
+
+          + egress {
+              + to {
+                  + pod_selector {
+                    }
+                }
+            }
+
+          + pod_selector {
+            }
+        }
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+Saved the plan to: fase2-red.tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "fase2-red.tfplan"

@@ -1,0 +1,3 @@
+# minikube: la StorageClass por defecto (hostpath).
+almacenamiento:
+  claseAlmacenamiento: ""

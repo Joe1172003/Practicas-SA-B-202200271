@@ -1,0 +1,14 @@
+# GKE. Minimo 2 replicas: con una sola, el PDB impide drenar el nodo, que es lo
+# que trabo el apagado del cluster en la P6.
+hpa:
+  habilitado: true
+
+pdb:
+  habilitado: true
+
+configuracion:
+  NODE_ENV: production
+
+ingress:
+  # nip.io resuelve esta IP sin comprar dominio. Es la del Service de ingress-nginx.
+  host: 34.59.174.240.nip.io

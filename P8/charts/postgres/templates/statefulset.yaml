@@ -1,0 +1,104 @@
+# StatefulSet y no Deployment: el Pod conserva su nombre y su disco aunque se recree.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  serviceName: {{ .Chart.Name }}-headless
+  # Una sola: escalar Postgres asi crearia bases separadas, no un cluster.
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa.etiquetas" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Chart.Name }}
+      securityContext:
+        {{- include "sa.seguridadPod" (dict "uid" .Values.uid) | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "sa.imagen" . | quote }}
+          imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.puerto }}
+          env:
+            # Clave por clave del Secret, que lo crea Sealed Secrets.
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-secreto
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-secreto
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: {{ .Values.baseInicial | quote }}
+            # Subcarpeta y no la raiz del disco, que trae un lost+found.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          securityContext:
+            {{- include "sa.seguridadContenedor" . | nindent 12 }}
+          volumeMounts:
+            - name: datos
+              mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+            # Con el disco raiz en solo lectura, Postgres necesita estas dos rutas
+            # para el socket y los archivos temporales de las consultas.
+            - name: socket
+              mountPath: /var/run/postgresql
+            - name: temporal
+              mountPath: /tmp
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ .Values.usuario | quote }}, "-d", {{ .Values.baseInicial | quote }}]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ .Values.usuario | quote }}, "-d", {{ .Values.baseInicial | quote }}]
+            # Mas holgada que la readiness: no matar la base por una ocupacion breve.
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: {{ .Values.recursos.requests.cpu | quote }}
+              memory: {{ .Values.recursos.requests.memoria | quote }}
+            limits:
+              cpu: {{ .Values.recursos.limits.cpu | quote }}
+              memory: {{ .Values.recursos.limits.memoria | quote }}
+      volumes:
+        - name: init
+          configMap:
+            name: {{ .Chart.Name }}-config
+        - name: socket
+          emptyDir: {}
+        - name: temporal
+          emptyDir: {}
+  # Molde del disco: crea un PVC que no se borra al morir el Pod.
+  volumeClaimTemplates:
+    - metadata:
+        name: datos
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.almacenamiento.claseAlmacenamiento }}
+        storageClassName: {{ .Values.almacenamiento.claseAlmacenamiento | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.almacenamiento.tamano | quote }}

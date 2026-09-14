@@ -1,0 +1,18 @@
+# clusterIP None: no reparte trafico, le da nombre propio al Pod. El StatefulSet
+# no arranca sin el.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "sa.selector" . | nindent 4 }}
+  ports:
+    - name: postgres
+      port: {{ .Values.puerto }}
+      targetPort: postgres
+      protocol: TCP

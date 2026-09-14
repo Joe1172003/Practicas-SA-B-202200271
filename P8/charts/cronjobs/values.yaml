@@ -1,0 +1,36 @@
+# Valores comunes a los dos ambientes.
+
+imagen:
+  # Una sola version para las dos imagenes: salen del mismo tag de git que el
+  # resto de la plataforma. La pone el repositorio GitOps.
+  etiqueta: ""
+  politicaDescarga: IfNotPresent
+
+carne: "202200271"
+colaNotificaciones: notificaciones
+
+# Cuantas ejecuciones viejas se guardan para poder revisar sus logs.
+historialExito: 3
+historialFallo: 3
+# Reintentos de una ejecucion que salio con error.
+reintentos: 2
+
+bitacora:
+  repositorio: ghcr.io/joe1172003/p5-cron-bitacora
+  horario: "*/2 * * * *"
+  # El uid que crea su Dockerfile.
+  uid: 10002
+
+resumen:
+  repositorio: ghcr.io/joe1172003/p5-cron-resumen
+  horario: "*/10 * * * *"
+  uid: 10003
+
+# Scripts cortos que abren una conexion y terminan: necesitan poco.
+recursos:
+  requests:
+    cpu: 10m
+    memoria: 64Mi
+  limits:
+    cpu: 200m
+    memoria: 128Mi

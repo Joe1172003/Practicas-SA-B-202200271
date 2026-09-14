@@ -1,0 +1,14 @@
+# SQL inicial. Se llama postgres-config porque ese es el nombre que autoriza el
+# Role de Terraform. Solo corre la primera vez, sobre un disco vacio.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+data:
+  init-db.sql: |
+    {{- range .Values.basesDatos }}
+    CREATE DATABASE {{ . }};
+    {{- end }}
