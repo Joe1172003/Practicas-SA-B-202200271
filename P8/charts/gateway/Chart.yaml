@@ -4,4 +4,4 @@ description: API Gateway, el unico punto de entrada publico de la plataforma
 type: application
 # Version del empaquetado del chart. La version de la aplicacion no va aca:
 # sale del tag de git y la fija el repositorio GitOps en imagen.etiqueta.
-version: 1.0.0
+version: 1.1.0

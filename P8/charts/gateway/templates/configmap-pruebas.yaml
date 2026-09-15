@@ -1,0 +1,13 @@
+{{- if .Values.canary.habilitado }}
+# Los scripts de k6 de la carpeta pruebas/ del chart. Viajan con cada version:
+# el canary siempre se prueba con los scripts de su propio tag.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-pruebas
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+data:
+  {{- (.Files.Glob "pruebas/*.js").AsConfig | nindent 2 }}
+{{- end }}

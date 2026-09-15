@@ -1,0 +1,56 @@
+{{- if .Values.canary.habilitado }}
+# Las tres pruebas que deciden si el canary avanza. Cada una corre un script de
+# k6 en un Job: si k6 termina bien, el paso pasa; si un umbral falla, k6 sale
+# con error, el Job falla y Argo Rollouts revierte a la version estable.
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Chart.Name }}-humo
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  metrics:
+    - name: humo
+      provider:
+        job:
+          spec:
+            {{- $env := list (dict "name" "VERSION_ESPERADA" "value" .Values.imagen.etiqueta) }}
+            {{- include "gateway.jobPrueba" (dict "raiz" . "script" "humo" "env" $env) | nindent 12 }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Chart.Name }}-integracion
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  metrics:
+    - name: integracion
+      provider:
+        job:
+          spec:
+            {{- include "gateway.jobPrueba" (dict "raiz" . "script" "integracion") | nindent 12 }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Chart.Name }}-carga
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  # Cuantos usuarios y cuanto tiempo los pasa cada paso del Rollout.
+  args:
+    - name: usuarios
+    - name: duracion
+  metrics:
+    - name: carga
+      provider:
+        job:
+          spec:
+            {{- /* {{args.x}} lo reemplaza Argo Rollouts, no Helm: por eso va como texto. */}}
+            {{- $env := list (dict "name" "USUARIOS" "value" "{{args.usuarios}}") (dict "name" "DURACION" "value" "{{args.duracion}}") }}
+            {{- include "gateway.jobPrueba" (dict "raiz" . "script" "carga" "env" $env) | nindent 12 }}
+{{- end }}
