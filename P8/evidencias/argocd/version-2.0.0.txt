@@ -1,0 +1,52 @@
+Version 2.0.0 en produccion - 14/09/2026, despliegue a las 17:08 hora de Guatemala (23:08 UTC)
+
+Camino: tag v2.0.0 -> pipeline P8 GitOps -> PR #1 automatico en sa-p8-gitops -> merge -> ArgoCD sincroniza
+  Pipeline: https://github.com/Joe1172003/Practicas-SA-B-202200271/actions/runs/34905815907
+  PR:       https://github.com/Joe1172003/sa-p8-gitops/pull/1
+
+== Applications (revisiones: chart del repo de codigo + repo GitOps) ==
+APP              SYNC     SALUD     CHART
+auth             Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+cronjobs         Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+gateway          Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+notificaciones   Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+ordenes          Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+postgres         Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+productos        Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+rabbitmq         Synced   Healthy   a601c877fa53f43d21c1f72830dce58e60e4bcce
+raiz             Synced   Healthy   <none>
+
+== Historial de sincronizaciones del gateway ==
+id 0  2026-09-14T03:03:54Z  chart a4196542900517e86ddfc41e96818cdac1009ba2  gitops 56ffd3296232e054e6d1915d663a879e57f76675
+id 1  2026-09-14T23:08:23Z  chart a601c877fa53f43d21c1f72830dce58e60e4bcce  gitops e5d9835cd44aa3375d77e9f918e5d12e5a83c8f0
+
+== Pods en sa-p8 ==
+POD                              IMAGEN                                                REINICIOS
+auth-859d86cb8f-4dxc5            ghcr.io/joe1172003/p4-auth:2.0.0                      0
+auth-859d86cb8f-ljxpv            ghcr.io/joe1172003/p4-auth:2.0.0                      0
+gateway-65dd99fcd7-ml5x8         ghcr.io/joe1172003/p4-gateway:2.0.0                   0
+gateway-65dd99fcd7-pcn48         ghcr.io/joe1172003/p4-gateway:2.0.0                   0
+notificaciones-d7b98c6f4-qlq8d   ghcr.io/joe1172003/p4-notificaciones:2.0.0            0
+ordenes-68b94b649f-h492t         ghcr.io/joe1172003/p4-ordenes:2.0.0                   0
+ordenes-68b94b649f-z7q6m         ghcr.io/joe1172003/p4-ordenes:2.0.0                   0
+postgres-0                       postgres:15-alpine                                    0
+productos-54f977464-59wpj        ghcr.io/joe1172003/p4-productos:2.0.0                 0
+productos-54f977464-dtmvv        ghcr.io/joe1172003/p4-productos:2.0.0                 0
+rabbitmq-0                       docker.io/bitnamilegacy/rabbitmq:4.1.3-debian-12-r1   0
+
+== npm ya no esta en la imagen del gateway (era el origen de la CVE critica) ==
+npm: no existe
+node v22.23.2
+
+== Flujo de punta a punta sobre la 2.0.0 (http://34.59.174.240.nip.io) ==
+ 1. GET /health                        HTTP 200   195 ms  ok
+ 2. POST /auth/register (CLIENTE)      HTTP 201  1513 ms  rol CLIENTE
+ 3. POST /auth/login                   HTTP 200  1339 ms  cookie de sesion: si
+ 4. GET /auth/me                       HTTP 200   173 ms  correo coincide: True
+ 5. GraphQL productos                  HTTP 200   299 ms  3 productos; elijo 'Celular Samsung A54' stock 22
+ 6. GraphQL crearOrden                 HTTP 200  1514 ms  {'id': 'f52d9cc8-4600-45a5-9dbe-56df842ce014', 'estado': 'PENDIENTE', 'total': 2300.5}
+ 7. GraphQL confirmarPago (saga)       HTTP 200   266 ms  {'id': 'f52d9cc8-4600-45a5-9dbe-56df842ce014', 'estado': 'PAGADA', 'motivo': None}
+ 8. GraphQL misOrdenes                 HTTP 200  1249 ms  [{'id': 'f52d9cc8-4600-45a5-9dbe-56df842ce014', 'estado': 'PAGADA', 'total': 2300.5}]
+ 9. GraphQL producto (despues)         HTTP 200   199 ms  stock 22 -> 21, apartado 0
+10. POST /auth/logout                  HTTP 200   166 ms  
+11. GET /auth/me sin sesion            HTTP 401  3178 ms  (tiene que ser 401)

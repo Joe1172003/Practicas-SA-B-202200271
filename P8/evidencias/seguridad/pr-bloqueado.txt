@@ -1,0 +1,18 @@
+Bloqueo por vulnerabilidad critica - PR #3 del repo de codigo (14/09/2026)
+
+PR bloqueado:   https://github.com/Joe1172003/Practicas-SA-B-202200271/pull/3
+Corrida:        https://github.com/Joe1172003/Practicas-SA-B-202200271/actions/runs/34910901991
+Job que fallo:  https://github.com/Joe1172003/Practicas-SA-B-202200271/actions/runs/34910901991/job/104198035462
+
+Que hice: en la rama demo-trivy-bloqueo deshice el arreglo del Dockerfile del
+gateway y deje npm en la imagen final. Ese npm trae tar 7.5.11, con la
+CVE-2026-59873 (CRITICAL, arreglada en 7.5.19).
+
+Que paso:
+  Imagen p4-gateway   -> fallo en "Puerta de Trivy" (trivy --severity CRITICAL --exit-code 1).
+                         Subir, firmar y verificar quedaron skipped: la imagen nunca llego a GHCR.
+  Las otras 6 imagenes -> pasaron la puerta.
+  Puerta de calidad   -> fallo, porque una etapa no estuvo en verde.
+  Merge               -> bloqueado por la regla main-protegida, que exige "Puerta de calidad".
+
+El PR queda abierto y sin fusionar como evidencia.

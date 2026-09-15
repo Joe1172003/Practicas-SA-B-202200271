@@ -1,0 +1,18 @@
+Reporte de Trivy 0.74.0 sobre las imagenes publicadas de la version 2.0.0
+Puerta del pipeline: bloquea con una sola CVE CRITICAL (--severity CRITICAL --exit-code 1)
+
+IMAGEN                 CRITICAL  HIGH (con arreglo)       BASE
+p4-gateway             0         5 (5)                    alpine 3.24.1
+p4-auth                0         5 (5)                    alpine 3.24.1
+p4-productos           0         5 (5)                    alpine 3.24.1
+p4-ordenes             0         5 (5)                    alpine 3.24.1
+p4-notificaciones      0         46 (2)                   debian 13.7
+p5-cron-bitacora       0         46 (2)                   debian 13.7
+p5-cron-resumen        0         46 (2)                   debian 13.7
+
+Comparacion con la version 1.0.1 (la que construia la P7, mismo analisis):
+  Node   (4 imagenes): CRITICAL 1 -> 0   HIGH 15 -> 5   CVE-2026-59873 en el tar del npm que trae node:22-alpine.
+                       Arreglo: borrar npm en la etapa final del Dockerfile (la imagen solo usa node).
+  Python (3 imagenes): CRITICAL 3 -> 0   HIGH 55 -> 46  CVE-2026-13221, CVE-2026-42496 y CVE-2026-8376 en perl-base.
+                       Arreglo: apt-get upgrade en la etapa final (Debian 13.6 -> 13.7).
+Con la 1.0.1, la puerta de Trivy habria bloqueado las 7 imagenes.
