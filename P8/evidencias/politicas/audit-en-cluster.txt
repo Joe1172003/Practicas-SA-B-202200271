@@ -1,0 +1,36 @@
+Politicas en modo Audit dentro del cluster - 15/09/2026, 10:10 hora de Guatemala
+
+En Audit Kyverno no rechaza nada: revisa y anota. Sirve para comprobar que todo lo
+que ya corre en sa-p8 cumple, antes de pasar a Enforce.
+
+== App politicas en ArgoCD (la aplica ArgoCD desde el repo GitOps, no yo)
+APP         PROYECTO    SYNC     SALUD
+politicas   politicas   Synced   Healthy
+
+== Las 4 politicas cargadas
+POLITICA          LISTA
+exigir-limites    True
+exigir-no-root    True
+prohibir-latest   True
+verificar-firma   True
+exigir-limites -> Audit
+exigir-no-root -> Audit
+prohibir-latest -> Audit
+verificar-firma -> Audit
+
+== Reportes de Kyverno sobre todo sa-p8
+57 reportes, resultados: {'pass': 173}
+   CronJob      {'pass': 6}
+   Deployment   {'pass': 12}
+   Job          {'pass': 31}
+   Pod          {'pass': 64}
+   ReplicaSet   {'pass': 54}
+   StatefulSet  {'pass': 6}
+por politica:
+   exigir-limites   pass: 57
+   exigir-no-root   pass: 57
+   prohibir-latest  pass: 57
+   verificar-firma  pass: 2
+
+== Verificacion de firma de un Pod nuevo (bitacora, en el log del admission controller)
+2026-09-15T16:08:02Z image=ghcr.io/joe1172003/p5-cron-bitacora:2.2.0 verifiedCount=1 
