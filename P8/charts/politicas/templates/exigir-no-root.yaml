@@ -1,0 +1,47 @@
+# Politica 3: ningun contenedor corre como root. Si alguien vulnera la app, con
+# root tiene mucho mas poder dentro del contenedor y mas chances de salir de el.
+#
+# Vale declararlo una vez para todo el Pod (spec.securityContext) o en cada
+# contenedor. Lo que no vale es no decir nada ni pedir root a proposito.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: exigir-no-root
+  annotations:
+    policies.kyverno.io/title: Exigir ejecucion sin root
+    policies.kyverno.io/description: >-
+      Los Pods de sa-p8 tienen que declarar runAsNonRoot true, en el Pod o en
+      cada contenedor, y ningun contenedor puede pedirlo en false.
+spec:
+  background: true
+  rules:
+    - name: run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: {{ toJson .Values.namespaces }}
+      validate:
+        failureAction: {{ .Values.accion }}
+        message: >-
+          El Pod tiene que correr sin root: runAsNonRoot true en
+          spec.securityContext o en el securityContext de cada contenedor.
+        anyPattern:
+          # Opcion 1: lo dice el Pod, y ningun contenedor lo contradice.
+          - spec:
+              securityContext:
+                runAsNonRoot: true
+              =(initContainers):
+                - =(securityContext):
+                    =(runAsNonRoot): true
+              containers:
+                - =(securityContext):
+                    =(runAsNonRoot): true
+          # Opcion 2: lo dice cada contenedor, uno por uno.
+          - spec:
+              =(initContainers):
+                - securityContext:
+                    runAsNonRoot: true
+              containers:
+                - securityContext:
+                    runAsNonRoot: true

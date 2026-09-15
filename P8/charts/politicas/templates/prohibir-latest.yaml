@@ -1,0 +1,32 @@
+# Politica 1: ninguna imagen sin version o con latest. Con latest no se sabe
+# que corre, y dos Pods del mismo Deployment pueden terminar con codigo distinto.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: prohibir-latest
+  annotations:
+    policies.kyverno.io/title: Prohibir la etiqueta latest
+    policies.kyverno.io/description: >-
+      Toda imagen de sa-p8 tiene que tener una version explicita. La version sale
+      de un tag de Git y la fija el repo GitOps.
+spec:
+  background: true
+  rules:
+    - name: imagen-con-version
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: {{ toJson .Values.namespaces }}
+      validate:
+        # Audit o Enforce: lo decide el repo GitOps (values.yaml explica cada uno).
+        failureAction: {{ .Values.accion }}
+        message: >-
+          La imagen tiene que llevar una version explicita y no puede ser latest.
+          Usa la version semantica que sale del tag de Git.
+        pattern:
+          spec:
+            =(initContainers):
+              - image: "!*:latest & *:*"
+            containers:
+              - image: "!*:latest & *:*"

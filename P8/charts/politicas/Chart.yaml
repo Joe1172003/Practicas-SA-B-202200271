@@ -1,0 +1,7 @@
+apiVersion: v2
+name: politicas
+description: Las politicas de admision de Kyverno para el namespace de la plataforma
+type: application
+# Version del empaquetado. Si las politicas bloquean o solo anotan no va aca: lo
+# decide el repo GitOps con el valor accion.
+version: 1.0.0
