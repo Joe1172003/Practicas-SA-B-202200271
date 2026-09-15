@@ -1,0 +1,23 @@
+﻿helm_release.argo_rollouts: Creating...
+helm_release.argo_rollouts: Still creating... [00m10s elapsed]
+helm_release.argo_rollouts: Still creating... [00m20s elapsed]
+helm_release.argo_rollouts: Creation complete after 22s [id=argo-rollouts]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80"
+controlador_sealed_secrets = "sealed-secrets/sealed-secrets-controller"
+namespace_plataforma = "sa-p8"
+service_accounts = [
+  "auth",
+  "bitacora",
+  "gateway",
+  "notificaciones",
+  "ordenes",
+  "postgres",
+  "productos",
+  "resumen",
+  "rabbitmq",
+]

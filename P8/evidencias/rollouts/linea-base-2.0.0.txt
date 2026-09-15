@@ -1,0 +1,51 @@
+Linea base de la version 2.0.0 del gateway - 14/09/2026
+
+Para que sirve: los umbrales que deciden si el canary avanza o se revierte
+salen de esta medicion, no de un numero inventado.
+
+Como la medi: los mismos scripts de P8/charts/gateway/pruebas/, corriendo con
+grafana/k6:1.8.1 dentro del cluster y contra UN solo Pod del gateway, que es lo
+que va a tener el canary.
+
+Humo (5 vueltas):         checks 100%, p95 34.57 ms
+Integracion (3 vueltas):  checks 100%, p95 1.32 s (registro y login usan bcrypt)
+
+===== 5 usuarios, 30s contra un solo Pod (gateway-65dd99fcd7-ml5x8, gateway 2.0.0)
+----------------------------------------------------------
+  RESULTADO DE LA PRUEBA DE CARGA
+----------------------------------------------------------
+  Destino            : http://10.8.0.226:3000
+  Usuarios virtuales : 5
+  Peticiones totales : 584
+  Peticiones/segundo : 19.22
+  Latencia p95       : 12.22 ms
+  Latencia promedio  : 7.00 ms
+  Tasa de error      : 0.00 %
+  Checks correctos   : 100.00 %
+  Umbrales:
+    PASA   checks rate>0.99
+    PASA   http_req_failed rate<0.01
+    PASA   http_req_duration p(95)<500
+----------------------------------------------------------
+===== 15 usuarios, 45s contra un solo Pod (gateway-65dd99fcd7-ml5x8, gateway 2.0.0)
+----------------------------------------------------------
+  RESULTADO DE LA PRUEBA DE CARGA
+----------------------------------------------------------
+  Destino            : http://10.8.0.226:3000
+  Usuarios virtuales : 15
+  Peticiones totales : 2556
+  Peticiones/segundo : 56.38
+  Latencia p95       : 52.45 ms
+  Latencia promedio  : 14.33 ms
+  Tasa de error      : 0.00 %
+  Checks correctos   : 100.00 %
+  Umbrales:
+    PASA   http_req_duration p(95)<500
+    PASA   checks rate>0.99
+    PASA   http_req_failed rate<0.01
+----------------------------------------------------------
+
+Umbrales que quedaron en carga.js:
+  http_req_failed   rate<0.01   la estable da 0%
+  checks            rate>0.99   respuestas 200 pero con errores de GraphQL
+  http_req_duration p(95)<300   unas 6 veces los 52 ms del paso mas pesado

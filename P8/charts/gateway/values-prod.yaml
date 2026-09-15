@@ -12,3 +12,7 @@ configuracion:
 ingress:
   # nip.io resuelve esta IP sin comprar dominio. Es la del Service de ingress-nginx.
   host: 34.59.174.240.nip.io
+
+# En GKE esta Argo Rollouts: cada version nueva pasa por el canary.
+canary:
+  habilitado: true

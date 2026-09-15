@@ -9,8 +9,14 @@ metadata:
     {{- include "sa.etiquetas" . | nindent 4 }}
 spec:
   scaleTargetRef:
+    {{- if .Values.canary.habilitado }}
+    # El Rollout tambien se puede escalar: el HPA le cambia las replicas igual.
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    {{- else }}
     apiVersion: apps/v1
     kind: Deployment
+    {{- end }}
     name: {{ .Chart.Name }}
   minReplicas: {{ .Values.hpa.minimo }}
   maxReplicas: {{ .Values.hpa.maximo }}

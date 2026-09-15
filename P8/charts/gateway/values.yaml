@@ -42,3 +42,29 @@ configuracion:
 ingress:
   clase: nginx
   host: ""
+
+# Entrega progresiva con Argo Rollouts. Apagado por defecto: en minikube no esta
+# Argo Rollouts y el gateway se despliega como un Deployment comun.
+canary:
+  habilitado: false
+  # Los dos niveles de la prueba de carga, sobre un solo Pod de la version nueva.
+  # Son los mismos con los que medi la linea base de la 2.0.0.
+  cargaLiviana:
+    usuarios: 5
+    duracion: 30s
+  cargaFuerte:
+    usuarios: 15
+    duracion: 45s
+
+# El Job de k6 que corre cada prueba del canary.
+pruebas:
+  imagen: grafana/k6:1.8.1
+  # Si una prueba se cuelga, el Job se corta aca y cuenta como fallida.
+  limiteSegundos: 180
+  recursos:
+    requests:
+      cpu: 50m
+      memoria: 64Mi
+    limits:
+      cpu: 500m
+      memoria: 256Mi

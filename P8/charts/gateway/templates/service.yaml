@@ -1,4 +1,5 @@
-# Nombre estable al que el Ingress manda el trafico de afuera.
+# Nombre estable al que el Ingress manda el trafico de afuera. Con el canary
+# encendido, Argo Rollouts lo deja apuntando solo a la version estable.
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,3 +16,24 @@ spec:
       port: {{ .Values.puerto }}
       targetPort: http
       protocol: TCP
+{{- if .Values.canary.habilitado }}
+---
+# Apunta solo a la version nueva mientras dura el canary. Recibe el porcentaje
+# del Ingress canary y las pruebas de k6.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-canary
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "sa.selector" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.puerto }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

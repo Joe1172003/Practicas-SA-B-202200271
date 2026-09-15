@@ -1,0 +1,60 @@
+{{- if .Values.canary.habilitado }}
+# El gateway en prod. Es un Deployment con otra forma de reemplazar los Pods:
+# la version nueva recibe primero una parte del trafico, y solo avanza si pasa
+# las pruebas de cada paso. Si una falla, Argo Rollouts vuelve solo a la estable.
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sa.etiquetas" . | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.habilitado }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      {{- include "sa.selector" . | nindent 6 }}
+  template:
+    {{- include "gateway.plantillaPod" . | nindent 4 }}
+  strategy:
+    canary:
+      # Dos Services con el mismo selector: Argo Rollouts le agrega a cada uno la
+      # version que le toca, asi gateway-canary apunta solo a la nueva.
+      stableService: {{ .Chart.Name }}
+      canaryService: {{ .Chart.Name }}-canary
+      # El porcentaje exacto lo reparte ingress-nginx: Argo Rollouts crea un
+      # Ingress canary con el peso de cada paso.
+      trafficRouting:
+        nginx:
+          stableIngress: {{ .Chart.Name }}
+      steps:
+        # Paso 1: 10% del trafico real. Antes de seguir, humo e integracion.
+        - setWeight: 10
+        - analysis:
+            templates:
+              - templateName: {{ .Chart.Name }}-humo
+              - templateName: {{ .Chart.Name }}-integracion
+        # Paso 2: 30%. Carga liviana contra la version nueva.
+        - setWeight: 30
+        - analysis:
+            templates:
+              - templateName: {{ .Chart.Name }}-carga
+            args:
+              - name: usuarios
+                value: {{ .Values.canary.cargaLiviana.usuarios | quote }}
+              - name: duracion
+                value: {{ .Values.canary.cargaLiviana.duracion | quote }}
+        # Paso 3: 60%. Carga fuerte. Si pasa, la version nueva se queda con el 100%.
+        - setWeight: 60
+        - analysis:
+            templates:
+              - templateName: {{ .Chart.Name }}-carga
+            args:
+              - name: usuarios
+                value: {{ .Values.canary.cargaFuerte.usuarios | quote }}
+              - name: duracion
+                value: {{ .Values.canary.cargaFuerte.duracion | quote }}
+{{- end }}

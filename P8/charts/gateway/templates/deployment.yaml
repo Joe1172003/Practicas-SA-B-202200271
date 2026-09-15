@@ -1,3 +1,6 @@
+{{- if not .Values.canary.habilitado }}
+# Solo en dev (minikube), donde no esta Argo Rollouts: reemplazo comun, todo de
+# una vez. En prod el gateway es un Rollout (rollout.yaml).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,45 +23,5 @@ spec:
     matchLabels:
       {{- include "sa.selector" . | nindent 6 }}
   template:
-    metadata:
-      labels:
-        {{- include "sa.etiquetas" . | nindent 8 }}
-      annotations:
-        # Si cambia la configuracion cambia este hash y los Pods se reemplazan solos.
-        checksum/config: {{ toYaml .Values.configuracion | sha256sum }}
-    spec:
-      # La cuenta la crea Terraform con permiso de leer solo gateway-config.
-      serviceAccountName: {{ .Chart.Name }}
-      securityContext:
-        {{- include "sa.seguridadPod" (dict "uid" 1000) | nindent 8 }}
-      containers:
-        - name: {{ .Chart.Name }}
-          image: {{ include "sa.imagen" . | quote }}
-          imagePullPolicy: {{ .Values.imagen.politicaDescarga }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.puerto }}
-          envFrom:
-            # Sin Secret: el gateway no toca la base ni firma tokens.
-            - configMapRef:
-                name: {{ .Chart.Name }}-config
-          env:
-            - name: PORT
-              value: {{ .Values.puerto | quote }}
-          securityContext:
-            {{- include "sa.seguridadContenedor" . | nindent 12 }}
-          {{- include "sa.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}
-          volumeMounts:
-            # Unico punto escribible: Node necesita /tmp aunque la app no escriba archivos.
-            - name: temporal
-              mountPath: /tmp
-          resources:
-            requests:
-              cpu: {{ .Values.recursos.requests.cpu | quote }}
-              memory: {{ .Values.recursos.requests.memoria | quote }}
-            limits:
-              cpu: {{ .Values.recursos.limits.cpu | quote }}
-              memory: {{ .Values.recursos.limits.memoria | quote }}
-      volumes:
-        - name: temporal
-          emptyDir: {}
+    {{- include "gateway.plantillaPod" . | nindent 4 }}
+{{- end }}
