@@ -35,6 +35,13 @@ export class ProductosProxyController {
     // para las mutaciones: si no le llega el header de ADMIN, las rechaza.
     const identidad = await this.identificarUsuario(request, response);
 
+    // DEFECTO INDUCIDO A PROPOSITO (P8, fallo inducido). Cada consulta al
+    // catalogo espera 1 segundo de mas: una regresion de rendimiento que no
+    // rompe nada (responde 200 con los datos correctos) pero vuelve lenta la
+    // tienda. Vive solo en la rama fallo-inducido y en el tag v2.3.0: el
+    // canary la tiene que detectar con la prueba de carga y revertirla solo.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const resultado = await this.graphqlCliente.reenviar({
       urlDelServicio: this.servicios.productos,
       consulta,
