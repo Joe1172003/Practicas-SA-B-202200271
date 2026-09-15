@@ -1,0 +1,38 @@
+Prueba de las politicas antes de instalarlas, con el CLI de Kyverno v1.19.1 - 15/09/2026
+(el CLI lo baje del release oficial y verifique su firma con cosign verify-blob)
+
+Politicas: P8/charts/politicas renderizado con values-prod.yaml (accion Enforce)
+
+== 1. Cinco Pods de prueba: uno correcto y uno que rompe cada regla
+   ok-firmada-2-2-0   imagen=ghcr.io/joe1172003/p4-gateway:2.2.0           limites=si  runAsNonRoot=si
+   mal-latest         imagen=docker.io/library/busybox:latest              limites=si  runAsNonRoot=si
+   mal-sin-limites    imagen=docker.io/library/busybox:1.37                limites=no  runAsNonRoot=si
+   mal-root           imagen=docker.io/library/busybox:1.37                limites=si  runAsNonRoot=no
+   mal-sin-firma-p7   imagen=ghcr.io/joe1172003/p4-gateway:1.0.1           limites=si  runAsNonRoot=si
+
+Applying 12 policy rule(s) to 5 resource(s)...
+policy prohibir-latest -> resource sa-p8/Pod/mal-latest failed:
+1 - imagen-con-version validation error: La imagen tiene que llevar una version explicita y no puede ser latest. Usa la version semantica que sale del tag de Git. rule imagen-con-version failed at path /spec/containers/0/image/
+policy exigir-limites -> resource sa-p8/Pod/mal-sin-limites failed:
+1 - limites-cpu-y-memoria validation error: Cada contenedor tiene que declarar resources.limits.cpu y resources.limits.memory. rule limites-cpu-y-memoria failed at path /spec/containers/0/resources/
+policy exigir-no-root -> resource sa-p8/Pod/mal-root failed:
+1 - run-as-non-root validation error: El Pod tiene que correr sin root: runAsNonRoot true en spec.securityContext o en el securityContext de cada contenedor. rule run-as-non-root[0] failed at path /spec/securityContext/ rule run-as-non-root[1] failed at path /spec/containers/0/securityContext/
+policy verificar-firma -> resource sa-p8/Pod/mal-sin-firma-p7 failed:
+1 - firmada-por-el-pipeline-p8 failed to verify image ghcr.io/joe1172003/p4-gateway:1.0.1: .attestors[0].entries[0].keyless: sigstore bundle verification failed: no matching signatures found
+policy verificar-firma -> resource sa-p8/Pod/mal-sin-firma-p7 failed:
+1 - firmada-por-el-pipeline-p8 unverified image ghcr.io/joe1172003/p4-gateway:1.0.1
+pass: 14, fail: 5, warn: 0, error: 0, skip: 0 
+
+== 2. Lo que corre hoy en produccion (los 8 charts con values-prod y la version 2.2.0)
+   9 Pods sacados del Rollout, 4 Deployments, 2 StatefulSets y 2 CronJobs, mas los controladores
+Applying 12 policy rule(s) to 54 resource(s)...
+pass: 77, fail: 0, warn: 0, error: 0, skip: 0 
+
+== 3. Firma de cada imagen de produccion
+   - message: verified image signatures for ghcr.io/joe1172003/p4-auth:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p4-gateway:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p4-notificaciones:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p4-ordenes:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p4-productos:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p5-cron-bitacora:2.2.0
+   - message: verified image signatures for ghcr.io/joe1172003/p5-cron-resumen:2.2.0

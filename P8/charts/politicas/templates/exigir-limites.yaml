@@ -1,0 +1,40 @@
+# Politica 2: todo contenedor declara cuanto CPU y memoria puede usar como
+# maximo. Sin techo, un solo Pod con una fuga de memoria tumba el nodo entero.
+#
+# El LimitRange de Terraform le pone limites por defecto a los Pods sueltos,
+# asi que esta regla muerde sobre todo en los Deployment, StatefulSet y CronJob:
+# Kyverno los revisa antes de que existan (sus reglas "autogen").
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: exigir-limites
+  annotations:
+    policies.kyverno.io/title: Exigir limites de CPU y memoria
+    policies.kyverno.io/description: >-
+      Cada contenedor de sa-p8 tiene que declarar resources.limits de cpu y memory.
+spec:
+  background: true
+  rules:
+    - name: limites-cpu-y-memoria
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: {{ toJson .Values.namespaces }}
+      validate:
+        failureAction: {{ .Values.accion }}
+        message: >-
+          Cada contenedor tiene que declarar resources.limits.cpu y
+          resources.limits.memory.
+        pattern:
+          spec:
+            =(initContainers):
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"

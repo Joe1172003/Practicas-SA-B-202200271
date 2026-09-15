@@ -115,6 +115,25 @@ resource "helm_release" "argocd_apps" {
           { group = "argoproj.io", kind = "Application" },
         ]
       }
+
+      # Las politicas de Kyverno son del cluster entero (ClusterPolicy), por eso
+      # van en un proyecto aparte: el de sa-p8 no puede crear nada a ese nivel.
+      # Este solo puede crear ClusterPolicy, y ningun objeto dentro de un namespace.
+      politicas = {
+        namespace   = "argocd"
+        description = "Politicas de admision de Kyverno"
+        sourceRepos = [var.repo_codigo, var.repo_gitops]
+        destinations = [{
+          server    = local.cluster_local
+          namespace = "kyverno"
+        }]
+        clusterResourceWhitelist = [
+          { group = "kyverno.io", kind = "ClusterPolicy" },
+        ]
+        namespaceResourceBlacklist = [
+          { group = "*", kind = "*" },
+        ]
+      }
     }
 
     applications = {

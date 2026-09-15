@@ -1,0 +1,15 @@
+# Que hace Kyverno cuando algo incumple una politica:
+#   Audit   solo lo anota en un reporte, no frena nada (para probar sin riesgo)
+#   Enforce lo rechaza antes de que se cree
+accion: Enforce
+
+# Donde aplican. Solo la plataforma: los namespaces del sistema quedan afuera.
+namespaces:
+  - sa-p8
+
+# La unica identidad que puede firmar mis imagenes: el workflow de la P8
+# publicando un tag v2.X.Y.
+firma:
+  imagenes: "ghcr.io/joe1172003/*"
+  emisor: https://token.actions.githubusercontent.com
+  firmante: ^https://github\.com/Joe1172003/Practicas-SA-B-202200271/\.github/workflows/p8-gitops\.yml@refs/tags/v2\.[0-9]+\.[0-9]+$

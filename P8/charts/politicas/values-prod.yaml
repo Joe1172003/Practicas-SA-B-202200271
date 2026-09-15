@@ -1,0 +1,3 @@
+# GKE: bloquear. El repo GitOps puede bajarlo a Audit mientras se prueba una
+# politica nueva.
+accion: Enforce

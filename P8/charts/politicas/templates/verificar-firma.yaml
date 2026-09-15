@@ -1,0 +1,42 @@
+# Politica 4: toda imagen mia que entre a sa-p8 tiene que estar firmada por el
+# workflow de la P8 al publicar un tag v2.X.Y. Es la misma comprobacion que hace
+# cosign verify en el pipeline, pero ahora la hace el cluster antes de crear el
+# Pod. Una imagen de la P7 (sin firma) o una subida a mano no entra.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verificar-firma
+  annotations:
+    policies.kyverno.io/title: Verificar la firma Cosign
+    policies.kyverno.io/description: >-
+      Las imagenes ghcr.io/joe1172003/* tienen que tener una firma keyless de
+      Cosign hecha por .github/workflows/p8-gitops.yml con un tag v2.X.Y.
+spec:
+  # Verificar una firma consulta el registro y Sigstore: le doy mas tiempo.
+  webhookTimeoutSeconds: 30
+  background: false
+  rules:
+    - name: firmada-por-el-pipeline-p8
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: {{ toJson .Values.namespaces }}
+      verifyImages:
+        - imageReferences:
+            - {{ .Values.firma.imagenes | quote }}
+          # cosign 3 guarda la firma como referencia OCI (formato Sigstore Bundle).
+          type: SigstoreBundle
+          failureAction: {{ .Values.accion }}
+          required: true
+          # Sin reescribir la imagen al digest: ArgoCD veria esa diferencia con Git
+          # y trataria de corregirla sin parar. Con esto la imagen queda como esta.
+          mutateDigest: false
+          verifyDigest: false
+          attestors:
+            - entries:
+                - keyless:
+                    issuer: {{ .Values.firma.emisor }}
+                    subjectRegExp: {{ .Values.firma.firmante | quote }}
+                    rekor:
+                      url: https://rekor.sigstore.dev
