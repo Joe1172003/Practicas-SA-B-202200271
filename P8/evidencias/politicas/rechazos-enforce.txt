@@ -1,0 +1,168 @@
+Despliegues rechazados por Kyverno en el cluster real - 15/09/2026, hora de Guatemala 10:16
+
+Politicas en Enforce (valores/politicas.yaml del repo GitOps, commit 381800c), aplicadas por ArgoCD:
+  exigir-limites -> Enforce
+  exigir-no-root -> Enforce
+  prohibir-latest -> Enforce
+  verificar-firma -> Enforce
+
+Cada intento usa kubectl apply --dry-run=server: el pedido pasa por el API server y por el
+webhook de Kyverno igual que uno de verdad, pero aunque se aceptara no se crearia nada.
+
+==================================================================
+CONTROL: Pod correcto (imagen 2.2.0 firmada, con limites y sin root). Tiene que pasar.
+==================================================================
+  | apiVersion: v1
+  | kind: Pod
+  | metadata:
+  |   name: prueba-correcta
+  |   namespace: sa-p8
+  | spec:
+  |   containers:
+  |   - command:
+  |     - sleep
+  |     - '3600'
+  |     image: ghcr.io/joe1172003/p4-gateway:2.2.0
+  |     name: app
+  |     resources:
+  |       limits:
+  |         cpu: 100m
+  |         memory: 64Mi
+  |       requests:
+  |         cpu: 10m
+  |         memory: 16Mi
+  |   securityContext:
+  |     runAsNonRoot: true
+  |     runAsUser: 1000
+  $ kubectl apply --dry-run=server -f 0-control-correcto.yaml
+  pod/prueba-correcta created (server dry run)
+
+==================================================================
+PRUEBA 1: imagen busybox:latest
+==================================================================
+  | apiVersion: v1
+  | kind: Pod
+  | metadata:
+  |   name: prueba-latest
+  |   namespace: sa-p8
+  | spec:
+  |   containers:
+  |   - command:
+  |     - sleep
+  |     - '3600'
+  |     image: docker.io/library/busybox:latest
+  |     name: app
+  |     resources:
+  |       limits:
+  |         cpu: 100m
+  |         memory: 64Mi
+  |       requests:
+  |         cpu: 10m
+  |         memory: 16Mi
+  |   securityContext:
+  |     runAsNonRoot: true
+  |     runAsUser: 1000
+  $ kubectl apply --dry-run=server -f 1-latest.yaml
+  Error from server: error when creating "1-latest.yaml": admission webhook "validate.kyverno.svc-fail" denied the request: 
+  resource Pod/sa-p8/prueba-latest was blocked due to the following policies 
+  prohibir-latest:
+    imagen-con-version: 'validation error: La imagen tiene que llevar una version explicita y no puede ser latest. Usa la version semantica que sale del tag de Git. rule imagen-con-version failed at path /spec/containers/0/image/'
+
+==================================================================
+PRUEBA 2: Deployment con un contenedor sin limites de CPU ni memoria
+==================================================================
+  | apiVersion: apps/v1
+  | kind: Deployment
+  | metadata:
+  |   name: prueba-sin-limites
+  |   namespace: sa-p8
+  | spec:
+  |   replicas: 1
+  |   selector:
+  |     matchLabels:
+  |       app: prueba
+  |   template:
+  |     metadata:
+  |       labels:
+  |         app: prueba
+  |     spec:
+  |       containers:
+  |       - command:
+  |         - sleep
+  |         - '3600'
+  |         image: docker.io/library/busybox:1.37
+  |         name: app
+  |       securityContext:
+  |         runAsNonRoot: true
+  |         runAsUser: 1000
+  $ kubectl apply --dry-run=server -f 2-sin-limites.yaml
+  Error from server: error when creating "2-sin-limites.yaml": admission webhook "validate.kyverno.svc-fail" denied the request: 
+  resource Deployment/sa-p8/prueba-sin-limites was blocked due to the following policies 
+  exigir-limites:
+    autogen-limites-cpu-y-memoria: 'validation error: Cada contenedor tiene que declarar resources.limits.cpu y resources.limits.memory. rule autogen-limites-cpu-y-memoria failed at path /spec/template/spec/containers/0/resources/limits/'
+
+==================================================================
+PRUEBA 3: Pod sin runAsNonRoot (correria como root)
+==================================================================
+  | apiVersion: v1
+  | kind: Pod
+  | metadata:
+  |   name: prueba-root
+  |   namespace: sa-p8
+  | spec:
+  |   containers:
+  |   - command:
+  |     - sleep
+  |     - '3600'
+  |     image: docker.io/library/busybox:1.37
+  |     name: app
+  |     resources:
+  |       limits:
+  |         cpu: 100m
+  |         memory: 64Mi
+  |       requests:
+  |         cpu: 10m
+  |         memory: 16Mi
+  $ kubectl apply --dry-run=server -f 3-root.yaml
+  Error from server: error when creating "3-root.yaml": admission webhook "validate.kyverno.svc-fail" denied the request: 
+  resource Pod/sa-p8/prueba-root was blocked due to the following policies 
+  exigir-no-root:
+    run-as-non-root: 'validation error: El Pod tiene que correr sin root: runAsNonRoot true en spec.securityContext o en el securityContext de cada contenedor. rule run-as-non-root[0] failed at path /spec/securityContext/runAsNonRoot/ rule run-as-non-root[1] failed at path /spec/containers/0/securityContext/'
+
+==================================================================
+PRUEBA 4: imagen de la P7 (p4-gateway:1.0.1), publicada sin firma
+==================================================================
+  | apiVersion: v1
+  | kind: Pod
+  | metadata:
+  |   name: prueba-sin-firma
+  |   namespace: sa-p8
+  | spec:
+  |   containers:
+  |   - command:
+  |     - sleep
+  |     - '3600'
+  |     image: ghcr.io/joe1172003/p4-gateway:1.0.1
+  |     name: app
+  |     resources:
+  |       limits:
+  |         cpu: 100m
+  |         memory: 64Mi
+  |       requests:
+  |         cpu: 10m
+  |         memory: 16Mi
+  |   securityContext:
+  |     runAsNonRoot: true
+  |     runAsUser: 1000
+  $ kubectl apply --dry-run=server -f 4-sin-firma-p7.yaml
+  Error from server: error when creating "4-sin-firma-p7.yaml": admission webhook "mutate.kyverno.svc-fail" denied the request: 
+  resource Pod/sa-p8/prueba-sin-firma was blocked due to the following policies 
+  verificar-firma:
+    firmada-por-el-pipeline-p8: 'failed to verify image ghcr.io/joe1172003/p4-gateway:1.0.1: .attestors[0].entries[0].keyless: sigstore bundle verification failed: no matching signatures found'
+
+==================================================================
+NOTA: un Pod suelto sin limites si entra, porque el LimitRange de Terraform le pone
+los de por defecto antes de que Kyverno lo revise. Son dos capas: el LimitRange corrige
+el Pod suelto y Kyverno frena los Deployment, StatefulSet y CronJob mal escritos.
+  $ kubectl apply --dry-run=server -f 5-pod-sin-limites.yaml -o jsonpath='{.spec.containers[0].resources}'
+  {"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"25m","memory":"64Mi"}}
