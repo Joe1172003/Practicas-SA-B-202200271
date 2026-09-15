@@ -1,0 +1,167 @@
+Fallo inducido: version 2.3.0 del gateway - 15/09/2026, 10:47 a 10:59 hora de Guatemala
+
+Que se rompio a proposito: en la rama fallo-inducido (nunca fusionada a main) el gateway
+espera 1 segundo de mas en cada consulta al catalogo. Responde 200 con los datos
+correctos, pero lento: una regresion de rendimiento.
+  Commit: https://github.com/Joe1172003/Practicas-SA-B-202200271/commit/3e7a2d27e6f0739d77a08b3b8c8a26f3d05ea0c9
+  Pipeline del tag v2.3.0: https://github.com/Joe1172003/Practicas-SA-B-202200271/actions/runs/34997215851
+  PR del repo GitOps que la aprobo: https://github.com/Joe1172003/sa-p8-gitops/pull/7
+
+El cambio:
+  +    // DEFECTO INDUCIDO A PROPOSITO (P8, fallo inducido). Cada consulta al
+  +    // catalogo espera 1 segundo de mas: una regresion de rendimiento que no
+  +    // rompe nada (responde 200 con los datos correctos) pero vuelve lenta la
+  +    // tienda. Vive solo en la rama fallo-inducido y en el tag v2.3.0: el
+  +    // canary la tiene que detectar con la prueba de carga y revertirla solo.
+  +    await new Promise((resolve) => setTimeout(resolve, 1000));
+  +
+
+Controles que la dejaron pasar (no miden velocidad): tests unitarios (12/12), Trivy (0
+criticas), firma Cosign del pipeline y las 4 politicas de Kyverno (imagen firmada).
+
+== Linea de tiempo (hora UTC)
+16:47:31  push del tag v2.3.0, arranca el pipeline
+16:51:26  el pipeline termina en verde y abre el PR #7 en el repo GitOps
+16:54:33  merge del PR #7: la version 2.3.0 queda aprobada para produccion
+16:54:47  (alguien apreto Restart en el dashboard: reinicio los Pods de la 2.2.0 y demoro
+           a ArgoCD; no cambio el resultado)
+16:56:25  ArgoCD aplica la 2.3.0 y Argo Rollouts arranca el canary (eventos de abajo):
+16:56:25  TrafficWeightUpdated    Traffic weight updated 
+16:56:25  RolloutNotCompleted     Rollout not completed, started update to revision 3 (576476b548)
+16:56:25  NewReplicaSetCreated    Created ReplicaSet gateway-576476b548 (revision 3)
+16:56:25  RolloutUpdated          Rollout updated to revision 3
+16:56:26  ScalingReplicaSet       Scaled up ReplicaSet gateway-576476b548 (revision 3) from 0 to 1
+16:56:39  AnalysisRunRunning      Step Analysis Run 'gateway-576476b548-3-1' Status New: 'Running' Previous: ''
+16:56:39  RolloutStepCompleted    Rollout step 1/6 completed (setWeight: 10)
+16:56:39  PatchingCanaryIngress   Updating Ingress `gateway-gateway-canary` to desiredWeight '10'
+16:56:39  TrafficWeightUpdated    Traffic weight updated from 0 to 10
+16:57:05  PatchingCanaryIngress   Updating Ingress `gateway-gateway-canary` to desiredWeight '30'
+16:57:05  RolloutStepCompleted    Rollout step 2/6 completed (analysis)
+16:57:05  RolloutStepCompleted    Rollout step 3/6 completed (setWeight: 30)
+16:57:05  TrafficWeightUpdated    Traffic weight updated from 10 to 30
+16:57:05  AnalysisRunSuccessful   Step Analysis Run 'gateway-576476b548-3-1' Status New: 'Successful' Previous: 'Running'
+16:57:11  AnalysisRunRunning      Step Analysis Run 'gateway-576476b548-3-3' Status New: 'Running' Previous: ''
+16:57:53  PatchingCanaryIngress   Updating Ingress `gateway-gateway-canary` to desiredWeight '0'
+16:57:53  SwitchService           Switched selector for service 'gateway-canary' from '5497769d99' to '576476b548'
+16:57:53  AnalysisRunFailed       Step Analysis Run 'gateway-576476b548-3-3' Status New: 'Failed' Previous: 'Running'
+16:57:53  RolloutAborted          Rollout aborted update to revision 3: Step-based analysis phase error/failed: Metric "carga" assessed Failed due to failed (1) > failureLimit (0)
+16:57:53  SwitchService           Switched selector for service 'gateway-canary' from '576476b548' to '5497769d99'
+16:57:53  TrafficWeightUpdated    Traffic weight updated from 30 to 0
+
+== Exposicion
+  10% del trafico durante 26 s (16:56:39 a 16:57:05)
+  30% del trafico durante 48 s (16:57:05 a 16:57:53)
+  Del merge al 100% estable: 3 min 20 s (16:54:33 a 16:57:53)
+
+== La prueba que la detecto: AnalysisRun gateway-576476b548-3-3
+gateway-5497769d99-2-5   Successful   2026-09-15T02:38:33Z
+gateway-576476b548-3-1   Successful   2026-09-15T16:56:39Z
+gateway-576476b548-3-3   Failed       2026-09-15T16:57:05Z
+
+Log del Job de k6 (carga liviana, 5 usuarios, 30 s, contra gateway-canary = solo la 2.3.0):
+  Pod 05f39ca1-d763-4d3c-bcfd-c0f6d95b39f0.carga.1-7m52l: Failed, codigo de salida 99
+    RESULTADO DE LA PRUEBA DE CARGA
+  ----------------------------------------------------------
+  time="2026-09-15T16:57:46Z" level=error msg="thresholds on metrics 'http_req_duration' have been crossed"
+
+== Trafico real visto desde afuera: POST /graphql/productos al dominio publico cada 0.5 s
+  244 peticiones de 16:53:53 a 16:59:24 UTC, codigos HTTP: {'200': 244}
+  (la latencia incluye el viaje por internet desde Guatemala hasta us-central1; la unica
+  respuesta 2.3.0 "despues del aborto" es una peticion que ya estaba en curso en ese segundo)
+  antes del canary     127 respuestas | 2.2.0: 127 (100%), promedio 230 ms
+  peso 10%              18 respuestas | 2.2.0: 17 (94%), promedio 273 ms | 2.3.0: 1 (6%), promedio 1206 ms
+  peso 30%              29 respuestas | 2.2.0: 19 (66%), promedio 262 ms | 2.3.0: 10 (34%), promedio 1205 ms
+  despues del aborto    70 respuestas | 2.2.0: 69 (99%), promedio 214 ms | 2.3.0: 1 (1%), promedio 1202 ms
+
+== Seguimiento del Rollout cada 3 s (hora UTC)
+16:54:03 spec=2.2.0 Healthy|paso=6|peso=0|aborto=|msg= pods=[ 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Healthy
+16:54:47 spec=2.2.0 Healthy|paso=6|peso=0|aborto=|msg= pods=[ 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Progressing
+16:54:53 spec=2.2.0 Progressing|paso=6|peso=0|aborto=|msg=rollout is restarting pods=[ 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Progressing
+16:55:06 spec=2.2.0 Progressing|paso=6|peso=0|aborto=|msg=rollout is restarting pods=[ 4 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Degraded
+16:55:25 spec=2.2.0 Progressing|paso=6|peso=0|aborto=|msg=rollout is restarting pods=[ 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Degraded
+16:55:37 spec=2.2.0 Progressing|paso=6|peso=0|aborto=|msg=rollout is restarting pods=[ 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Progressing
+16:55:56 spec=2.2.0 Progressing|paso=6|peso=0|aborto=|msg=updated replicas are still becoming available pods=[ 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Progressing
+16:56:09 spec=2.2.0 Healthy|paso=6|peso=0|aborto=|msg= pods=[ 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=OutOfSync/Healthy
+16:56:29 spec=2.3.0 Progressing|paso=0|peso=0|aborto=|msg=more replicas need to be updated pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ] argocd=Synced/Progressing
+16:56:42 spec=2.3.0 Progressing|paso=0|peso=0|aborto=|msg=more replicas need to be updated pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-3=Successful 2-5=Successful 3-1=Running ] argocd=Synced/Progressing
+16:56:48 spec=2.3.0 Progressing|paso=1|peso=10|aborto=|msg=more replicas need to be updated pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-3=Successful 2-5=Successful 3-1=Running ] argocd=Synced/Progressing
+16:57:06 spec=2.3.0 Progressing|paso=1|peso=10|aborto=|msg=more replicas need to be updated pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-3=Successful 2-5=Successful 3-1=Successful ] argocd=Synced/Progressing
+16:57:13 spec=2.3.0 Progressing|paso=3|peso=30|aborto=|msg=more replicas need to be updated pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-5=Successful 3-1=Successful 3-3=Running ] argocd=Synced/Progressing
+16:57:57 spec=2.3.0 Degraded|paso=0|peso=0|aborto=true|msg=RolloutAborted: Rollout aborted update to revision 3: Step-based analysis phase error/failed: Metric "carga" assessed Failed due to failed (1) > failureLimit (0) pods=[ 3 2.2.0, 1 2.3.0,] analisis=[2-5=Successful 3-1=Successful 3-3=Failed ] argocd=Synced/Degraded
+16:58:59 spec=2.3.0 Degraded|paso=0|peso=0|aborto=true|msg=RolloutAborted: Rollout aborted update to revision 3: Step-based analysis phase error/failed: Metric "carga" assessed Failed due to failed (1) > failureLimit (0) pods=[ 3 2.2.0,] analisis=[2-5=Successful 3-1=Successful 3-3=Failed ] argocd=Synced/Degraded
+
+== El Rollout despues del aborto
+Name:            gateway
+Namespace:       sa-p8
+Status:          ✖ Degraded
+Message:         RolloutAborted: Rollout aborted update to revision 3: Step-based analysis phase error/failed: Metric "carga" assessed Failed due to failed (1) > failureLimit (0)
+Strategy:        Canary
+  Step:          0/6
+  SetWeight:     0
+  ActualWeight:  0
+Images:          ghcr.io/joe1172003/p4-gateway:2.2.0 (stable)
+Replicas:
+  Desired:       2
+  Current:       2
+  Updated:       0
+  Ready:         2
+  Available:     2
+
+NAME                                                           KIND         STATUS        AGE    INFO
+⟳ gateway                                                      Rollout      ✖ Degraded    14h    
+├──# revision:3                                                                                  
+│  ├──⧉ gateway-576476b548                                     ReplicaSet   • ScaledDown  4m29s  canary,delay:passed
+│  ├──α gateway-576476b548-3-1                                 AnalysisRun  ✔ Successful  4m15s  ✔ 2
+│  │  ├──⊞ 4f332053-0f75-4d66-a448-2743c7ee9dd6.humo.1         Job          ✔ Successful  4m15s  
+│  │  └──⊞ 4f332053-0f75-4d66-a448-2743c7ee9dd6.integracion.1  Job          ✔ Successful  4m15s  
+│  └──α gateway-576476b548-3-3                                 AnalysisRun  ✖ Failed      3m49s  ✖ 1
+│     └──⊞ 05f39ca1-d763-4d3c-bcfd-c0f6d95b39f0.carga.1        Job          ✖ Failed      3m43s  
+├──# revision:2                                                                                  
+│  ├──⧉ gateway-5497769d99                                     ReplicaSet   ✔ Healthy     14h    stable
+│  │  ├──□ gateway-5497769d99-pps2n                            Pod          ✔ Running     6m7s   ready:1/1
+│  │  └──□ gateway-5497769d99-nj8pf                            Pod          ✔ Running     5m54s  ready:1/1
+│  ├──α gateway-5497769d99-2-1                                 AnalysisRun  ✔ Successful  14h    ✔ 2
+│  │  ├──⊞ 3365eb34-f7b7-4385-8a16-2c7ebb71c9b2.integracion.1  Job          ✔ Successful  14h    
+│  │  └──⊞ 3365eb34-f7b7-4385-8a16-2c7ebb71c9b2.humo.1         Job          ✔ Successful  14h    
+│  ├──α gateway-5497769d99-2-3                                 AnalysisRun  ✔ Successful  14h    ✔ 1
+│  │  └──⊞ 9308756f-1ade-4503-8d4d-0fed6c608e3b.carga.1        Job          ✔ Successful  14h    
+│  └──α gateway-5497769d99-2-5                                 AnalysisRun  ✔ Successful  14h    ✔ 1
+│     └──⊞ c2d05b2f-11c1-4b7f-bbf5-d0c4e2fe16d0.carga.1        Job          ✔ Successful  14h    
+└──# revision:1                                                                                  
+   └──⧉ gateway-86f49587d6                                     ReplicaSet   • ScaledDown  14h    
+
+==================================================================
+== Cierre del incidente: revert del PR #7 en el repo GitOps
+==================================================================
+El canary ya habia devuelto el trafico a la 2.2.0, pero Git seguia pidiendo la 2.3.0 (por eso
+ArgoCD mostraba el gateway Synced y Degraded). Con el boton Revert de GitHub se abrio el PR #8,
+que deja Git igual que antes del incidente.
+  PR del revert: https://github.com/Joe1172003/sa-p8-gitops/pull/8  (merge 17:10:55 UTC)
+
+Eventos del Rollout (hora UTC): la 2.2.0 ya era la estable, asi que no hubo canary:
+  17:13:10  TrafficWeightUpdated    Traffic weight updated 
+  17:13:10  RolloutUpdated          Rollout updated to revision 4
+  17:13:10  SkipSteps               Rollback to stable ReplicaSets
+
+Applications de ArgoCD despues del revert:
+  APP              SYNC     SALUD     CHART
+  auth             Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  cronjobs         Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  gateway          Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  notificaciones   Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  ordenes          Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  politicas        Synced   Healthy   b4caa04e6cc230276b1ba2c8297278432652058e
+  postgres         Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  productos        Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  rabbitmq         Synced   Healthy   f9de49bb8cc3921c74e35f03dbbb652bfc56945a
+  raiz             Synced   Healthy   <none>
+
+Gateway en el dominio publico, unos minutos despues del revert (POST /graphql/productos):
+  HTTP 200  conexion 0.090722 s  total 0.215409 s  X-Version-Gateway: 2.2.0
+  HTTP 200  conexion 0.102661 s  total 0.237256 s  X-Version-Gateway: 2.2.0
+  HTTP 200  conexion 0.087198 s  total 0.189725 s  X-Version-Gateway: 2.2.0
+  HTTP 200  conexion 0.095313 s  total 0.189486 s  X-Version-Gateway: 2.2.0
+  HTTP 200  conexion 0.087033 s  total 0.199253 s  X-Version-Gateway: 2.2.0
+  (unos 90 ms son el viaje por internet hasta us-central1; dentro del cluster la misma consulta
+  tarda unos 25 ms. Justo despues del revert hubo 2 o 3 respuestas de 1 a 3.5 s: eran los Pods
+  de productos recien recreados calentando sus conexiones, no la demora de la 2.3.0.)
