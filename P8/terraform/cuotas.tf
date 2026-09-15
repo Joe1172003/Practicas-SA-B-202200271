@@ -1,5 +1,12 @@
-# Techo total del namespace: los mismos valores de la P5, salvo pods. Durante un
-# canary conviven la version estable, la nueva y los pods de analisis.
+# Techo total del namespace. Va dimensionado para el pico de un despliegue, no
+# para el reposo: en el canary de la 2.2.0 la cuota de 6 CPU / 6Gi se lleno y
+# Kubernetes rechazo Pods, incluido el Job de k6 del analisis.
+#
+# Pico calculado con los valores de prod: gateway con estable y canary completos
+# (6 Pods), auth/productos/ordenes en el maximo del HPA mas el Pod extra del
+# rolling update (4 cada uno), notificaciones 2, postgres, rabbitmq, los dos
+# cronjobs a la vez y el Job de k6. Da 7.7 CPU y 7.4Gi de limits, y 2.9Gi de
+# requests de memoria: la cuota queda un 15% arriba de eso.
 resource "kubernetes_resource_quota_v1" "plataforma" {
   metadata {
     name      = "cuota"
@@ -10,10 +17,12 @@ resource "kubernetes_resource_quota_v1" "plataforma" {
   spec {
     hard = {
       # requests es lo que el planificador reserva; limits, el techo que nadie pasa.
+      # La suma de limits puede pasar el CPU de los nodos: son techos por Pod,
+      # no reservas. Lo que de verdad reserva es requests.cpu.
       "requests.cpu"         = "2"
-      "requests.memory"      = "3Gi"
-      "limits.cpu"           = "6"
-      "limits.memory"        = "6Gi"
+      "requests.memory"      = "4Gi"
+      "limits.cpu"           = "9"
+      "limits.memory"        = "9Gi"
       pods                   = "30"
       persistentvolumeclaims = "5"
     }

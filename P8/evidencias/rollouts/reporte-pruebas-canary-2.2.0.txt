@@ -1,0 +1,216 @@
+Reporte de las pruebas del canary de la version 2.2.0 - 14/09/2026, 20:37 hora de Guatemala
+
+Son los logs de los Jobs de k6 que corrio Argo Rollouts en cada paso, contra
+gateway-canary (solo los Pods de la 2.2.0). Scripts: P8/charts/gateway/pruebas/
+Umbrales y su justificacion: carga.js y P8/evidencias/rollouts/linea-base-2.0.0.txt
+
+ANALISIS                 RESULTADO    INICIO_UTC
+gateway-5497769d99-2-1   Successful   2026-09-15T02:37:16Z
+gateway-5497769d99-2-3   Successful   2026-09-15T02:37:34Z
+gateway-5497769d99-2-5   Successful   2026-09-15T02:38:33Z
+
+==================================================================
+/pruebas/humo.js   (BASE=http://gateway-canary:3000 VERSION_ESPERADA=2.2.0 )
+==================================================================
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+  █ THRESHOLDS 
+    checks
+    ✓ 'rate==1' rate=100.00%
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=75.79ms
+  █ TOTAL RESULTS 
+    checks_total.......: 15      127.67744/s
+    checks_succeeded...: 100.00% 15 out of 15
+    checks_failed......: 0.00%   0 out of 15
+    ✓ health responde 200
+    ✓ estado ok
+    ✓ es la version nueva
+    HTTP
+    http_req_duration..............: avg=20.65ms min=1.92ms med=2.48ms max=94.09ms p(90)=57.49ms p(95)=75.79ms
+      { expected_response:true }...: avg=20.65ms min=1.92ms med=2.48ms max=94.09ms p(90)=57.49ms p(95)=75.79ms
+    http_req_failed................: 0.00%  0 out of 5
+    http_reqs......................: 5      42.559147/s
+    EXECUTION
+    iteration_duration.............: avg=23.43ms min=2.42ms med=3.53ms max=94.46ms p(90)=62.03ms p(95)=78.24ms
+    iterations.....................: 5      42.559147/s
+    NETWORK
+    data_received..................: 2.4 kB 20 kB/s
+    data_sent......................: 405 B  3.4 kB/s
+default ✓ [ 100% ] 1 VUs  00m00.1s/10m0s  5/5 shared iters
+
+==================================================================
+/pruebas/integracion.js   (BASE=http://gateway-canary:3000 )
+==================================================================
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+default   [   0% ] 1 VUs  00m01.0s/10m0s  0/3 shared iters
+default   [   0% ] 1 VUs  00m02.0s/10m0s  0/3 shared iters
+default   [   0% ] 1 VUs  00m03.0s/10m0s  0/3 shared iters
+default   [  33% ] 1 VUs  00m04.0s/10m0s  1/3 shared iters
+default   [  33% ] 1 VUs  00m05.0s/10m0s  1/3 shared iters
+default   [  67% ] 1 VUs  00m06.0s/10m0s  2/3 shared iters
+default   [  67% ] 1 VUs  00m07.0s/10m0s  2/3 shared iters
+default   [  67% ] 1 VUs  00m08.0s/10m0s  2/3 shared iters
+  █ THRESHOLDS 
+    checks
+    ✓ 'rate==1' rate=100.00%
+    http_req_duration
+    ✓ 'p(95)<3000' p(95)=1.5s
+    http_req_failed
+    ✓ 'rate==0' rate=0.00%
+  █ TOTAL RESULTS 
+    checks_total.......: 24      2.874458/s
+    checks_succeeded...: 100.00% 24 out of 24
+    checks_failed......: 0.00%   0 out of 24
+    ✓ registro 201
+    ✓ login 200
+    ✓ auth/me 200
+    ✓ auth/me devuelve mi correo
+    ✓ catalogo 200
+    ✓ catalogo trae productos
+    ✓ logout 200
+    ✓ sin sesion da 401
+    HTTP
+    http_req_duration..............: avg=462.73ms min=1.14ms med=18.72ms max=1.62s p(90)=1.34s p(95)=1.5s 
+      { expected_response:true }...: avg=462.73ms min=1.14ms med=18.72ms max=1.62s p(90)=1.34s p(95)=1.5s 
+    http_req_failed................: 0.00%  0 out of 18
+    http_reqs......................: 18     2.155843/s
+    EXECUTION
+    iteration_duration.............: avg=2.78s    min=2.45s  med=2.83s   max=3.06s p(90)=3.01s p(95)=3.03s
+    iterations.....................: 3      0.359307/s
+    vus............................: 1      min=1       max=1
+    vus_max........................: 1      min=1       max=1
+    NETWORK
+    data_received..................: 12 kB  1.4 kB/s
+    data_sent......................: 5.6 kB 672 B/s
+default ✓ [ 100% ] 1 VUs  00m08.3s/10m0s  3/3 shared iters
+
+==================================================================
+/pruebas/carga.js   (BASE=http://gateway-canary:3000 USUARIOS=5 DURACION=30s )
+==================================================================
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+default   [   3% ] 5 VUs  01.0s/30s
+default   [   7% ] 5 VUs  02.0s/30s
+default   [  10% ] 5 VUs  03.0s/30s
+default   [  13% ] 5 VUs  04.0s/30s
+default   [  17% ] 5 VUs  05.0s/30s
+default   [  20% ] 5 VUs  06.0s/30s
+default   [  23% ] 5 VUs  07.0s/30s
+default   [  27% ] 5 VUs  08.0s/30s
+default   [  30% ] 5 VUs  09.0s/30s
+default   [  33% ] 5 VUs  10.0s/30s
+default   [  37% ] 5 VUs  11.0s/30s
+default   [  40% ] 5 VUs  12.0s/30s
+default   [  43% ] 5 VUs  13.0s/30s
+default   [  47% ] 5 VUs  14.0s/30s
+default   [  50% ] 5 VUs  15.0s/30s
+default   [  53% ] 5 VUs  16.0s/30s
+default   [  57% ] 5 VUs  17.0s/30s
+default   [  60% ] 5 VUs  18.0s/30s
+default   [  63% ] 5 VUs  19.0s/30s
+default   [  67% ] 5 VUs  20.0s/30s
+default   [  70% ] 5 VUs  21.0s/30s
+default   [  73% ] 5 VUs  22.0s/30s
+default   [  77% ] 5 VUs  23.0s/30s
+default   [  80% ] 5 VUs  24.0s/30s
+default   [  83% ] 5 VUs  25.0s/30s
+default   [  87% ] 5 VUs  26.0s/30s
+default   [  90% ] 5 VUs  27.0s/30s
+default   [  93% ] 5 VUs  28.0s/30s
+default   [  97% ] 5 VUs  29.0s/30s
+default   [ 100% ] 5 VUs  30.0s/30s
+----------------------------------------------------------
+  RESULTADO DE LA PRUEBA DE CARGA
+----------------------------------------------------------
+  Destino            : http://gateway-canary:3000
+  Usuarios virtuales : 5
+  Peticiones totales : 560
+  Peticiones/segundo : 18.39
+  Latencia p95       : 56.43 ms
+  Latencia promedio  : 19.85 ms
+  Tasa de error      : 0.00 %
+  Checks correctos   : 100.00 %
+  Umbrales:
+    PASA   http_req_duration p(95)<300
+    PASA   checks rate>0.99
+    PASA   http_req_failed rate<0.01
+----------------------------------------------------------
+default ✓ [ 100% ] 5 VUs  30s
+
+==================================================================
+/pruebas/carga.js   (BASE=http://gateway-canary:3000 USUARIOS=15 DURACION=45s )
+==================================================================
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+default   [   2% ] 15 VUs  01.0s/45s
+default   [   4% ] 15 VUs  02.0s/45s
+default   [   7% ] 15 VUs  03.0s/45s
+default   [   9% ] 15 VUs  04.0s/45s
+default   [  11% ] 15 VUs  05.0s/45s
+default   [  13% ] 15 VUs  06.0s/45s
+default   [  16% ] 15 VUs  07.0s/45s
+default   [  18% ] 15 VUs  08.0s/45s
+default   [  20% ] 15 VUs  09.0s/45s
+default   [  22% ] 15 VUs  10.0s/45s
+default   [  24% ] 15 VUs  11.0s/45s
+default   [  27% ] 15 VUs  12.0s/45s
+default   [  29% ] 15 VUs  13.0s/45s
+default   [  31% ] 15 VUs  14.0s/45s
+default   [  33% ] 15 VUs  15.0s/45s
+default   [  36% ] 15 VUs  16.0s/45s
+default   [  38% ] 15 VUs  17.0s/45s
+default   [  40% ] 15 VUs  18.0s/45s
+default   [  42% ] 15 VUs  19.0s/45s
+default   [  44% ] 15 VUs  20.0s/45s
+default   [  47% ] 15 VUs  21.0s/45s
+default   [  49% ] 15 VUs  22.0s/45s
+default   [  51% ] 15 VUs  23.0s/45s
+default   [  53% ] 15 VUs  24.0s/45s
+default   [  56% ] 15 VUs  25.0s/45s
+default   [  58% ] 15 VUs  26.0s/45s
+default   [  60% ] 15 VUs  27.0s/45s
+default   [  62% ] 15 VUs  28.0s/45s
+default   [  64% ] 15 VUs  29.0s/45s
+default   [  67% ] 15 VUs  30.0s/45s
+default   [  69% ] 15 VUs  31.0s/45s
+default   [  71% ] 15 VUs  32.0s/45s
+default   [  73% ] 15 VUs  33.0s/45s
+default   [  76% ] 15 VUs  34.0s/45s
+default   [  78% ] 15 VUs  35.0s/45s
+default   [  80% ] 15 VUs  36.0s/45s
+default   [  82% ] 15 VUs  37.0s/45s
+default   [  84% ] 15 VUs  38.0s/45s
+default   [  87% ] 15 VUs  39.0s/45s
+default   [  89% ] 15 VUs  40.0s/45s
+default   [  91% ] 15 VUs  41.0s/45s
+default   [  93% ] 15 VUs  42.0s/45s
+default   [  96% ] 15 VUs  43.0s/45s
+default   [  98% ] 15 VUs  44.0s/45s
+default   [ 100% ] 15 VUs  45.0s/45s
+----------------------------------------------------------
+  RESULTADO DE LA PRUEBA DE CARGA
+----------------------------------------------------------
+  Destino            : http://gateway-canary:3000
+  Usuarios virtuales : 15
+  Peticiones totales : 2588
+  Peticiones/segundo : 56.89
+  Latencia p95       : 31.55 ms
+  Latencia promedio  : 11.69 ms
+  Tasa de error      : 0.00 %
+  Checks correctos   : 100.00 %
+  Umbrales:
+    PASA   http_req_duration p(95)<300
+    PASA   checks rate>0.99
+    PASA   http_req_failed rate<0.01
+----------------------------------------------------------
+default ✓ [ 100% ] 15 VUs  45s
