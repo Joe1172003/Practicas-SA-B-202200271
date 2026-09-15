@@ -1,0 +1,56 @@
+Version 2.1.0: el gateway pasa de Deployment a Rollout - 14/09/2026, 20:08 hora de Guatemala (02:08 UTC del 15/09)
+
+Esta primera vez no hay canary: no existia una version anterior bajo un Rollout.
+Lo que habia que probar es que el cambio de tipo de objeto no cortara el servicio.
+En el repo GitOps el gateway tiene PruneLast=true: ArgoCD levanta el Rollout, espera
+que este sano y recien ahi borra el Deployment.
+
+== Linea de tiempo (vigilando el cluster cada 3 s, hora UTC) ==
+02:03:50 deploy=2/2 rollout=no argocd=Synced/Healthy pods=[2.0.0:true 2.0.0:true ]
+02:07:12 deploy=2/2 rollout=no argocd=OutOfSync/Healthy pods=[2.0.0:true 2.0.0:true ]
+02:08:12 deploy=2/2 rollout=Degraded|/ argocd=OutOfSync/Degraded pods=[2.0.0:true 2.0.0:true ]
+02:08:17 deploy=2/2 rollout=Progressing|/1 argocd=OutOfSync/Progressing pods=[2.0.0:true 2.0.0:true 2.1.0:false ]
+02:08:23 deploy=2/2 rollout=Progressing|/2 argocd=OutOfSync/Progressing pods=[2.0.0:true 2.0.0:true 2.1.0:false 2.1.0:false ]
+02:08:34 deploy=2/2 rollout=Progressing|1/2 argocd=OutOfSync/Progressing pods=[2.0.0:true 2.0.0:true 2.1.0:false 2.1.0:true ]
+02:08:39 deploy=/2 rollout=Healthy|2/2 argocd=OutOfSync/Progressing pods=[2.0.0:true 2.0.0:true 2.1.0:true 2.1.0:true ]
+02:08:50 deploy=/2 rollout=Healthy|2/2 argocd=OutOfSync/Degraded pods=[2.0.0:true 2.0.0:true 2.1.0:true 2.1.0:true ]
+02:09:07 deploy=/2 rollout=Progressing|2/3 argocd=OutOfSync/Progressing pods=[2.0.0:true 2.0.0:true 2.1.0:false 2.1.0:true 2.1.0:true ]
+02:09:12 deploy=no rollout=Progressing|2/3 argocd=Synced/Progressing pods=[2.1.0:false 2.1.0:true 2.1.0:true ]
+02:09:18 deploy=no rollout=Healthy|3/3 argocd=Synced/Healthy pods=[2.1.0:true 2.1.0:true 2.1.0:true ]
+
+== Sonda al /health publico cada medio segundo durante el cambio ==
+peticiones: 367 (de 02:03:39 a 02:09:40 UTC)
+codigos HTTP: {'200': 367}
+  desde 02:03:39  HTTP 200  version p7-cicd    300 respuestas
+  desde 02:08:35  HTTP 200  version 2.1.0      1 respuestas
+  desde 02:08:36  HTTP 200  version p7-cicd    1 respuestas
+  desde 02:08:37  HTTP 200  version 2.1.0      65 respuestas
+(p7-cicd es lo que respondia el /health de la 2.0.0, antes de leer la version del chart)
+
+== Resultado de la sincronizacion en ArgoCD ==
+Succeeded: successfully synced (all tasks run)
+Deployment/gateway Pruned
+
+== El Rollout despues del cambio ==
+Name:            gateway
+Namespace:       sa-p8
+Status:          ✔ Healthy
+Strategy:        Canary
+  Step:          6/6
+  SetWeight:     100
+  ActualWeight:  100
+Images:          ghcr.io/joe1172003/p4-gateway:2.1.0 (stable)
+Replicas:
+  Desired:       3
+  Current:       3
+  Updated:       3
+  Ready:         3
+  Available:     3
+
+NAME                                 KIND        STATUS     AGE   INFO
+⟳ gateway                            Rollout     ✔ Healthy  117s  
+└──# revision:1                                                   
+   └──⧉ gateway-86f49587d6           ReplicaSet  ✔ Healthy  114s  stable
+      ├──□ gateway-86f49587d6-bjr5s  Pod         ✔ Running  112s  ready:1/1
+      ├──□ gateway-86f49587d6-7lpz8  Pod         ✔ Running  106s  ready:1/1
+      └──□ gateway-86f49587d6-5w5nm  Pod         ✔ Running  62s   ready:1/1
