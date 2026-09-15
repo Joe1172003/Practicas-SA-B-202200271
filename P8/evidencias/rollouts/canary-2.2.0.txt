@@ -1,0 +1,91 @@
+Canary de la version 2.2.0 del gateway - 14/09/2026, 20:37 a 20:42 hora de Guatemala
+
+Camino: tag v2.2.0 -> pipeline -> PR automatico en sa-p8-gitops -> merge -> ArgoCD
+aplica el Rollout -> Argo Rollouts avanza por pasos, cada uno condicionado a su prueba.
+
+Pasos del Rollout (P8/charts/gateway/templates/rollout.yaml):
+  1. setWeight 10  -> analisis: humo + integracion
+  2. setWeight 30  -> analisis: carga liviana (5 usuarios, 30 s)
+  3. setWeight 60  -> analisis: carga fuerte (15 usuarios, 45 s)
+  si los tres pasan, la 2.2.0 queda con el 100%
+
+== Linea de tiempo (vigilando el Rollout cada 3 s, hora UTC) ==
+   paso = indice del paso actual, peso = % del trafico que va a la 2.2.0
+02:36:03 spec=2.1.0 Healthy|paso=6|peso=0|estable=86f49587d6|pausa=|aborto= pods=[ 2 2.1.0,] analisis=[]
+02:37:09 spec=2.2.0 Progressing|paso=0|peso=0|estable=86f49587d6|pausa=|aborto= pods=[ 2 2.1.0, 1 2.2.0,] analisis=[]
+02:37:20 spec=2.2.0 Progressing|paso=1|peso=10|estable=86f49587d6|pausa=|aborto= pods=[ 2 2.1.0, 1 2.2.0,] analisis=[2-1=Running ]
+02:37:37 spec=2.2.0 Progressing|paso=3|peso=30|estable=86f49587d6|pausa=|aborto= pods=[ 3 2.1.0, 1 2.2.0,] analisis=[2-1=Successful 2-3=Running ]
+02:38:21 spec=2.2.0 Progressing|paso=3|peso=30|estable=86f49587d6|pausa=|aborto= pods=[ 3 2.1.0, 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful ]
+02:38:26 spec=2.2.0 Progressing|paso=4|peso=30|estable=86f49587d6|pausa=|aborto= pods=[ 3 2.1.0, 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful ]
+02:38:38 spec=2.2.0 Progressing|paso=5|peso=60|estable=86f49587d6|pausa=|aborto= pods=[ 3 2.1.0, 2 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Running ]
+02:40:47 spec=2.2.0 Progressing|paso=6|peso=60|estable=86f49587d6|pausa=|aborto= pods=[ 3 2.1.0, 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ]
+02:40:59 spec=2.2.0 Healthy|paso=6|peso=0|estable=5497769d99|pausa=|aborto= pods=[ 3 2.1.0, 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ]
+02:41:55 spec=2.2.0 Healthy|paso=6|peso=0|estable=5497769d99|pausa=|aborto= pods=[ 2 2.1.0, 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ]
+02:42:01 spec=2.2.0 Healthy|paso=6|peso=0|estable=5497769d99|pausa=|aborto= pods=[ 3 2.2.0,] analisis=[2-1=Successful 2-3=Successful 2-5=Successful ]
+
+== Resultado de cada analisis ==
+ANALISIS                 RESULTADO    INICIO_UTC
+gateway-5497769d99-2-1   Successful   2026-09-15T02:37:16Z
+gateway-5497769d99-2-3   Successful   2026-09-15T02:37:34Z
+gateway-5497769d99-2-5   Successful   2026-09-15T02:38:33Z
+
+== Trafico real, visto desde afuera: /health publico cada medio segundo ==
+390 peticiones, codigos HTTP: {'200': 390}
+  antes del canary     87 respuestas  2.1.0: 87 (100%)
+  paso 1 (10%)         16 respuestas  2.1.0: 14 (88%)  2.2.0: 2 (12%)
+  paso 2 (30%)         61 respuestas  2.1.0: 42 (69%)  2.2.0: 19 (31%)
+  paso 3 (60%)        143 respuestas  2.1.0: 66 (46%)  2.2.0: 77 (54%)
+  promovida (100%)     83 respuestas  2.2.0: 83 (100%)
+
+== El Rollout al final ==
+Name:            gateway
+Namespace:       sa-p8
+Status:          ✔ Healthy
+Strategy:        Canary
+  Step:          6/6
+  SetWeight:     100
+  ActualWeight:  100
+Images:          ghcr.io/joe1172003/p4-gateway:2.2.0 (stable)
+Replicas:
+  Desired:       2
+  Current:       2
+  Updated:       2
+  Ready:         2
+  Available:     2
+
+NAME                                                           KIND         STATUS        AGE    INFO
+⟳ gateway                                                      Rollout      ✔ Healthy     35m    
+├──# revision:2                                                                                  
+│  ├──⧉ gateway-5497769d99                                     ReplicaSet   ✔ Healthy     6m6s   stable
+│  │  ├──□ gateway-5497769d99-vh6mv                            Pod          ✔ Running     6m6s   ready:1/1
+│  │  └──□ gateway-5497769d99-pktq8                            Pod          ✔ Running     4m50s  ready:1/1
+│  ├──α gateway-5497769d99-2-1                                 AnalysisRun  ✔ Successful  5m53s  ✔ 2
+│  │  ├──⊞ 3365eb34-f7b7-4385-8a16-2c7ebb71c9b2.integracion.1  Job          ✔ Successful  5m53s  
+│  │  └──⊞ 3365eb34-f7b7-4385-8a16-2c7ebb71c9b2.humo.1         Job          ✔ Successful  5m53s  
+│  ├──α gateway-5497769d99-2-3                                 AnalysisRun  ✔ Successful  5m35s  ✔ 1
+│  │  └──⊞ 9308756f-1ade-4503-8d4d-0fed6c608e3b.carga.1        Job          ✔ Successful  5m35s  
+│  └──α gateway-5497769d99-2-5                                 AnalysisRun  ✔ Successful  4m36s  ✔ 1
+│     └──⊞ c2d05b2f-11c1-4b7f-bbf5-d0c4e2fe16d0.carga.1        Job          ✔ Successful  4m36s  
+└──# revision:1                                                                                  
+   └──⧉ gateway-86f49587d6                                     ReplicaSet   • ScaledDown  34m    
+
+== Encabezado nuevo de la 2.2.0 ==
+X-Version-Gateway: 2.2.0
+Access-Control-Expose-Headers: X-Token-Renovado,X-Version-Gateway
+
+== Hallazgo: la cuota del namespace se lleno durante este canary ==
+La 2.2.0 actualizo los 6 componentes a la vez. Con el canary del gateway y los rolling
+updates de los demas, los limits llegaron a 5.9 de 6 CPU y 6 de 6Gi. Kubernetes rechazo
+Pods, entre ellos el Job de k6 de la carga fuerte, que se reintento solo cuando se libero
+lugar (por eso el paso 3 tardo 2 min y no 45 s). El canary paso igual, pero con otra
+espera podia fallar el analisis por falta de cuota y revertir una version sana.
+Correccion: cuota dimensionada para el pico de un despliegue (P8/terraform/cuotas.tf).
+
+Rechazos registrados (hora UTC):
+2026-09-15T02:38:07Z   ordenes-8466b97b7f                                         exceeded quota: cuota, requested: limits.cpu=300m, used: limits.cpu=5800m, limited: limits.cpu=6
+2026-09-15T02:38:26Z   auth-69b8fdd6fc                                            exceeded quota: cuota, requested: limits.cpu=300m,limits.memory=320Mi, used: limits.cpu=5900m,limits.memory=6Gi, limited: limits.cpu=6,limits.memory=6Gi
+2026-09-15T02:38:33Z   c2d05b2f-11c1-4b7f-bbf5-d0c4e2fe16d0.carga.1               exceeded quota: cuota, requested: limits.cpu=500m,limits.memory=256Mi, used: limits.cpu=5900m,limits.memory=6Gi, limited: limits.cpu=6,limits.memory=6Gi
+2026-09-15T02:40:00Z   resumen-29824000                                           exceeded quota: cuota, requested: limits.cpu=200m, used: limits.cpu=5900m, limited: limits.cpu=6
+2026-09-15T02:40:00Z   bitacora-29824000                                          exceeded quota: cuota, requested: limits.cpu=200m, used: limits.cpu=5900m, limited: limits.cpu=6
+2026-09-15T02:40:07Z   productos-5bc66878d                                        exceeded quota: cuota, requested: limits.cpu=300m, used: limits.cpu=5900m, limited: limits.cpu=6
+(uno por objeto; hubo varios reintentos de cada uno)

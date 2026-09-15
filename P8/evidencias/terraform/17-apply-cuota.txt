@@ -1,0 +1,21 @@
+﻿kubernetes_resource_quota_v1.plataforma: Modifying... [id=sa-p8/cuota]
+kubernetes_resource_quota_v1.plataforma: Modifications complete after 0s [id=sa-p8/cuota]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80"
+controlador_sealed_secrets = "sealed-secrets/sealed-secrets-controller"
+namespace_plataforma = "sa-p8"
+service_accounts = [
+  "auth",
+  "bitacora",
+  "gateway",
+  "notificaciones",
+  "ordenes",
+  "postgres",
+  "productos",
+  "resumen",
+  "rabbitmq",
+]

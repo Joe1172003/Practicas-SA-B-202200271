@@ -1,0 +1,75 @@
+﻿kubernetes_namespace_v1.herramientas["sealed-secrets"]: Refreshing state... [id=sealed-secrets]
+kubernetes_namespace_v1.herramientas["argo-rollouts"]: Refreshing state... [id=argo-rollouts]
+kubernetes_namespace_v1.herramientas["argocd"]: Refreshing state... [id=argocd]
+kubernetes_namespace_v1.ingress_nginx: Refreshing state... [id=ingress-nginx]
+kubernetes_namespace_v1.herramientas["kyverno"]: Refreshing state... [id=kyverno]
+kubernetes_namespace_v1.plataforma: Refreshing state... [id=sa-p8]
+kubernetes_cluster_role_binding_v1.consola_admin: Refreshing state... [id=consola-admin]
+kubernetes_network_policy_v1.salida_interna: Refreshing state... [id=sa-p8/salida-interna]
+kubernetes_role_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_network_policy_v1.permitir_dns: Refreshing state... [id=sa-p8/permitir-dns]
+kubernetes_role_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_service_account_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_network_policy_v1.denegar_todo: Refreshing state... [id=sa-p8/denegar-todo]
+kubernetes_service_account_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_service_account_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_service_account_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_service_account_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_resource_quota_v1.plataforma: Refreshing state... [id=sa-p8/cuota]
+kubernetes_service_account_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_limit_range_v1.plataforma: Refreshing state... [id=sa-p8/limites]
+kubernetes_role_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+helm_release.argo_rollouts: Refreshing state... [id=argo-rollouts]
+helm_release.argocd: Refreshing state... [id=argocd]
+helm_release.sealed_secrets: Refreshing state... [id=sealed-secrets]
+kubernetes_role_binding_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_role_binding_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_binding_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_binding_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_binding_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_binding_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_binding_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_binding_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_binding_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+helm_release.argocd_apps: Refreshing state... [id=argocd-apps]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # kubernetes_resource_quota_v1.plataforma will be updated in-place
+  ~ resource "kubernetes_resource_quota_v1" "plataforma" {
+        id = "sa-p8/cuota"
+
+      ~ spec {
+          ~ hard   = {
+              ~ "limits.cpu"             = "6" -> "9"
+              ~ "limits.memory"          = "6Gi" -> "9Gi"
+              ~ "requests.memory"        = "3Gi" -> "4Gi"
+                # (3 unchanged elements hidden)
+            }
+            # (1 unchanged attribute hidden)
+        }
+
+        # (1 unchanged block hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: fase6-cuota.tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "fase6-cuota.tfplan"
