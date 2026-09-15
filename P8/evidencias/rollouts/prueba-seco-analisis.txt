@@ -1,0 +1,141 @@
+Prueba en seco de los 3 AnalysisTemplate sobre la 2.1.0 - antes del primer canary
+
+Las lance a mano con kubectl argo rollouts create analysisrun --from <template>.
+gateway-canary apuntaba a los Pods estables, asi que era seguro. Sirvio para
+comprobar la NetworkPolicy, el ConfigMap con los scripts y la seguridad del Job
+antes de depender de ellos en el canary de verdad.
+
+ANALISIS                  RESULTADO
+prueba-seco-carga         Successful
+prueba-seco-humo          Successful
+prueba-seco-integracion   Successful
+
+== log del Job de humo
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+  █ THRESHOLDS 
+    checks
+    ✓ 'rate==1' rate=100.00%
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=233.21ms
+  █ TOTAL RESULTS 
+    checks_total.......: 15      43.89513/s
+    checks_succeeded...: 100.00% 15 out of 15
+    checks_failed......: 0.00%   0 out of 15
+    ✓ health responde 200
+    ✓ estado ok
+    ✓ es la version nueva
+    HTTP
+    http_req_duration..............: avg=62.77ms min=3.06ms med=4.24ms max=287.58ms p(90)=178.84ms p(95)=233.21ms
+      { expected_response:true }...: avg=62.77ms min=3.06ms med=4.24ms max=287.58ms p(90)=178.84ms p(95)=233.21ms
+    http_req_failed................: 0.00%  0 out of 5
+    http_reqs......................: 5      14.63171/s
+    EXECUTION
+    iteration_duration.............: avg=68.25ms min=3.34ms med=4.51ms max=287.98ms p(90)=189.59ms p(95)=238.78ms
+    iterations.....................: 5      14.63171/s
+    NETWORK
+    data_received..................: 2.2 kB 6.3 kB/s
+    data_sent......................: 405 B  1.2 kB/s
+default ✓ [ 100% ] 1 VUs  00m00.3s/10m0s  5/5 shared iters
+
+== log del Job de integracion
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+default   [   0% ] 1 VUs  00m01.0s/10m0s  0/3 shared iters
+default   [   0% ] 1 VUs  00m02.0s/10m0s  0/3 shared iters
+default   [   0% ] 1 VUs  00m03.0s/10m0s  0/3 shared iters
+default   [  33% ] 1 VUs  00m04.0s/10m0s  1/3 shared iters
+default   [  33% ] 1 VUs  00m05.0s/10m0s  1/3 shared iters
+default   [  67% ] 1 VUs  00m06.0s/10m0s  2/3 shared iters
+default   [  67% ] 1 VUs  00m07.0s/10m0s  2/3 shared iters
+default   [  67% ] 1 VUs  00m08.0s/10m0s  2/3 shared iters
+  █ THRESHOLDS 
+    checks
+    ✓ 'rate==1' rate=100.00%
+    http_req_duration
+    ✓ 'p(95)<3000' p(95)=1.37s
+    http_req_failed
+    ✓ 'rate==0' rate=0.00%
+  █ TOTAL RESULTS 
+    checks_total.......: 24      2.952539/s
+    checks_succeeded...: 100.00% 24 out of 24
+    checks_failed......: 0.00%   0 out of 24
+    ✓ registro 201
+    ✓ login 200
+    ✓ auth/me 200
+    ✓ auth/me devuelve mi correo
+    ✓ catalogo 200
+    ✓ catalogo trae productos
+    ✓ logout 200
+    ✓ sin sesion da 401
+    HTTP
+    http_req_duration..............: avg=450.42ms min=1.63ms med=25.69ms max=1.85s p(90)=1.22s p(95)=1.37s
+      { expected_response:true }...: avg=450.42ms min=1.63ms med=25.69ms max=1.85s p(90)=1.22s p(95)=1.37s
+    http_req_failed................: 0.00%  0 out of 18
+    http_reqs......................: 18     2.214404/s
+    EXECUTION
+    iteration_duration.............: avg=2.7s     min=2.44s  med=2.52s   max=3.15s p(90)=3.02s p(95)=3.09s
+    iterations.....................: 3      0.369067/s
+    vus............................: 1      min=1       max=1
+    vus_max........................: 1      min=1       max=1
+    NETWORK
+    data_received..................: 11 kB  1.4 kB/s
+    data_sent......................: 5.6 kB 690 B/s
+default ✓ [ 100% ] 1 VUs  00m08.1s/10m0s  3/3 shared iters
+
+== log del Job de carga
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+default   [   3% ] 5 VUs  01.0s/30s
+default   [   7% ] 5 VUs  02.0s/30s
+default   [  10% ] 5 VUs  03.0s/30s
+default   [  13% ] 5 VUs  04.0s/30s
+default   [  17% ] 5 VUs  05.0s/30s
+default   [  20% ] 5 VUs  06.0s/30s
+default   [  23% ] 5 VUs  07.0s/30s
+default   [  27% ] 5 VUs  08.0s/30s
+default   [  30% ] 5 VUs  09.0s/30s
+default   [  33% ] 5 VUs  10.0s/30s
+default   [  37% ] 5 VUs  11.0s/30s
+default   [  40% ] 5 VUs  12.0s/30s
+default   [  43% ] 5 VUs  13.0s/30s
+default   [  47% ] 5 VUs  14.0s/30s
+default   [  50% ] 5 VUs  15.0s/30s
+default   [  53% ] 5 VUs  16.0s/30s
+default   [  57% ] 5 VUs  17.0s/30s
+default   [  60% ] 5 VUs  18.0s/30s
+default   [  63% ] 5 VUs  19.0s/30s
+default   [  67% ] 5 VUs  20.0s/30s
+default   [  70% ] 5 VUs  21.0s/30s
+default   [  73% ] 5 VUs  22.0s/30s
+default   [  77% ] 5 VUs  23.0s/30s
+default   [  80% ] 5 VUs  24.0s/30s
+default   [  83% ] 5 VUs  25.0s/30s
+default   [  87% ] 5 VUs  26.0s/30s
+default   [  90% ] 5 VUs  27.0s/30s
+default   [  93% ] 5 VUs  28.0s/30s
+default   [  97% ] 5 VUs  29.0s/30s
+default   [ 100% ] 5 VUs  30.0s/30s
+----------------------------------------------------------
+  RESULTADO DE LA PRUEBA DE CARGA
+----------------------------------------------------------
+  Destino            : http://gateway-canary:3000
+  Usuarios virtuales : 5
+  Peticiones totales : 568
+  Peticiones/segundo : 18.67
+  Latencia p95       : 34.88 ms
+  Latencia promedio  : 14.56 ms
+  Tasa de error      : 0.00 %
+  Checks correctos   : 100.00 %
+  Umbrales:
+    PASA   http_req_duration p(95)<300
+    PASA   http_req_failed rate<0.01
+    PASA   checks rate>0.99
+----------------------------------------------------------
+default ✓ [ 100% ] 5 VUs  30s

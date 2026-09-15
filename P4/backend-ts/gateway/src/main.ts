@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { marcarVersion } from './common/version.middleware';
 import { appConfig } from './config/app.config';
 import type { AppConfig } from './config/app.config';
 
@@ -20,6 +21,9 @@ async function bootstrap() {
   // Necesario para poder leer la cookie con el JWT que manda el navegador.
   app.use(cookieParser());
 
+  // Cada respuesta dice que version del gateway la atendio (se ve en el canary).
+  app.use(marcarVersion);
+
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -34,7 +38,7 @@ async function bootstrap() {
   app.enableCors({
     origin: config.corsOrigins,
     credentials: true,
-    exposedHeaders: ['X-Token-Renovado'],
+    exposedHeaders: ['X-Token-Renovado', 'X-Version-Gateway'],
   });
 
   // 0.0.0.0 para aceptar tráfico que viene de fuera del contenedor.
