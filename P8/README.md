@@ -24,7 +24,7 @@ En la Práctica 7 mi pipeline tenía acceso al clúster y desplegaba solo. Si al
 | 6 | Bloqueo por vulnerabilidad crítica | https://github.com/Joe1172003/Practicas-SA-B-202200271/pull/3 |
 | 7 | Imagen firmada | `ghcr.io/joe1172003/p4-gateway:2.2.0` |
 | 8 | Reporte de prueba de carga | [P8/evidencias/rollouts/reporte-pruebas-canary-2.2.0.txt](evidencias/rollouts/reporte-pruebas-canary-2.2.0.txt) |
-| 9 | Video demostrativo | PENDIENTE: URL del video |
+| 9 | Video demostrativo | aqui va ir mi enlace de mi URL esto en fines de ejemplos |
 
 
 ## Diagrama del flujo
