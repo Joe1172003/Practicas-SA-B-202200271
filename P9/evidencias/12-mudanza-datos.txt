@@ -1,0 +1,48 @@
+Mudanza de datos de sa-p6 a sa-p9 - 2026-09-22T18:50:24Z
+
+El cluster nuevo arranco con los datos de ejemplo que siembra el chart de postgres.
+Restauro el respaldo que saque de sa-p6 antes de borrarlo.
+
+ANTES de restaurar:
+  usuarios (db_auth):   0
+  productos:            3
+  ordenes:              0
+
+DESPUES de restaurar:
+  usuarios (db_auth):   21
+  productos:            3
+  categorias:           3
+  ordenes:              5
+  lineas de orden:      5
+
+Contenido real de productos (no solo el conteo):
+Contenido real de productos:
+  Celular Samsung A54|2300.50|20
+  Laptop Lenovo ThinkPad|8500.00|10
+  Mouse Logitech M170|120.00|3
+
+Ultimos usuarios registrados (sin datos personales, solo el conteo por rol):
+  CLIENTE|21
+
+Verificacion de punta a punta - 2026-09-22T18:51:39Z
+
+$ curl http://136.113.9.71.nip.io/health
+{"estado":"ok","servicio":"api-gateway","version":"2.2.1","hora":"2026-09-22T18:51:39.563Z"}
+
+$ curl -X POST .../graphql/productos  (catalogo con los datos restaurados)
+{"data":{"productos":[{"nombre":"Celular Samsung A54","precio":2300.5},{"nombre":"Laptop Lenovo ThinkPad","precio":8500},{"nombre":"Mouse Logitech M170","precio":120}]}}
+
+$ kubectl get clusterpolicy
+Warning: kyverno.io/v1 ClusterPolicy is deprecated and will be removed in a future release; migrate to ValidatingPolicy, MutatingPolicy, GeneratingPolicy or ImageValidatingPolicy (policies.kyverno.io), see https://kyverno.io/docs/guides/migration-to-cel/
+  exigir-limites True
+  exigir-no-root True
+  prohibir-latest True
+  verificar-firma True
+
+$ kubectl -n sa-p8 run prueba-latest --image=...:latest --dry-run=server
+Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request: 
+
+resource Pod/sa-p8/prueba-latest was blocked due to the following policies 
+
+verificar-firma:
+  firmada-por-el-pipeline-p8: 'failed to verify image ghcr.io/joe1172003/p4-gateway:latest: .attestors[0].entries[0].keyless: sigstore bundle verification failed: no matching signatures found'

@@ -64,10 +64,10 @@ variable "repo_gitops" {
   default     = "https://github.com/Joe1172003/sa-p8-gitops.git"
 }
 
-# Se enciende en la Fase 4, cuando el repositorio GitOps ya tiene las apps de
-# plataforma y la llave de Sealed Secrets esta repuesta.
+# Queda encendida: el bootstrap tiene que crear la raiz solo, sin que nadie
+# recuerde pasar un parametro. Se apaga a mano solo para depurar.
 variable "crear_raiz" {
   description = "Crear la aplicacion raiz (app of apps) de ArgoCD."
   type        = bool
-  default     = false
+  default     = true
 }

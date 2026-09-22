@@ -1,0 +1,39 @@
+Plataforma desplegada por ArgoCD en sa-p9 - 2026-09-22T19:06:41Z
+
+Terraform crea el cluster, ArgoCD y la app raiz. Todo lo demas, incluidas las
+herramientas, lo despliega ArgoCD desde el repositorio GitOps, en olas.
+
+$ kubectl -n argocd get app
+APP              PROYECTO     OLA      SYNC     SALUD
+argo-rollouts    plataforma   -2       Synced   Healthy
+auth             sa-p8        <none>   Synced   Healthy
+cronjobs         sa-p8        <none>   Synced   Healthy
+gateway          sa-p8        <none>   Synced   Healthy
+ingress-nginx    plataforma   -3       Synced   Healthy
+kyverno          plataforma   -2       Synced   Healthy
+notificaciones   sa-p8        <none>   Synced   Healthy
+ordenes          sa-p8        <none>   Synced   Healthy
+politicas        politicas    <none>   Synced   Healthy
+postgres         sa-p8        <none>   Synced   Healthy
+productos        sa-p8        <none>   Synced   Healthy
+rabbitmq         sa-p8        <none>   Synced   Healthy
+raiz             raiz         <none>   Synced   Healthy
+sealed-secrets   plataforma   -3       Synced   Healthy
+velero           plataforma   -2       Synced   Healthy
+
+$ kubectl get ns ingress-nginx -o jsonpath='{.metadata.labels}'
+{"kubernetes.io/metadata.name":"ingress-nginx","name":"ingress-nginx"}
+
+$ kubectl -n velero get backupstoragelocation
+NOMBRE    PROVEEDOR   BUCKET                   ESTADO
+default   gcp         sa-p9-velero-202200271   Available
+
+Available significa que Velero llego al bucket. No hay ninguna llave JSON: la
+cuenta de Kubernetes velero-server actua como velero-sa-p9 por Workload Identity.
+
+$ kubectl -n velero get sa velero-server -o jsonpath='{.metadata.annotations}'
+velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com
+
+$ kubectl get volumesnapshotclass
+NOMBRE       DRIVER                  BORRADO
+discos-gke   pd.csi.storage.gke.io   Retain

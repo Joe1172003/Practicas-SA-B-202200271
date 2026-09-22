@@ -1,0 +1,22 @@
+inicio: 2026-09-22T18:36:59Z
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+            EOT,
+        ]
+        # (29 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+helm_release.argocd_apps: Modifying... [id=argocd-apps]
+helm_release.argocd_apps: Still modifying... [id=argocd-apps, 00m10s elapsed]
+helm_release.argocd_apps: Modifications complete after 11s [id=argocd-apps]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+cluster = "sa-p9"
+consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80"
+credenciales = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+host_gateway = "136.113.9.71.nip.io"
+version_gke = "1.35.8-gke.1036000"
+fin: 2026-09-22T18:37:36Z
