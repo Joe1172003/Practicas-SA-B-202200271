@@ -1,0 +1,1548 @@
+data.terraform_remote_state.permanente: Reading...
+data.google_client_config.actual: Reading...
+data.google_client_config.actual: Read complete after 0s [id=projects/sa-p6-202200271/regions/us-central1/zones/]
+data.terraform_remote_state.permanente: Read complete after 1s
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # google_container_cluster.sa_p9 will be created
+  + resource "google_container_cluster" "sa_p9" {
+      + autopilot_privileged_admission           = (known after apply)
+      + cluster_ipv4_cidr                        = (known after apply)
+      + datapath_provider                        = "ADVANCED_DATAPATH"
+      + default_max_pods_per_node                = (known after apply)
+      + deletion_policy                          = "DELETE"
+      + deletion_protection                      = false
+      + disable_l4_lb_firewall_reconciliation    = false
+      + effective_labels                         = {
+          + "goog-terraform-provisioned" = "true"
+        }
+      + emulated_version                         = (known after apply)
+      + enable_cilium_clusterwide_network_policy = false
+      + enable_fqdn_network_policy               = false
+      + enable_intranode_visibility              = (known after apply)
+      + enable_kubernetes_alpha                  = false
+      + enable_l4_ilb_subsetting                 = (known after apply)
+      + enable_legacy_abac                       = false
+      + enable_multi_networking                  = false
+      + enable_shielded_nodes                    = true
+      + endpoint                                 = (known after apply)
+      + id                                       = (known after apply)
+      + initial_node_count                       = 1
+      + label_fingerprint                        = (known after apply)
+      + location                                 = "us-central1-a"
+      + logging_service                          = (known after apply)
+      + master_version                           = (known after apply)
+      + monitoring_service                       = (known after apply)
+      + name                                     = "sa-p9"
+      + network                                  = "default"
+      + networking_mode                          = "VPC_NATIVE"
+      + node_locations                           = (known after apply)
+      + node_version                             = (known after apply)
+      + operation                                = (known after apply)
+      + private_ipv6_google_access               = (known after apply)
+      + project                                  = (known after apply)
+      + remove_default_node_pool                 = true
+      + self_link                                = (known after apply)
+      + services_ipv4_cidr                       = (known after apply)
+      + subnetwork                               = (known after apply)
+      + terraform_labels                         = {
+          + "goog-terraform-provisioned" = "true"
+        }
+      + tpu_ipv4_cidr_block                      = (known after apply)
+
+      + addons_config {
+          + agent_sandbox_config (known after apply)
+          + cloudrun_config (known after apply)
+          + config_connector_config (known after apply)
+          + dns_cache_config (known after apply)
+          + gce_persistent_disk_csi_driver_config {
+              + enabled = true
+            }
+          + gcp_filestore_csi_driver_config (known after apply)
+          + gcs_fuse_csi_driver_config (known after apply)
+          + gke_backup_agent_config (known after apply)
+          + high_scale_checkpointing_config (known after apply)
+          + horizontal_pod_autoscaling (known after apply)
+          + http_load_balancing (known after apply)
+          + lustre_csi_driver_config (known after apply)
+          + network_policy_config (known after apply)
+          + node_readiness_config (known after apply)
+          + parallelstore_csi_driver_config (known after apply)
+          + pod_snapshot_config (known after apply)
+          + ray_operator_config (known after apply)
+          + slice_controller_config (known after apply)
+          + slurm_operator_config (known after apply)
+          + stateful_ha_config (known after apply)
+        }
+
+      + anonymous_authentication_config (known after apply)
+
+      + authenticator_groups_config (known after apply)
+
+      + autopilot_cluster_policy_config (known after apply)
+
+      + cluster_autoscaling (known after apply)
+
+      + confidential_nodes (known after apply)
+
+      + control_plane_endpoints_config (known after apply)
+
+      + cost_management_config (known after apply)
+
+      + database_encryption (known after apply)
+
+      + default_snat_status (known after apply)
+
+      + enterprise_config (known after apply)
+
+      + gateway_api_config (known after apply)
+
+      + gke_auto_upgrade_config (known after apply)
+
+      + identity_service_config (known after apply)
+
+      + ip_allocation_policy {
+          + cluster_ipv4_cidr_block       = (known after apply)
+          + cluster_secondary_range_name  = (known after apply)
+          + services_ipv4_cidr_block      = (known after apply)
+          + services_secondary_range_name = (known after apply)
+          + stack_type                    = "IPV4"
+
+          + auto_ipam_config (known after apply)
+
+          + network_tier_config (known after apply)
+
+          + pod_cidr_overprovision_config (known after apply)
+        }
+
+      + logging_config (known after apply)
+
+      + master_auth (known after apply)
+
+      + master_authorized_networks_config (known after apply)
+
+      + mesh_certificates (known after apply)
+
+      + monitoring_config (known after apply)
+
+      + node_config (known after apply)
+
+      + node_creation_config (known after apply)
+
+      + node_pool (known after apply)
+
+      + node_pool_auto_config (known after apply)
+
+      + node_pool_defaults (known after apply)
+
+      + notification_config (known after apply)
+
+      + pod_autoscaling (known after apply)
+
+      + rbac_binding_config (known after apply)
+
+      + release_channel {
+          + channel = "REGULAR"
+        }
+
+      + security_posture_config (known after apply)
+
+      + service_external_ips_config (known after apply)
+
+      + vertical_pod_autoscaling (known after apply)
+
+      + workload_identity_config {
+          + workload_pool = "sa-p6-202200271.svc.id.goog"
+        }
+    }
+
+  # google_container_node_pool.principal will be created
+  + resource "google_container_node_pool" "principal" {
+      + cluster                     = "sa-p9"
+      + deletion_policy             = "DELETE"
+      + id                          = (known after apply)
+      + initial_node_count          = (known after apply)
+      + instance_group_urls         = (known after apply)
+      + location                    = "us-central1-a"
+      + managed_instance_group_urls = (known after apply)
+      + max_pods_per_node           = (known after apply)
+      + name                        = "principal"
+      + name_prefix                 = (known after apply)
+      + node_count                  = 3
+      + node_locations              = (known after apply)
+      + operation                   = (known after apply)
+      + project                     = "sa-p6-202200271"
+      + version                     = (known after apply)
+
+      + management {
+          + auto_repair  = true
+          + auto_upgrade = true
+        }
+
+      + network_config (known after apply)
+
+      + node_config {
+          + disk_size_gb       = 30
+          + disk_type          = "pd-balanced"
+          + effective_taints   = (known after apply)
+          + gpudirect_strategy = (known after apply)
+          + image_type         = (known after apply)
+          + labels             = {
+              + "practica" = "p9"
+            }
+          + local_ssd_count    = (known after apply)
+          + logging_variant    = (known after apply)
+          + machine_type       = "e2-standard-2"
+          + metadata           = (known after apply)
+          + min_cpu_platform   = (known after apply)
+          + oauth_scopes       = [
+              + "https://www.googleapis.com/auth/cloud-platform",
+            ]
+          + preemptible        = false
+          + service_account    = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+          + spot               = false
+
+          + boot_disk (known after apply)
+
+          + confidential_nodes (known after apply)
+
+          + containerd_config (known after apply)
+
+          + gcfs_config (known after apply)
+
+          + guest_accelerator (known after apply)
+
+          + kubelet_config (known after apply)
+
+          + linux_node_config (known after apply)
+
+          + node_image_config (known after apply)
+
+          + shielded_instance_config (known after apply)
+
+          + windows_node_config (known after apply)
+
+          + workload_metadata_config {
+              + mode = "GKE_METADATA"
+            }
+        }
+
+      + node_drain_config (known after apply)
+
+      + upgrade_settings (known after apply)
+    }
+
+  # google_project_iam_member.nodos["roles/logging.logWriter"] will be created
+  + resource "google_project_iam_member" "nodos" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + project = "sa-p6-202200271"
+      + role    = "roles/logging.logWriter"
+    }
+
+  # google_project_iam_member.nodos["roles/monitoring.metricWriter"] will be created
+  + resource "google_project_iam_member" "nodos" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + project = "sa-p6-202200271"
+      + role    = "roles/monitoring.metricWriter"
+    }
+
+  # google_project_iam_member.nodos["roles/monitoring.viewer"] will be created
+  + resource "google_project_iam_member" "nodos" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + project = "sa-p6-202200271"
+      + role    = "roles/monitoring.viewer"
+    }
+
+  # google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"] will be created
+  + resource "google_project_iam_member" "nodos" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + project = "sa-p6-202200271"
+      + role    = "roles/stackdriver.resourceMetadata.writer"
+    }
+
+  # google_service_account.nodos will be created
+  + resource "google_service_account" "nodos" {
+      + account_id      = "nodos-sa-p9"
+      + deletion_policy = "DELETE"
+      + disabled        = false
+      + display_name    = "Nodos del cluster sa-p9"
+      + email           = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + id              = (known after apply)
+      + member          = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+      + name            = (known after apply)
+      + project         = "sa-p6-202200271"
+      + unique_id       = (known after apply)
+    }
+
+  # google_service_account_iam_member.velero_wi will be created
+  + resource "google_service_account_iam_member" "velero_wi" {
+      + etag               = (known after apply)
+      + id                 = (known after apply)
+      + member             = "serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]"
+      + role               = "roles/iam.workloadIdentityUser"
+      + service_account_id = "projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com"
+    }
+
+  # helm_release.argocd will be created
+  + resource "helm_release" "argocd" {
+      + atomic                     = false
+      + chart                      = "argo-cd"
+      + cleanup_on_fail            = false
+      + create_namespace           = false
+      + dependency_update          = false
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "argocd"
+      + namespace                  = "argocd"
+      + pass_credentials           = false
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "https://argoproj.github.io/argo-helm"
+      + reset_values               = false
+      + reuse_values               = false
+      + set_wo                     = (write-only attribute)
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + take_ownership             = false
+      + timeout                    = 900
+      + upgrade_install            = false
+      + values                     = [
+          + <<-EOT
+                "applicationSet":
+                  "replicas": 0
+                "configs":
+                  "params":
+                    "server.insecure": true
+                "controller":
+                  "resources":
+                    "limits":
+                      "cpu": "500m"
+                      "memory": "768Mi"
+                    "requests":
+                      "cpu": "50m"
+                      "memory": "256Mi"
+                "dex":
+                  "enabled": false
+                "notifications":
+                  "enabled": false
+                "redis":
+                  "resources":
+                    "limits":
+                      "cpu": "200m"
+                      "memory": "128Mi"
+                    "requests":
+                      "cpu": "10m"
+                      "memory": "32Mi"
+                "repoServer":
+                  "resources":
+                    "limits":
+                      "cpu": "500m"
+                      "memory": "512Mi"
+                    "requests":
+                      "cpu": "25m"
+                      "memory": "128Mi"
+                "server":
+                  "resources":
+                    "limits":
+                      "cpu": "300m"
+                      "memory": "256Mi"
+                    "requests":
+                      "cpu": "20m"
+                      "memory": "96Mi"
+            EOT,
+        ]
+      + verify                     = false
+      + version                    = "10.9.0"
+      + wait                       = true
+      + wait_for_jobs              = false
+    }
+
+  # helm_release.argocd_apps will be created
+  + resource "helm_release" "argocd_apps" {
+      + atomic                     = false
+      + chart                      = "argocd-apps"
+      + cleanup_on_fail            = false
+      + create_namespace           = false
+      + dependency_update          = false
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "argocd-apps"
+      + namespace                  = "argocd"
+      + pass_credentials           = false
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "https://argoproj.github.io/argo-helm"
+      + reset_values               = false
+      + reuse_values               = false
+      + set_wo                     = (write-only attribute)
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + take_ownership             = false
+      + timeout                    = 300
+      + upgrade_install            = false
+      + values                     = [
+          + <<-EOT
+                "applications": {}
+                "projects":
+                  "plataforma":
+                    "clusterResourceWhitelist":
+                    - "group": "*"
+                      "kind": "*"
+                    "description": "Herramientas de la plataforma instaladas por GitOps"
+                    "destinations":
+                    - "namespace": "*"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "sourceRepos":
+                    - "*"
+                  "politicas":
+                    "clusterResourceWhitelist":
+                    - "group": "kyverno.io"
+                      "kind": "ClusterPolicy"
+                    "description": "Politicas de admision de Kyverno"
+                    "destinations":
+                    - "namespace": "kyverno"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceBlacklist":
+                    - "group": "*"
+                      "kind": "*"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git"
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+                  "raiz":
+                    "description": "App of apps que lee la carpeta apps del repo GitOps"
+                    "destinations":
+                    - "namespace": "argocd"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceWhitelist":
+                    - "group": "argoproj.io"
+                      "kind": "Application"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+                  "sa-p8":
+                    "description": "Microservicios de la plataforma"
+                    "destinations":
+                    - "namespace": "sa-p8"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceBlacklist":
+                    - "group": ""
+                      "kind": "ResourceQuota"
+                    - "group": ""
+                      "kind": "LimitRange"
+                    - "group": ""
+                      "kind": "ServiceAccount"
+                    - "group": "rbac.authorization.k8s.io"
+                      "kind": "Role"
+                    - "group": "rbac.authorization.k8s.io"
+                      "kind": "RoleBinding"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git"
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+            EOT,
+        ]
+      + verify                     = false
+      + version                    = "2.0.5"
+      + wait                       = true
+      + wait_for_jobs              = false
+    }
+
+  # kubernetes_limit_range_v1.plataforma will be created
+  + resource "kubernetes_limit_range_v1" "plataforma" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "limites"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + limit {
+              + default         = {
+                  + "cpu"    = "200m"
+                  + "memory" = "256Mi"
+                }
+              + default_request = {
+                  + "cpu"    = "25m"
+                  + "memory" = "64Mi"
+                }
+              + max             = {
+                  + "cpu"    = "1"
+                  + "memory" = "1Gi"
+                }
+              + min             = {
+                  + "cpu"    = "10m"
+                  + "memory" = "16Mi"
+                }
+              + type            = "Container"
+            }
+        }
+    }
+
+  # kubernetes_namespace_v1.argocd will be created
+  + resource "kubernetes_namespace_v1" "argocd" {
+      + id                               = (known after apply)
+      + wait_for_default_service_account = false
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "argocd"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_namespace_v1.plataforma will be created
+  + resource "kubernetes_namespace_v1" "plataforma" {
+      + id                               = (known after apply)
+      + wait_for_default_service_account = false
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+              + "entorno"                      = "prod"
+            }
+          + name             = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_namespace_v1.sealed_secrets will be created
+  + resource "kubernetes_namespace_v1" "sealed_secrets" {
+      + id                               = (known after apply)
+      + wait_for_default_service_account = false
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "sealed-secrets"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_network_policy_v1.denegar_todo will be created
+  + resource "kubernetes_network_policy_v1" "denegar_todo" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "denegar-todo"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Ingress",
+              + "Egress",
+            ]
+
+          + pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.permitir_dns will be created
+  + resource "kubernetes_network_policy_v1" "permitir_dns" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "permitir-dns"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Egress",
+            ]
+
+          + egress {
+              + ports {
+                  + port     = "53"
+                  + protocol = "UDP"
+                }
+              + ports {
+                  + port     = "53"
+                  + protocol = "TCP"
+                }
+              + to {
+                  + namespace_selector {
+                      + match_labels = {
+                          + "kubernetes.io/metadata.name" = "kube-system"
+                        }
+                    }
+                }
+            }
+
+          + pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.salida_interna will be created
+  + resource "kubernetes_network_policy_v1" "salida_interna" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "salida-interna"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + policy_types = [
+              + "Egress",
+            ]
+
+          + egress {
+              + to {
+                  + pod_selector {
+                    }
+                }
+            }
+
+          + pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_resource_quota_v1.plataforma will be created
+  + resource "kubernetes_resource_quota_v1" "plataforma" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "cuota"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + spec {
+          + hard = {
+              + "limits.cpu"             = "9"
+              + "limits.memory"          = "9Gi"
+              + "persistentvolumeclaims" = "6"
+              + "pods"                   = "30"
+              + "requests.cpu"           = "2"
+              + "requests.memory"        = "4Gi"
+            }
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["auth"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "auth"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "auth"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "auth"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "auth"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["bitacora"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "bitacora"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "bitacora"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "bitacora"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "bitacora"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["gateway"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "gateway"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "gateway"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "gateway"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "gateway"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["notificaciones"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "notificaciones"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "notificaciones"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "notificaciones"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "notificaciones"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["ordenes"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "ordenes"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "ordenes"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "ordenes"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "ordenes"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["postgres"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "postgres"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "postgres"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "postgres"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "postgres"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["productos"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "productos"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "productos"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "productos"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "productos"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["resumen"] will be created
+  + resource "kubernetes_role_binding_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "resumen"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "resumen"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "resumen"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "resumen"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_binding_v1.rabbitmq will be created
+  + resource "kubernetes_role_binding_v1" "rabbitmq" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "rabbitmq"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "rabbitmq"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + role_ref {
+          + api_group = "rbac.authorization.k8s.io"
+          + kind      = "Role"
+          + name      = "rabbitmq"
+        }
+
+      + subject {
+          + api_group = (known after apply)
+          + kind      = "ServiceAccount"
+          + name      = "rabbitmq"
+          + namespace = "sa-p8"
+        }
+    }
+
+  # kubernetes_role_v1.componente["auth"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "auth"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "auth"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "auth-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "auth-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["bitacora"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "bitacora"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "bitacora"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "bitacora-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["gateway"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "gateway"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "gateway"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "gateway-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["notificaciones"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "notificaciones"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "notificaciones"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "notificaciones-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "notificaciones-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["ordenes"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "ordenes"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "ordenes"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "ordenes-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "ordenes-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["postgres"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "postgres"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "postgres"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "postgres-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "postgres-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["productos"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "productos"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "productos"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "productos-config",
+            ]
+          + resources      = [
+              + "configmaps",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "productos-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.componente["resumen"] will be created
+  + resource "kubernetes_role_v1" "componente" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "resumen"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "resumen"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups     = [
+              + null,
+            ]
+          + resource_names = [
+              + "resumen-secreto",
+            ]
+          + resources      = [
+              + "secrets",
+            ]
+          + verbs          = [
+              + "get",
+            ]
+        }
+    }
+
+  # kubernetes_role_v1.rabbitmq will be created
+  + resource "kubernetes_role_v1" "rabbitmq" {
+      + id = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "rabbitmq"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "rabbitmq"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+
+      + rule {
+          + api_groups = [
+              + null,
+            ]
+          + resources  = [
+              + "endpoints",
+            ]
+          + verbs      = [
+              + "get",
+            ]
+        }
+      + rule {
+          + api_groups = [
+              + null,
+            ]
+          + resources  = [
+              + "events",
+            ]
+          + verbs      = [
+              + "create",
+            ]
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["auth"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "auth"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "auth"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["bitacora"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "bitacora"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "bitacora"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["gateway"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "gateway"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "gateway"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["notificaciones"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "notificaciones"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "notificaciones"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["ordenes"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "ordenes"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "ordenes"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["postgres"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "postgres"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "postgres"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["productos"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "productos"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "productos"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["resumen"] will be created
+  + resource "kubernetes_service_account_v1" "componente" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "resumen"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "resumen"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_service_account_v1.rabbitmq will be created
+  + resource "kubernetes_service_account_v1" "rabbitmq" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "terraform"
+              + "app.kubernetes.io/name"       = "rabbitmq"
+              + "app.kubernetes.io/part-of"    = "sa-p9"
+            }
+          + name             = "rabbitmq"
+          + namespace        = "sa-p8"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+Plan: 45 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + cluster        = "sa-p9"
+  + consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80"
+  + credenciales   = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+  + host_gateway   = "136.113.9.71.nip.io"
+  + version_gke    = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
