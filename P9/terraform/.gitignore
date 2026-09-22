@@ -1,0 +1,19 @@
+# Proveedores descargados por terraform init: se vuelven a bajar solos.
+.terraform/
+
+# El state vive en el bucket de GCS. Si alguna vez aparece una copia local
+# (por ejemplo un backup de terraform state pull), no se sube.
+*.tfstate
+*.tfstate.*
+
+# Mis valores reales. El formato esta en terraform.tfvars.example.
+terraform.tfvars
+
+# Planes guardados con -out: son binarios y pueden llevar valores sensibles.
+*.tfplan
+crash.log
+
+# Llaves o credenciales exportadas por error nunca entran al repo.
+*.key
+*.pem
+*credenciales*.json

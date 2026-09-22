@@ -1,0 +1,4 @@
+# Copiar como terraform.tfvars solo si hace falta cambiar algun valor por
+# defecto. terraform.tfvars no se sube al repositorio.
+proyecto = "sa-p6-202200271"
+region   = "us-central1"
