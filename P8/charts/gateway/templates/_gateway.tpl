@@ -10,6 +10,8 @@ metadata:
 spec:
   # La cuenta la crea Terraform con permiso de leer solo gateway-config.
   serviceAccountName: {{ .Chart.Name }}
+  affinity:
+    {{- include "sa.antiafinidad" . | nindent 4 }}
   securityContext:
     {{- include "sa.seguridadPod" (dict "uid" 1000) | nindent 4 }}
   containers:

@@ -29,6 +29,8 @@ spec:
     spec:
       # La cuenta la crea Terraform, con permiso de leer solo su config y su Secret.
       serviceAccountName: {{ .Chart.Name }}
+      affinity:
+        {{- include "sa.antiafinidad" . | nindent 8 }}
       securityContext:
         {{- include "sa.seguridadPod" (dict "uid" 1000) | nindent 8 }}
       containers:

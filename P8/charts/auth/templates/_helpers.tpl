@@ -66,3 +66,23 @@ livenessProbe:
   timeoutSeconds: 5
   failureThreshold: 3
 {{- end -}}
+
+{{/*
+Anti-afinidad: pide que las replicas de un mismo servicio caigan en nodos
+distintos. Asi, si se pierde un nodo, siempre queda una viva en otro.
+
+Es "preferred" y no "required" a proposito: con 3 nodos y un HPA que puede
+llegar a 3 replicas, una regla obligatoria dejaria Pods en Pending durante un
+rolling update (que crea un Pod de mas antes de bajar el viejo). Con peso 100
+el planificador las separa igual, pero nunca bloquea un despliegue.
+*/}}
+{{- define "sa.antiafinidad" -}}
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            {{- include "sa.selector" . | nindent 12 }}
+{{- end -}}
