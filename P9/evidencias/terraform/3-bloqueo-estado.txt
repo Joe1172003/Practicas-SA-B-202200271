@@ -1,0 +1,31 @@
+Prueba de bloqueo del estado remoto - capa permanente
+Mientras corre el apply de la Fase 1, lanzo un plan en paralelo sobre el mismo estado.
+
+$ gcloud storage ls gs://sa-p9-tfstate-202200271/permanente/
+gs://sa-p9-tfstate-202200271/permanente/default.tflock
+gs://sa-p9-tfstate-202200271/permanente/default.tfstate
+
+2026-09-22T16:33:54Z  $ terraform plan -lock-timeout=0s
+Acquiring state lock. This may take a few moments...
+
+Error: Error acquiring the state lock
+
+Error message: writing
+"gs://sa-p9-tfstate-202200271/permanente/default.tflock" failed: googleapi:
+Error 412: At least one of the pre-conditions you specified did not hold.,
+conditionNotMet
+Lock Info:
+  ID:        1790094828318065
+  Path:      gs://sa-p9-tfstate-202200271/permanente/default.tflock
+  Operation: OperationTypeApply
+  Who:       Sergicode\Sergio Rodas@Sergicode
+  Version:   1.16.2
+  Created:   2026-09-22 16:33:48.108741 +0000 UTC
+  Info:      
+
+
+Terraform acquires a state lock to protect the state from being written
+by multiple users at the same time. Please resolve the issue above and try
+again. For most commands, you can disable locking with the "-lock=false"
+flag, but this is not recommended.
+codigo de salida: 1

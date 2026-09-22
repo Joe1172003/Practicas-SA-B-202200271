@@ -9,3 +9,9 @@ variable "region" {
   type        = string
   default     = "us-central1"
 }
+
+variable "bucket_velero" {
+  description = "Bucket de los respaldos de Velero."
+  type        = string
+  default     = "sa-p9-velero-202200271"
+}
