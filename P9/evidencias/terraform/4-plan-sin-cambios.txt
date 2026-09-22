@@ -1,0 +1,19 @@
+google_project_service.api["container.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/container.googleapis.com]
+google_project_service.api["iamcredentials.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/iamcredentials.googleapis.com]
+google_project_iam_custom_role.velero: Refreshing state... [id=projects/sa-p6-202200271/roles/veleroSaP9]
+google_project_service.api["storage.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/storage.googleapis.com]
+google_project_service.api["secretmanager.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/secretmanager.googleapis.com]
+google_project_service.api["iam.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/iam.googleapis.com]
+google_project_service.api["compute.googleapis.com"]: Refreshing state... [id=sa-p6-202200271/compute.googleapis.com]
+google_service_account.velero: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_compute_address.ingress: Refreshing state... [id=projects/sa-p6-202200271/regions/us-central1/addresses/sa-p9-ingress]
+google_secret_manager_secret.llave_sealed_secrets: Refreshing state... [id=projects/sa-p6-202200271/secrets/sa-p9-sealed-secrets-llave]
+google_storage_bucket.velero: Refreshing state... [id=sa-p9-velero-202200271]
+google_service_account_iam_member.velero_firma: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com/roles/iam.serviceAccountTokenCreator/serviceAccount:velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.velero: Refreshing state... [id=sa-p6-202200271/projects/sa-p6-202200271/roles/veleroSaP9/serviceAccount:velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_storage_bucket_iam_member.velero: Refreshing state... [id=b/sa-p9-velero-202200271/roles/storage.objectAdmin/serviceAccount:velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
