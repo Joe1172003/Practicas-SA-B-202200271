@@ -1,0 +1,94 @@
+inicio apply: 2026-09-22T18:11:18Z
+data.terraform_remote_state.permanente: Reading...
+data.google_client_config.actual: Reading...
+google_service_account.nodos: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_container_cluster.sa_p9: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9]
+data.google_client_config.actual: Read complete after 0s [id=projects/sa-p6-202200271/regions/us-central1/zones/]
+data.terraform_remote_state.permanente: Read complete after 1s
+data.google_secret_manager_secret_version.llave_sealed_secrets: Reading...
+google_project_iam_member.nodos["roles/logging.logWriter"]: Refreshing state... [id=sa-p6-202200271/roles/logging.logWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/monitoring.viewer"]: Refreshing state... [id=sa-p6-202200271/roles/monitoring.viewer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/monitoring.metricWriter"]: Refreshing state... [id=sa-p6-202200271/roles/monitoring.metricWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"]: Refreshing state... [id=sa-p6-202200271/roles/stackdriver.resourceMetadata.writer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+data.google_secret_manager_secret_version.llave_sealed_secrets: Read complete after 1s [id=projects/135223512781/secrets/sa-p9-sealed-secrets-llave/versions/1]
+google_service_account_iam_member.velero_wi: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com/roles/iam.workloadIdentityUser/serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]]
+google_container_node_pool.principal: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal]
+kubernetes_namespace_v1.sealed_secrets: Refreshing state... [id=sealed-secrets]
+kubernetes_namespace_v1.plataforma: Refreshing state... [id=sa-p8]
+kubernetes_namespace_v1.argocd: Refreshing state... [id=argocd]
+kubernetes_resource_quota_v1.plataforma: Refreshing state... [id=sa-p8/cuota]
+kubernetes_service_account_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_limit_range_v1.plataforma: Refreshing state... [id=sa-p8/limites]
+kubernetes_role_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_role_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_network_policy_v1.permitir_dns: Refreshing state... [id=sa-p8/permitir-dns]
+kubernetes_network_policy_v1.salida_interna: Refreshing state... [id=sa-p8/salida-interna]
+kubernetes_network_policy_v1.denegar_todo: Refreshing state... [id=sa-p8/denegar-todo]
+kubernetes_role_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_service_account_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_service_account_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_service_account_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_service_account_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_service_account_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_service_account_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+helm_release.argocd: Refreshing state... [id=argocd]
+kubernetes_role_binding_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_role_binding_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_binding_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_binding_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_binding_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_binding_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_binding_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_binding_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_binding_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+helm_release.argocd_apps: Refreshing state... [id=argocd-apps]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"] will be created
+  + resource "kubernetes_secret_v1" "llave_sealed_secrets" {
+      + binary_data_wo                 = (write-only attribute)
+      + data                           = (sensitive value)
+      + data_wo                        = (write-only attribute)
+      + id                             = (known after apply)
+      + type                           = "kubernetes.io/tls"
+      + wait_for_service_account_token = true
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "sealedsecrets.bitnami.com/sealed-secrets-key" = "active"
+            }
+          + name             = "sealed-secrets-keyn5h7g"
+          + namespace        = "sealed-secrets"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"]: Creating...
+kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"]: Creation complete after 0s [id=sealed-secrets/sealed-secrets-keyn5h7g]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cluster = "sa-p9"
+consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80"
+credenciales = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+host_gateway = "136.113.9.71.nip.io"
+version_gke = "1.35.8-gke.1036000"
+fin apply: 2026-09-22T18:11:39Z
