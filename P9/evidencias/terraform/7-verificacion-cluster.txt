@@ -1,0 +1,40 @@
+Verificacion del cluster sa-p9 - 2026-09-22T17:44:23Z
+
+$ terraform plan (capa cluster)
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+$ kubectl get nodes
+NODO                                ESTADO   CPU     MEM
+gke-sa-p9-principal-eb18abb5-0xth   Ready    1930m   6170284Ki
+gke-sa-p9-principal-eb18abb5-1nz6   Ready    1930m   6170292Ki
+gke-sa-p9-principal-eb18abb5-95zn   Ready    1930m   6170292Ki
+
+$ gcloud container clusters describe sa-p9 (workload identity, dataplane, canal)
+sa-p6-202200271.svc.id.goog	ADVANCED_DATAPATH	REGULAR
+
+$ kubectl -n argocd get pods
+argocd-application-controller-0 1/1 Running
+argocd-redis-b6577584f-mkxm9 1/1 Running
+argocd-repo-server-6567754c94-4x6ms 1/1 Running
+argocd-server-84594c745b-t2wjt 1/1 Running
+
+$ kubectl -n argocd get appproject
+default
+plataforma
+politicas
+raiz
+sa-p8
+
+$ kubectl -n sa-p8 get resourcequota,limitrange,networkpolicy
+resourcequota/cuota
+limitrange/limites
+networkpolicy.networking.k8s.io/denegar-todo
+networkpolicy.networking.k8s.io/permitir-dns
+networkpolicy.networking.k8s.io/salida-interna
+
+$ gcloud secrets versions list sa-p9-sealed-secrets-llave
+NAME  STATE    CREATED
+1     enabled  2026-09-22T17:23:35
