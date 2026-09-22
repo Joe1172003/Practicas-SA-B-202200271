@@ -51,6 +51,10 @@ resource "google_project_iam_custom_role" "velero" {
     "compute.snapshots.create",
     "compute.snapshots.useReadOnly",
     "compute.snapshots.delete",
+    # Velero le pone etiquetas a cada snapshot para saber de que respaldo
+    # salio. Sin este permiso el respaldo funciona igual, pero avisa
+    # "Missing compute.snapshots.setLabels permission" en cada corrida.
+    "compute.snapshots.setLabels",
     "compute.zones.get",
   ]
 }

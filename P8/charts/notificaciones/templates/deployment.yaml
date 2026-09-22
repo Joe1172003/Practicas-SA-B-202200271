@@ -26,6 +26,8 @@ spec:
         checksum/config: {{ toYaml .Values.configuracion | sha256sum }}
     spec:
       serviceAccountName: {{ .Chart.Name }}
+      affinity:
+        {{- include "sa.antiafinidad" . | nindent 8 }}
       # uid 10001 y no 1000: es el que crea su Dockerfile con useradd.
       securityContext:
         {{- include "sa.seguridadPod" (dict "uid" 10001) | nindent 8 }}
