@@ -1,0 +1,67 @@
+  proyecto sa-p6-202200271, cluster sa-p9, zona us-central1-a
+
+===== 2026-09-23T03:02:52Z  1. Herramientas
+  todo presente
+
+===== 2026-09-23T03:02:55Z  2. Bucket del estado de Terraform
+El bucket gs://sa-p9-tfstate-202200271 ya existe. No hago nada.
+
+===== 2026-09-23T03:02:59Z  3. Capa permanente (respaldos, IP fija, cuenta de Velero, llave)
+host_gateway = "136.113.9.71.nip.io"
+ip_ingress = "136.113.9.71"
+secreto_llave = "sa-p9-sealed-secrets-llave"
+
+===== 2026-09-23T03:03:30Z  4. Cluster, nodos y ArgoCD
+credenciales = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+host_gateway = "136.113.9.71.nip.io"
+version_gke = "1.35.8-gke.1036000"
+credenciales = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+host_gateway = "136.113.9.71.nip.io"
+version_gke = "1.35.8-gke.1036000"
+
+===== 2026-09-23T03:17:27Z  5. Credenciales de kubectl
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for sa-p9.
+gke-sa-p9-principal-9d9b371e-8vpc   Ready
+gke-sa-p9-principal-9d9b371e-ch6x   Ready
+gke-sa-p9-principal-9d9b371e-w87z   Ready
+
+===== 2026-09-23T03:17:34Z  6. ArgoCD despliega la plataforma
+  esperando a que las 15 apps queden Synced y Healthy (hasta 20 minutos)
+  argo-rollouts    Synced Healthy
+  auth             Synced Healthy
+  cronjobs         Synced Healthy
+  gateway          Synced Healthy
+  ingress-nginx    Synced Healthy
+  kyverno          Synced Healthy
+  notificaciones   Synced Healthy
+  ordenes          Synced Healthy
+  politicas        Synced Healthy
+  postgres         Synced Healthy
+  productos        Synced Healthy
+  rabbitmq         Synced Healthy
+  raiz             Synced Healthy
+  sealed-secrets   Synced Healthy
+  velero           Synced Healthy
+
+===== 2026-09-23T03:26:32Z  7. Datos desde el ultimo respaldo de Velero
+  uso el respaldo simulacro-20260923-0148
+.....
+Restore completed with status: PartiallyFailed. You may check for more information using the commands `velero restore describe bootstrap-20260923-030252` and `velero restore logs bootstrap-20260923-030252`.
+pod/postgres-0 condition met
+  datos restaurados
+
+===== 2026-09-23T03:29:45Z  8. Pruebas de que el sistema responde
+  gateway en http://136.113.9.71.nip.io
+  /health respondio 200
+  catalogo: {"data":{"productos":[{"nombre":"ANTES DEL RESPALDO 20260922-224808","precio":111.11},{"nombre":"Celular Samsung A54","precio":2300.5},{"nombre":"Laptop Lenovo ThinkPad","precio":8500},{"nombre":"Mous
+  en la base: 4 productos y 24 usuarios
+
+===== 2026-09-23T03:29:51Z  9. Tiempos
+  inicio                2026-09-23T03:02:52Z
+  terraform listo       2026-09-23T03:17:27Z
+  apps sanas            2026-09-23T03:26:32Z
+  datos restaurados     2026-09-23T03:29:45Z
+  fin                   2026-09-23T03:29:50Z
+
+  bitacora: reconstruccion-20260923-030252.txt
