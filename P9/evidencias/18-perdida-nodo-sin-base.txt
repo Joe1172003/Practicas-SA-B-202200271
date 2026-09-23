@@ -1,0 +1,21 @@
+Perdida de nodo sin la base de datos - corrida del 2026-09-23T00:40Z
+
+Misma prueba que la evidencia 17, pero drenando un nodo donde NO vivia postgres
+(se drenó 95zn y la base estaba en 1nz6 desde las 00:21:46Z).
+
+  Drenaje: 00:40:58Z a 00:43:03Z (2 minutos 5 segundos)
+  Vueltas totales:            83
+  /health con 200:            83
+  /graphql/productos con 200: 83
+  Fallas: 0
+  Vuelta mas lenta: 1.29 s
+
+Lectura de las tres corridas juntas:
+  16 (ingress con 1 replica, nodo con postgres): se cae hasta /health.
+  17 (ingress con 2 replicas, nodo con postgres): /health 100%, catalogo cortado 71 s.
+  18 (ingress con 2 replicas, nodo sin postgres): todo al 100%, 83 de 83.
+
+Conclusion: con anti-afinidad, PDB y 2 replicas, perder un nodo cualquiera no
+interrumpe el servicio. El unico caso con corte es perder el nodo donde corre la
+base, que tiene una sola replica: ahi el catalogo se cae mientras el disco se
+reengancha en otro nodo.
