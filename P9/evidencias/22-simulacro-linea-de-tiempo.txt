@@ -1,0 +1,190 @@
+Simulacro de desastre - 23/09/2026 (horas en UTC)
+
+Destrui el cluster sa-p9 completo y lo reconstrui con el bootstrap, con el
+cronometro corriendo. Aca esta lo que paso, incluido lo que salio mal.
+
+Objetivos declarados antes de empezar (evidencias/assets/objetivos-rto-rpo.md):
+  RTO 45 minutos
+  RPO 3 horas
+
+
+==================================================================
+PREPARACION
+==================================================================
+
+01:48:27  Respaldo a pedido con Velero: simulacro-20260923-0148
+01:48:37  Termina. 541 objetos y los 2 discos (postgres y rabbitmq).
+
+~01:55    Escribo a proposito un producto DESPUES del respaldo:
+          "PERDIDO EN EL SIMULACRO". Es el dato que mide el RPO real.
+
+
+==================================================================
+DESTRUCCION
+==================================================================
+
+02:05     terraform destroy en P9/terraform/cluster (evidencia 20).
+
+          PROBLEMA 1: se traba borrando el namespace argocd.
+
+          Las 14 Applications tienen el finalizer
+          resources-finalizer.argocd.argoproj.io, que significa "antes de
+          borrarme, que ArgoCD elimine lo que despliegue". Terraform ya habia
+          desinstalado ArgoCD, asi que nadie podia atender ese pedido. El
+          namespace quedo en Terminating y Terraform corto con
+          "context deadline exceeded".
+
+          Lo resolvi quitandole el finalizer a las 14 Applications:
+            kubectl -n argocd get applications -o name | while read a; do
+              kubectl -n argocd patch "$a" --type merge \
+                -p '{"metadata":{"finalizers":null}}'
+            done
+
+          El namespace desaparecio en segundos y el destroy siguio.
+
+02:18     Destruction complete: node pool 4m27s, cluster 4m48s.
+          Los discos de postgres y rabbitmq se van con el cluster.
+
+          Sobrevive la capa permanente, que es la idea:
+            IP 136.113.9.71 reservada
+            bucket sa-p9-velero-202200271 con 3 respaldos
+            llave de Sealed Secrets en Secret Manager
+            snapshots de los discos en estado READY
+
+
+==================================================================
+PRIMER INTENTO DE RECONSTRUCCION (fallido)
+==================================================================
+
+02:19:52  Arranca reconstruir.sh.
+02:20:16  Paso 4: Terraform empieza a crear el cluster.
+02:27:49  PROBLEMA 2: se cae mi conexion a internet.
+
+          gcloud no pudo renovar el token y kubectl no alcanzaba al cluster.
+          Terraform habia creado el cluster en GCP pero no alcanzo a guardar
+          el estado en el bucket: la infraestructura y la libreta quedaron
+          desincronizadas.
+
+          Ademas el candado del estado quedo tomado por el proceso muerto:
+            Error acquiring the state lock
+          Se libera con el numero de generacion del archivo .tflock:
+            terraform force-unlock 1790130020662608
+
+02:42     PROBLEMA 3: al reintentar, Terraform quiere crear de nuevo el
+          cluster y la cuenta de los nodos, que ya existian:
+            Error 409: Already exists
+
+          terraform import tampoco sirve aca: evalua todos los proveedores, y
+          los de Kubernetes y Helm dependen del cluster que todavia no esta en
+          el estado.
+
+02:55     Decision: borrar lo que quedo a medias y medir una reconstruccion
+          limpia, desde cero.
+            gcloud container clusters delete sa-p9 --zone us-central1-a --quiet
+            gcloud iam service-accounts delete nodos-sa-p9@... --quiet
+
+
+==================================================================
+RECONSTRUCCION MEDIDA
+==================================================================
+
+03:02:52  Arranca reconstruir.sh con el estado vacio y nada en GCP.
+          A partir de aca corre el cronometro del RTO.
+
+03:02:55  Paso 2: el bucket del estado ya existe, no lo toca.
+03:02:59  Paso 3: capa permanente sin cambios (sobrevivio al desastre).
+03:03:30  Paso 4: crea cluster, nodos, namespaces, cuotas, RBAC, la llave de
+          Sealed Secrets y ArgoCD.
+03:17:27  Paso 5: kubectl apunta al cluster nuevo. Los 3 nodos Ready.
+03:17:34  Paso 6: ArgoCD levanta la plataforma en olas.
+03:26:32  Las 15 apps quedan Synced y Healthy.
+03:26:38  Paso 7: restaura los datos del respaldo simulacro-20260923-0148.
+
+          PROBLEMA 4: la restauracion queda en PartiallyFailed.
+
+            error executing PVAction for persistentvolumes/pvc-2409da74...:
+            PermissionDenied: Required 'compute.disks.setLabels' permission
+
+          Velero crea el disco desde el snapshot y despues le pone etiquetas.
+          Le faltaba ese permiso desde la Fase 1 y nadie lo habia notado,
+          porque respaldar funcionaba bien: el que fallaba era el camino de
+          vuelta. Lo agregue al rol veleroSaP9 y lo aplique con Terraform.
+
+03:28:30  Reintento de la restauracion: Completed.
+03:29:20  El postgres restaurado arranca en el namespace temporal y ya trae
+          los datos:
+            ANTES DEL RESPALDO 20260922-224808
+            Celular Samsung A54
+            Laptop Lenovo ThinkPad
+            Mouse Logitech M170
+
+03:29:53  Paso los datos a produccion con pg_dumpall y borro el namespace
+          temporal.
+
+
+==================================================================
+VERIFICACION
+==================================================================
+
+$ kubectl -n argocd get app        -> 15 de 15 Synced y Healthy
+$ curl http://136.113.9.71/health  -> 200 {"estado":"ok","version":"2.2.1"}
+$ curl POST /graphql/productos     -> devuelve los 4 productos con sus precios
+
+En la base:
+  4 productos
+  24 usuarios
+  5 ordenes
+
+Los microservicios arrancaron con sus contrasenas sin que nadie volviera a
+sellar nada: Sealed Secrets encontro la llave que Terraform repuso desde
+Secret Manager antes de instalarlo.
+
+La IP publica sigue siendo 136.113.9.71, asi que el host del gateway no cambio.
+
+
+==================================================================
+RESULTADO
+==================================================================
+
+RTO declarado:  45 minutos
+RTO medido:     27 minutos (03:02:52 a 03:29:53)
+
+  Terraform (cluster, nodos, ArgoCD)   14 min 35 s
+  ArgoCD levantando las 15 apps         9 min 5 s
+  Restaurar los datos                   3 min 21 s
+
+RPO declarado:  3 horas (respaldo cada 3 horas)
+RPO medido:     el producto "PERDIDO EN EL SIMULACRO", escrito despues del
+                respaldo, no volvio. Todo lo anterior si. La ventana real de
+                perdida fue de unos 7 minutos, que es lo que paso entre el
+                respaldo y la destruccion.
+
+Entre el primer intento y el segundo pasaron 43 minutos mas, que no cuento en
+el RTO porque la causa fue mi conexion a internet, no el sistema. Igual queda
+anotado: en una emergencia de verdad, ese tiempo lo habrian sufrido los
+usuarios.
+
+
+==================================================================
+PUNTOS UNICOS DE FALLO QUE ENCONTRO ESTE SIMULACRO
+==================================================================
+
+1. Los finalizers de ArgoCD traban la destruccion si el controlador ya no
+   esta. Hay que quitarlos a mano o borrar las Applications antes.
+
+2. La reconstruccion depende de la maquina y la conexion del operador. Si se
+   cae la red en medio de un apply, Terraform deja recursos creados sin
+   registrar y el estado queda bloqueado.
+
+3. Al rol de Velero le faltaba compute.disks.setLabels. Los respaldos se
+   venian haciendo bien desde el primer dia, pero la restauracion completa
+   nunca se habia probado en un cluster nuevo.
+
+4. El script seguia de largo aunque la restauracion fallara. Ahora verifica el
+   estado, reintenta una vez y cuenta las filas antes de darse por terminado.
+
+Archivos relacionados:
+  evidencias/20-destruccion.txt
+  evidencias/21-reconstruccion.txt
+  evidencias/reconstruccion-20260923-030252.txt  (bitacora del script)
+  evidencias/assets/objetivos-rto-rpo.md

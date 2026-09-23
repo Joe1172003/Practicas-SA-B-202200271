@@ -1,0 +1,3091 @@
+data.terraform_remote_state.permanente: Reading...
+data.google_client_config.actual: Reading...
+google_service_account.nodos: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_container_cluster.sa_p9: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9]
+data.google_client_config.actual: Read complete after 0s [id=projects/sa-p6-202200271/regions/us-central1/zones/]
+data.terraform_remote_state.permanente: Read complete after 1s
+data.google_secret_manager_secret_version.llave_sealed_secrets: Reading...
+google_project_iam_member.nodos["roles/monitoring.viewer"]: Refreshing state... [id=sa-p6-202200271/roles/monitoring.viewer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/monitoring.metricWriter"]: Refreshing state... [id=sa-p6-202200271/roles/monitoring.metricWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"]: Refreshing state... [id=sa-p6-202200271/roles/stackdriver.resourceMetadata.writer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/logging.logWriter"]: Refreshing state... [id=sa-p6-202200271/roles/logging.logWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+data.google_secret_manager_secret_version.llave_sealed_secrets: Read complete after 3s [id=projects/135223512781/secrets/sa-p9-sealed-secrets-llave/versions/1]
+google_service_account_iam_member.velero_wi: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com/roles/iam.workloadIdentityUser/serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]]
+google_container_node_pool.principal: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal]
+kubernetes_namespace_v1.plataforma: Refreshing state... [id=sa-p8]
+kubernetes_namespace_v1.sealed_secrets: Refreshing state... [id=sealed-secrets]
+kubernetes_namespace_v1.argocd: Refreshing state... [id=argocd]
+kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"]: Refreshing state... [id=sealed-secrets/sealed-secrets-keyn5h7g]
+kubernetes_role_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_resource_quota_v1.plataforma: Refreshing state... [id=sa-p8/cuota]
+kubernetes_network_policy_v1.permitir_dns: Refreshing state... [id=sa-p8/permitir-dns]
+kubernetes_network_policy_v1.salida_interna: Refreshing state... [id=sa-p8/salida-interna]
+kubernetes_service_account_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+kubernetes_network_policy_v1.denegar_todo: Refreshing state... [id=sa-p8/denegar-todo]
+kubernetes_limit_range_v1.plataforma: Refreshing state... [id=sa-p8/limites]
+kubernetes_service_account_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_service_account_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_service_account_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_service_account_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_service_account_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_service_account_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_binding_v1.rabbitmq: Refreshing state... [id=sa-p8/rabbitmq]
+helm_release.argocd: Refreshing state... [id=argocd]
+kubernetes_role_binding_v1.componente["gateway"]: Refreshing state... [id=sa-p8/gateway]
+kubernetes_role_binding_v1.componente["resumen"]: Refreshing state... [id=sa-p8/resumen]
+kubernetes_role_binding_v1.componente["productos"]: Refreshing state... [id=sa-p8/productos]
+kubernetes_role_binding_v1.componente["ordenes"]: Refreshing state... [id=sa-p8/ordenes]
+kubernetes_role_binding_v1.componente["auth"]: Refreshing state... [id=sa-p8/auth]
+kubernetes_role_binding_v1.componente["bitacora"]: Refreshing state... [id=sa-p8/bitacora]
+kubernetes_role_binding_v1.componente["notificaciones"]: Refreshing state... [id=sa-p8/notificaciones]
+kubernetes_role_binding_v1.componente["postgres"]: Refreshing state... [id=sa-p8/postgres]
+helm_release.argocd_apps: Refreshing state... [id=argocd-apps]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # google_container_cluster.sa_p9 will be destroyed
+  - resource "google_container_cluster" "sa_p9" {
+      - autopilot_privileged_admission           = [] -> null
+      - cluster_ipv4_cidr                        = "10.16.0.0/14" -> null
+      - datapath_provider                        = "ADVANCED_DATAPATH" -> null
+      - default_max_pods_per_node                = 110 -> null
+      - deletion_policy                          = "DELETE" -> null
+      - deletion_protection                      = false -> null
+      - disable_l4_lb_firewall_reconciliation    = false -> null
+      - effective_labels                         = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+      - enable_autopilot                         = false -> null
+      - enable_cilium_clusterwide_network_policy = false -> null
+      - enable_fqdn_network_policy               = false -> null
+      - enable_intranode_visibility              = false -> null
+      - enable_kubernetes_alpha                  = false -> null
+      - enable_l4_ilb_subsetting                 = false -> null
+      - enable_legacy_abac                       = false -> null
+      - enable_multi_networking                  = false -> null
+      - enable_shielded_nodes                    = true -> null
+      - enable_tpu                               = false -> null
+      - endpoint                                 = "35.184.21.89" -> null
+      - id                                       = "projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9" -> null
+      - initial_node_count                       = 1 -> null
+      - label_fingerprint                        = "78cdf2f6" -> null
+      - location                                 = "us-central1-a" -> null
+      - logging_service                          = "logging.googleapis.com/kubernetes" -> null
+      - master_version                           = "1.35.8-gke.1036000" -> null
+      - monitoring_service                       = "monitoring.googleapis.com/kubernetes" -> null
+      - name                                     = "sa-p9" -> null
+      - network                                  = "projects/sa-p6-202200271/global/networks/default" -> null
+      - networking_mode                          = "VPC_NATIVE" -> null
+      - node_locations                           = [] -> null
+      - node_version                             = "1.35.8-gke.1036000" -> null
+      - project                                  = "sa-p6-202200271" -> null
+      - remove_default_node_pool                 = true -> null
+      - resource_labels                          = {} -> null
+      - self_link                                = "https://container.googleapis.com/v1/projects/sa-p6-202200271/zones/us-central1-a/clusters/sa-p9" -> null
+      - services_ipv4_cidr                       = "34.118.224.0/20" -> null
+      - subnetwork                               = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+      - terraform_labels                         = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+        # (5 unchanged attributes hidden)
+
+      - addons_config {
+          - dns_cache_config {
+              - enabled = true -> null
+            }
+          - gce_persistent_disk_csi_driver_config {
+              - enabled = true -> null
+            }
+          - network_policy_config {
+              - disabled = true -> null
+            }
+          - node_readiness_config {
+              - enabled = false -> null
+            }
+        }
+
+      - anonymous_authentication_config {
+          - mode = "LIMITED" -> null
+        }
+
+      - binary_authorization {
+          - enabled         = false -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - cluster_autoscaling {
+          - auto_provisioning_locations   = [] -> null
+          - autoscaling_profile           = "BALANCED" -> null
+          - default_compute_class_enabled = false -> null
+          - enabled                       = false -> null
+
+          - auto_provisioning_defaults {
+              - disk_size         = 0 -> null
+              - image_type        = "COS_CONTAINERD" -> null
+              - oauth_scopes      = [
+                  - "https://www.googleapis.com/auth/devstorage.read_only",
+                  - "https://www.googleapis.com/auth/logging.write",
+                  - "https://www.googleapis.com/auth/monitoring",
+                  - "https://www.googleapis.com/auth/service.management.readonly",
+                  - "https://www.googleapis.com/auth/servicecontrol",
+                  - "https://www.googleapis.com/auth/trace.append",
+                ] -> null
+              - service_account   = "default" -> null
+                # (3 unchanged attributes hidden)
+
+              - management {
+                  - auto_repair     = true -> null
+                  - auto_upgrade    = true -> null
+                  - upgrade_options = [] -> null
+                }
+            }
+        }
+
+      - control_plane_endpoints_config {
+          - dns_endpoint_config {
+              - allow_external_traffic    = false -> null
+              - enable_k8s_certs_via_dns  = false -> null
+              - enable_k8s_tokens_via_dns = false -> null
+              - endpoint                  = "gke-6fceda384baf4f02beb21911f4cf852cf4d7-135223512781.us-central1-a.gke.goog" -> null
+            }
+          - ip_endpoints_config {
+              - enabled = true -> null
+            }
+        }
+
+      - database_encryption {
+          - state    = "DECRYPTED" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - default_snat_status {
+          - disabled = false -> null
+        }
+
+      - enterprise_config {
+          - cluster_tier = "STANDARD" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - ip_allocation_policy {
+          - cluster_ipv4_cidr_block       = "10.16.0.0/14" -> null
+          - cluster_secondary_range_name  = "gke-sa-p9-pods-6fceda38" -> null
+          - services_ipv4_cidr_block      = "34.118.224.0/20" -> null
+          - stack_type                    = "IPV4" -> null
+            # (1 unchanged attribute hidden)
+
+          - network_tier_config {
+              - network_tier = "NETWORK_TIER_DEFAULT" -> null
+            }
+
+          - pod_cidr_overprovision_config {
+              - disabled = false -> null
+            }
+        }
+
+      - logging_config {
+          - enable_components = [
+              - "SYSTEM_COMPONENTS",
+              - "WORKLOADS",
+            ] -> null
+        }
+
+      - master_auth {
+          - cluster_ca_certificate = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVMVENDQXBXZ0F3SUJBZ0lSQUt3bjJ1dUdBbmF5RE8yUi9QQ04rS0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa05USmtZV1V4TmpjdE5HVTROeTAwWkdaaExUazNOV1l0TTJSak1XSTJaakppT1dSaQpNQ0FYRFRJMk1Ea3lNakUyTXpNeE0xb1lEekl3TlRZd09URTBNVGN6TXpFeldqQXZNUzB3S3dZRFZRUURFeVExCk1tUmhaVEUyTnkwMFpUZzNMVFJrWm1FdE9UYzFaaTB6WkdNeFlqWm1NbUk1WkdJd2dnR2lNQTBHQ1NxR1NJYjMKRFFFQkFRVUFBNElCandBd2dnR0tBb0lCZ1FET2FIRElQd0hRUG03ZzZoaThPMW5mYzViYmp1dDRQSHBzSXJCYQptQlJTdjVpOGlPemNaVzJ0NTJEeDZkMkU0ajRKaGEzbGJUQWpBaUZ5a2RTTXRVYksyT3FJSFBWRjFSTStJNGNDClhDVVdrd0M5d3JSYWN2aVJaTEZRbGl1VjlyRG1tcUNrWjExcjJWd0VLODQvSUVtb3l4TFI5THhoQ2QvOVZOUWsKK2dSeHJFYVZQcXRmay9aVTlSUmpGZjZxekE1T3QrSzIxOHU5Z0xjcHVtUW1SWmZKVE5GbFFnWW1jMGdKWUp5TQprMEFTbXRUcWFYVVoyeEd6S1owR0dvRTFLMGdXRW1lM3pMcG14a0kybXkzN3ZRYXNkYUE4L2U4c013OVhhRVN0CjhWd2UrbGFIZmZ3NWcwQU9uclhXZnhNTUxsSDhlNnpndE5HeFg0cEhockRMaTM0d3pEM2ROSUZFWFNnRHJscmQKdk5OMmJFV2dQK1pQUzZRM05DTVV4czNiaTVEZG5EYk9OVDc1cjJTTEwxNnVuV2dzWHlqdSt6d3pTVmVaYUNUUgpiWDZiNTlzZzB0SWR3SFhmQVB2WDZRZlFJbW1aUlRmV0dnLzVrMzVzZTVrTnRCWUplLzJ1bjdodlVzN3lKOXAxCmt2RGc4SStOY2YvTG8rQitxbGtQSWRCYVFuRUNBd0VBQWFOQ01FQXdEZ1lEVlIwUEFRSC9CQVFEQWdJRU1BOEcKQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGR2RUdFV1Y2MrTlRGTm1rMnFPakZ3S3F6S2hTTUEwRwpDU3FHU0liM0RRRUJDd1VBQTRJQmdRQk9VenZhTjhuSXVTeEM2aitGbHFpYngvRHJIb096RGZuQnl4eUxxR3Z2Ci9uMmFOcm0vd1VpT0FGVFk1a0NRclFBbkxsZUQ4V29waWNmd0Vuam0xaVZJeWpjOHM3VUVYYm9pZnViRVZMaE8KV0diRjdLdHd1TU5YanhSaWZqRUVSSjg2cDZYWXlBaHpMTkJZMDM4Y1cwZm5oZDF0MTh2WUNqSzUwZkdSUEVHRgpSSlEzT2s5TVp0ZUdDdTY1YVRZMlFOODVrOWJCZUQxWDcxU1B4R3Z4YnhEaWo4NFhIbkU3K1VDTWJFWXQreFF4CkowRmlEQTh6dEplb3JWU0pjM2VUa2xYN0ZQRTE1RkowUGl0MVVGRi9nKzZTMGtJTDhmbTBkZ1hHSGxYOUpGV1QKNVo4SjdUN0xUUGUwS05RRm42OUxyVlgxcGZBUzQxS0xucTFiaFR1b2RhcTlkQk9MQnBNTERIaWZOb3Y0Tm1QUgpISi81dFA2NUl4ekFZTVVlSUxaTXM0NWE2MlFNNnVPK3QySkZnSkJxMVdkRUdLWnE0NEk0QkFGVHZQeDQvSXJOCjFwNWYvNU0xOEpUdzJmVXI2aG5GS1NOSkVpZlRjZkdYTUdRQkFBcW9keGhTSHZGZzlHQmV4K2JrQ25pb0VSb0YKVVNnU0tTMHBsVml5SzhsUkpaUE9FMlU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K" -> null
+            # (2 unchanged attributes hidden)
+
+          - client_certificate_config {
+              - issue_client_certificate = false -> null
+            }
+        }
+
+      - monitoring_config {
+          - enable_components = [
+              - "CADVISOR",
+              - "DAEMONSET",
+              - "DCGM",
+              - "DEPLOYMENT",
+              - "HPA",
+              - "JOBSET",
+              - "KUBELET",
+              - "POD",
+              - "STATEFULSET",
+              - "STORAGE",
+              - "SYSTEM_COMPONENTS",
+            ] -> null
+
+          - advanced_datapath_observability_config {
+              - enable_metrics = false -> null
+              - enable_relay   = false -> null
+            }
+
+          - managed_prometheus {
+              - enabled = true -> null
+            }
+        }
+
+      - network_policy {
+          - enabled  = false -> null
+          - provider = "PROVIDER_UNSPECIFIED" -> null
+        }
+
+      - node_config {
+          - disk_size_gb                = 30 -> null
+          - disk_type                   = "pd-balanced" -> null
+          - effective_taints            = [] -> null
+          - enable_confidential_storage = false -> null
+          - flex_start                  = false -> null
+          - image_type                  = "COS_CONTAINERD" -> null
+          - labels                      = {
+              - "practica" = "p9"
+            } -> null
+          - local_ssd_count             = 0 -> null
+          - logging_variant             = "DEFAULT" -> null
+          - machine_type                = "e2-standard-2" -> null
+          - metadata                    = {
+              - "disable-legacy-endpoints" = "true"
+            } -> null
+          - oauth_scopes                = [
+              - "https://www.googleapis.com/auth/cloud-platform",
+            ] -> null
+          - preemptible                 = false -> null
+          - resource_labels             = {
+              - "goog-gke-node-pool-provisioning-model" = "on-demand"
+            } -> null
+          - resource_manager_tags       = {} -> null
+          - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+          - spot                        = false -> null
+          - storage_pools               = [] -> null
+          - tags                        = [] -> null
+            # (6 unchanged attributes hidden)
+
+          - boot_disk {
+              - disk_type              = "pd-balanced" -> null
+              - provisioned_iops       = 0 -> null
+              - provisioned_throughput = 0 -> null
+              - size_gb                = 30 -> null
+            }
+
+          - kubelet_config {
+              - allowed_unsafe_sysctls                      = [] -> null
+              - container_log_max_files                     = 0 -> null
+              - cpu_cfs_quota                               = false -> null
+              - eviction_max_pod_grace_period_seconds       = 0 -> null
+              - image_gc_high_threshold_percent             = 0 -> null
+              - image_gc_low_threshold_percent              = 0 -> null
+              - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+              - max_parallel_image_pulls                    = 3 -> null
+              - pod_pids_limit                              = 0 -> null
+              - shutdown_grace_period_critical_pods_seconds = 0 -> null
+              - shutdown_grace_period_seconds               = 0 -> null
+              - single_process_oom_kill                     = false -> null
+                # (5 unchanged attributes hidden)
+            }
+
+          - node_image_config {
+              - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+              - image_project = "gke-node-images" -> null
+            }
+
+          - shielded_instance_config {
+              - enable_integrity_monitoring = true -> null
+              - enable_secure_boot          = false -> null
+            }
+
+          - windows_node_config {
+                # (1 unchanged attribute hidden)
+            }
+
+          - workload_metadata_config {
+              - mode = "GKE_METADATA" -> null
+            }
+        }
+
+      - node_creation_config {
+          - node_creation_mode = "VIA_KUBELET" -> null
+        }
+
+      - node_pool {
+          - ignore_node_count_changes   = false -> null
+          - initial_node_count          = 3 -> null
+          - instance_group_urls         = [
+              - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroupManagers/gke-sa-p9-principal-eb18abb5-grp",
+            ] -> null
+          - managed_instance_group_urls = [
+              - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroups/gke-sa-p9-principal-eb18abb5-grp",
+            ] -> null
+          - max_pods_per_node           = 110 -> null
+          - name                        = "principal" -> null
+          - node_count                  = 3 -> null
+          - node_locations              = [
+              - "us-central1-a",
+            ] -> null
+          - version                     = "1.35.8-gke.1036000" -> null
+            # (1 unchanged attribute hidden)
+
+          - management {
+              - auto_repair  = true -> null
+              - auto_upgrade = true -> null
+            }
+
+          - network_config {
+              - create_pod_range            = false -> null
+              - enable_private_nodes        = false -> null
+              - pod_ipv4_cidr_block         = "10.16.0.0/14" -> null
+              - pod_range                   = "gke-sa-p9-pods-6fceda38" -> null
+              - subnetwork                  = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+                # (1 unchanged attribute hidden)
+            }
+
+          - node_config {
+              - disk_size_gb                = 30 -> null
+              - disk_type                   = "pd-balanced" -> null
+              - effective_taints            = [] -> null
+              - enable_confidential_storage = false -> null
+              - flex_start                  = false -> null
+              - image_type                  = "COS_CONTAINERD" -> null
+              - labels                      = {
+                  - "practica" = "p9"
+                } -> null
+              - local_ssd_count             = 0 -> null
+              - logging_variant             = "DEFAULT" -> null
+              - machine_type                = "e2-standard-2" -> null
+              - metadata                    = {
+                  - "disable-legacy-endpoints" = "true"
+                } -> null
+              - oauth_scopes                = [
+                  - "https://www.googleapis.com/auth/cloud-platform",
+                ] -> null
+              - preemptible                 = false -> null
+              - resource_labels             = {
+                  - "goog-gke-node-pool-provisioning-model" = "on-demand"
+                } -> null
+              - resource_manager_tags       = {} -> null
+              - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+              - spot                        = false -> null
+              - storage_pools               = [] -> null
+              - tags                        = [] -> null
+                # (6 unchanged attributes hidden)
+
+              - boot_disk {
+                  - disk_type              = "pd-balanced" -> null
+                  - provisioned_iops       = 0 -> null
+                  - provisioned_throughput = 0 -> null
+                  - size_gb                = 30 -> null
+                }
+
+              - kubelet_config {
+                  - allowed_unsafe_sysctls                      = [] -> null
+                  - container_log_max_files                     = 0 -> null
+                  - cpu_cfs_quota                               = false -> null
+                  - eviction_max_pod_grace_period_seconds       = 0 -> null
+                  - image_gc_high_threshold_percent             = 0 -> null
+                  - image_gc_low_threshold_percent              = 0 -> null
+                  - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+                  - max_parallel_image_pulls                    = 3 -> null
+                  - pod_pids_limit                              = 0 -> null
+                  - shutdown_grace_period_critical_pods_seconds = 0 -> null
+                  - shutdown_grace_period_seconds               = 0 -> null
+                  - single_process_oom_kill                     = false -> null
+                    # (5 unchanged attributes hidden)
+                }
+
+              - node_image_config {
+                  - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+                  - image_project = "gke-node-images" -> null
+                }
+
+              - shielded_instance_config {
+                  - enable_integrity_monitoring = true -> null
+                  - enable_secure_boot          = false -> null
+                }
+
+              - windows_node_config {
+                    # (1 unchanged attribute hidden)
+                }
+
+              - workload_metadata_config {
+                  - mode = "GKE_METADATA" -> null
+                }
+            }
+
+          - upgrade_settings {
+              - max_surge       = 1 -> null
+              - max_unavailable = 0 -> null
+              - strategy        = "SURGE" -> null
+            }
+        }
+
+      - node_pool_auto_config {
+          - resource_manager_tags = {} -> null
+
+          - node_kubelet_config {
+              - insecure_kubelet_readonly_port_enabled = "FALSE" -> null
+            }
+        }
+
+      - node_pool_defaults {
+          - node_config_defaults {
+              - insecure_kubelet_readonly_port_enabled = "FALSE" -> null
+              - logging_variant                        = "DEFAULT" -> null
+            }
+        }
+
+      - notification_config {
+          - pubsub {
+              - enabled = false -> null
+                # (1 unchanged attribute hidden)
+            }
+        }
+
+      - pod_autoscaling {
+          - hpa_profile = "PERFORMANCE" -> null
+        }
+
+      - private_cluster_config {
+          - enable_private_endpoint     = false -> null
+          - enable_private_nodes        = false -> null
+          - private_endpoint            = "10.128.0.11" -> null
+          - public_endpoint             = "35.184.21.89" -> null
+            # (3 unchanged attributes hidden)
+
+          - master_global_access_config {
+              - enabled = false -> null
+            }
+        }
+
+      - rbac_binding_config {
+          - enable_insecure_binding_system_authenticated   = true -> null
+          - enable_insecure_binding_system_unauthenticated = true -> null
+        }
+
+      - release_channel {
+          - channel = "REGULAR" -> null
+        }
+
+      - secret_manager_config {
+          - enabled = false -> null
+        }
+
+      - secret_sync_config {
+          - enabled = false -> null
+        }
+
+      - security_posture_config {
+          - mode               = "BASIC" -> null
+          - vulnerability_mode = "VULNERABILITY_MODE_UNSPECIFIED" -> null
+        }
+
+      - service_external_ips_config {
+          - enabled = false -> null
+        }
+
+      - workload_identity_config {
+          - workload_pool = "sa-p6-202200271.svc.id.goog" -> null
+        }
+    }
+
+  # google_container_node_pool.principal will be destroyed
+  - resource "google_container_node_pool" "principal" {
+      - cluster                     = "sa-p9" -> null
+      - deletion_policy             = "DELETE" -> null
+      - id                          = "projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal" -> null
+      - ignore_node_count_changes   = false -> null
+      - initial_node_count          = 3 -> null
+      - instance_group_urls         = [
+          - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroupManagers/gke-sa-p9-principal-eb18abb5-grp",
+        ] -> null
+      - location                    = "us-central1-a" -> null
+      - managed_instance_group_urls = [
+          - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroups/gke-sa-p9-principal-eb18abb5-grp",
+        ] -> null
+      - max_pods_per_node           = 110 -> null
+      - name                        = "principal" -> null
+      - node_count                  = 3 -> null
+      - node_locations              = [
+          - "us-central1-a",
+        ] -> null
+      - project                     = "sa-p6-202200271" -> null
+      - version                     = "1.35.8-gke.1036000" -> null
+        # (1 unchanged attribute hidden)
+
+      - management {
+          - auto_repair  = true -> null
+          - auto_upgrade = true -> null
+        }
+
+      - network_config {
+          - create_pod_range            = false -> null
+          - enable_private_nodes        = false -> null
+          - pod_ipv4_cidr_block         = "10.16.0.0/14" -> null
+          - pod_range                   = "gke-sa-p9-pods-6fceda38" -> null
+          - subnetwork                  = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - node_config {
+          - disk_size_gb                = 30 -> null
+          - disk_type                   = "pd-balanced" -> null
+          - effective_taints            = [] -> null
+          - enable_confidential_storage = false -> null
+          - flex_start                  = false -> null
+          - image_type                  = "COS_CONTAINERD" -> null
+          - labels                      = {
+              - "practica" = "p9"
+            } -> null
+          - local_ssd_count             = 0 -> null
+          - logging_variant             = "DEFAULT" -> null
+          - machine_type                = "e2-standard-2" -> null
+          - metadata                    = {
+              - "disable-legacy-endpoints" = "true"
+            } -> null
+          - oauth_scopes                = [
+              - "https://www.googleapis.com/auth/cloud-platform",
+            ] -> null
+          - preemptible                 = false -> null
+          - resource_labels             = {
+              - "goog-gke-node-pool-provisioning-model" = "on-demand"
+            } -> null
+          - resource_manager_tags       = {} -> null
+          - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+          - spot                        = false -> null
+          - storage_pools               = [] -> null
+          - tags                        = [] -> null
+            # (6 unchanged attributes hidden)
+
+          - boot_disk {
+              - disk_type              = "pd-balanced" -> null
+              - provisioned_iops       = 0 -> null
+              - provisioned_throughput = 0 -> null
+              - size_gb                = 30 -> null
+            }
+
+          - kubelet_config {
+              - allowed_unsafe_sysctls                      = [] -> null
+              - container_log_max_files                     = 0 -> null
+              - cpu_cfs_quota                               = false -> null
+              - eviction_max_pod_grace_period_seconds       = 0 -> null
+              - image_gc_high_threshold_percent             = 0 -> null
+              - image_gc_low_threshold_percent              = 0 -> null
+              - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+              - max_parallel_image_pulls                    = 3 -> null
+              - pod_pids_limit                              = 0 -> null
+              - shutdown_grace_period_critical_pods_seconds = 0 -> null
+              - shutdown_grace_period_seconds               = 0 -> null
+              - single_process_oom_kill                     = false -> null
+                # (5 unchanged attributes hidden)
+            }
+
+          - node_image_config {
+              - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+              - image_project = "gke-node-images" -> null
+            }
+
+          - shielded_instance_config {
+              - enable_integrity_monitoring = true -> null
+              - enable_secure_boot          = false -> null
+            }
+
+          - windows_node_config {
+                # (1 unchanged attribute hidden)
+            }
+
+          - workload_metadata_config {
+              - mode = "GKE_METADATA" -> null
+            }
+        }
+
+      - upgrade_settings {
+          - max_surge       = 1 -> null
+          - max_unavailable = 0 -> null
+          - strategy        = "SURGE" -> null
+        }
+    }
+
+  # google_project_iam_member.nodos["roles/logging.logWriter"] will be destroyed
+  - resource "google_project_iam_member" "nodos" {
+      - etag    = "BwZcFcQpiWM=" -> null
+      - id      = "sa-p6-202200271/roles/logging.logWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project = "sa-p6-202200271" -> null
+      - role    = "roles/logging.logWriter" -> null
+    }
+
+  # google_project_iam_member.nodos["roles/monitoring.metricWriter"] will be destroyed
+  - resource "google_project_iam_member" "nodos" {
+      - etag    = "BwZcFcQpiWM=" -> null
+      - id      = "sa-p6-202200271/roles/monitoring.metricWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project = "sa-p6-202200271" -> null
+      - role    = "roles/monitoring.metricWriter" -> null
+    }
+
+  # google_project_iam_member.nodos["roles/monitoring.viewer"] will be destroyed
+  - resource "google_project_iam_member" "nodos" {
+      - etag    = "BwZcFcQpiWM=" -> null
+      - id      = "sa-p6-202200271/roles/monitoring.viewer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project = "sa-p6-202200271" -> null
+      - role    = "roles/monitoring.viewer" -> null
+    }
+
+  # google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"] will be destroyed
+  - resource "google_project_iam_member" "nodos" {
+      - etag    = "BwZcFcQpiWM=" -> null
+      - id      = "sa-p6-202200271/roles/stackdriver.resourceMetadata.writer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member  = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project = "sa-p6-202200271" -> null
+      - role    = "roles/stackdriver.resourceMetadata.writer" -> null
+    }
+
+  # google_service_account.nodos will be destroyed
+  - resource "google_service_account" "nodos" {
+      - account_id      = "nodos-sa-p9" -> null
+      - deletion_policy = "DELETE" -> null
+      - disabled        = false -> null
+      - display_name    = "Nodos del cluster sa-p9" -> null
+      - email           = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - id              = "projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member          = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - name            = "projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project         = "sa-p6-202200271" -> null
+      - unique_id       = "111594469717201283240" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # google_service_account_iam_member.velero_wi will be destroyed
+  - resource "google_service_account_iam_member" "velero_wi" {
+      - etag               = "BwZcFd+Lfcc=" -> null
+      - id                 = "projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com/roles/iam.workloadIdentityUser/serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]" -> null
+      - member             = "serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]" -> null
+      - role               = "roles/iam.workloadIdentityUser" -> null
+      - service_account_id = "projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+    }
+
+  # helm_release.argocd will be destroyed
+  - resource "helm_release" "argocd" {
+      - atomic                     = false -> null
+      - chart                      = "argo-cd" -> null
+      - cleanup_on_fail            = false -> null
+      - create_namespace           = false -> null
+      - dependency_update          = false -> null
+      - disable_crd_hooks          = false -> null
+      - disable_openapi_validation = false -> null
+      - disable_webhooks           = false -> null
+      - force_update               = false -> null
+      - id                         = "argocd" -> null
+      - lint                       = false -> null
+      - max_history                = 0 -> null
+      - metadata                   = {
+          - app_version    = "v3.5.2" -> null
+          - chart          = "argo-cd" -> null
+          - first_deployed = 1790098949 -> null
+          - last_deployed  = 1790098949 -> null
+          - name           = "argocd" -> null
+          - namespace      = "argocd" -> null
+          - notes          = <<-EOT
+                In order to access the server UI you have the following options:
+                
+                1. kubectl port-forward service/argocd-server -n argocd 8080:443
+                
+                    and then open the browser on http://localhost:8080 and accept the certificate
+                
+                2. enable ingress in the values file `server.ingress.enabled` and either
+                      - Add the annotation for ssl passthrough: https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#option-1-ssl-passthrough
+                      - Set the `configs.params."server.insecure"` in the values file and terminate SSL at your ingress: https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#option-2-multiple-ingress-objects-and-hosts
+                
+                
+                After reaching the UI the first time you can login with username: admin and the random password generated during the installation. You can find the password by running:
+                
+                kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+                
+                (You should delete the initial secret afterwards as suggested by the Getting Started Guide: https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli)
+            EOT -> null
+          - revision       = 1 -> null
+          - values         = jsonencode(
+                {
+                  - applicationSet = {
+                      - replicas = 0
+                    }
+                  - configs        = {
+                      - params = {
+                          - "server.insecure" = true
+                        }
+                    }
+                  - controller     = {
+                      - resources = {
+                          - limits   = {
+                              - cpu    = "500m"
+                              - memory = "768Mi"
+                            }
+                          - requests = {
+                              - cpu    = "50m"
+                              - memory = "256Mi"
+                            }
+                        }
+                    }
+                  - dex            = {
+                      - enabled = false
+                    }
+                  - notifications  = {
+                      - enabled = false
+                    }
+                  - redis          = {
+                      - resources = {
+                          - limits   = {
+                              - cpu    = "200m"
+                              - memory = "128Mi"
+                            }
+                          - requests = {
+                              - cpu    = "10m"
+                              - memory = "32Mi"
+                            }
+                        }
+                    }
+                  - repoServer     = {
+                      - resources = {
+                          - limits   = {
+                              - cpu    = "500m"
+                              - memory = "512Mi"
+                            }
+                          - requests = {
+                              - cpu    = "25m"
+                              - memory = "128Mi"
+                            }
+                        }
+                    }
+                  - server         = {
+                      - resources = {
+                          - limits   = {
+                              - cpu    = "300m"
+                              - memory = "256Mi"
+                            }
+                          - requests = {
+                              - cpu    = "20m"
+                              - memory = "96Mi"
+                            }
+                        }
+                    }
+                }
+            ) -> null
+          - version        = "10.9.0" -> null
+        } -> null
+      - name                       = "argocd" -> null
+      - namespace                  = "argocd" -> null
+      - pass_credentials           = false -> null
+      - recreate_pods              = false -> null
+      - render_subchart_notes      = true -> null
+      - replace                    = false -> null
+      - repository                 = "https://argoproj.github.io/argo-helm" -> null
+      - reset_values               = false -> null
+      - reuse_values               = false -> null
+      - set_wo                     = (write-only attribute) -> null
+      - skip_crds                  = false -> null
+      - status                     = "deployed" -> null
+      - take_ownership             = false -> null
+      - timeout                    = 900 -> null
+      - upgrade_install            = false -> null
+      - values                     = [
+          - <<-EOT
+                "applicationSet":
+                  "replicas": 0
+                "configs":
+                  "params":
+                    "server.insecure": true
+                "controller":
+                  "resources":
+                    "limits":
+                      "cpu": "500m"
+                      "memory": "768Mi"
+                    "requests":
+                      "cpu": "50m"
+                      "memory": "256Mi"
+                "dex":
+                  "enabled": false
+                "notifications":
+                  "enabled": false
+                "redis":
+                  "resources":
+                    "limits":
+                      "cpu": "200m"
+                      "memory": "128Mi"
+                    "requests":
+                      "cpu": "10m"
+                      "memory": "32Mi"
+                "repoServer":
+                  "resources":
+                    "limits":
+                      "cpu": "500m"
+                      "memory": "512Mi"
+                    "requests":
+                      "cpu": "25m"
+                      "memory": "128Mi"
+                "server":
+                  "resources":
+                    "limits":
+                      "cpu": "300m"
+                      "memory": "256Mi"
+                    "requests":
+                      "cpu": "20m"
+                      "memory": "96Mi"
+            EOT,
+        ] -> null
+      - verify                     = false -> null
+      - version                    = "10.9.0" -> null
+      - wait                       = true -> null
+      - wait_for_jobs              = false -> null
+    }
+
+  # helm_release.argocd_apps will be destroyed
+  - resource "helm_release" "argocd_apps" {
+      - atomic                     = false -> null
+      - chart                      = "argocd-apps" -> null
+      - cleanup_on_fail            = false -> null
+      - create_namespace           = false -> null
+      - dependency_update          = false -> null
+      - disable_crd_hooks          = false -> null
+      - disable_openapi_validation = false -> null
+      - disable_webhooks           = false -> null
+      - force_update               = false -> null
+      - id                         = "argocd-apps" -> null
+      - lint                       = false -> null
+      - max_history                = 0 -> null
+      - metadata                   = {
+          - app_version    = "" -> null
+          - chart          = "argocd-apps" -> null
+          - first_deployed = 1790099021 -> null
+          - last_deployed  = 1790102250 -> null
+          - name           = "argocd-apps" -> null
+          - namespace      = "argocd" -> null
+          - notes          = "" -> null
+          - revision       = 2 -> null
+          - values         = jsonencode(
+                {
+                  - applications = {
+                      - raiz = {
+                          - destination = {
+                              - namespace = "argocd"
+                              - server    = "https://kubernetes.default.svc"
+                            }
+                          - namespace   = "argocd"
+                          - project     = "raiz"
+                          - source      = {
+                              - directory      = {
+                                  - recurse = true
+                                }
+                              - path           = "apps"
+                              - repoURL        = "https://github.com/Joe1172003/sa-p8-gitops.git"
+                              - targetRevision = "main"
+                            }
+                          - syncPolicy  = {
+                              - automated = {
+                                  - prune    = true
+                                  - selfHeal = true
+                                }
+                            }
+                        }
+                    }
+                  - projects     = {
+                      - plataforma = {
+                          - clusterResourceWhitelist = [
+                              - {
+                                  - group = "*"
+                                  - kind  = "*"
+                                },
+                            ]
+                          - description              = "Herramientas de la plataforma instaladas por GitOps"
+                          - destinations             = [
+                              - {
+                                  - namespace = "*"
+                                  - server    = "https://kubernetes.default.svc"
+                                },
+                            ]
+                          - namespace                = "argocd"
+                          - sourceRepos              = [
+                              - "*",
+                            ]
+                        }
+                      - politicas  = {
+                          - clusterResourceWhitelist   = [
+                              - {
+                                  - group = "kyverno.io"
+                                  - kind  = "ClusterPolicy"
+                                },
+                            ]
+                          - description                = "Politicas de admision de Kyverno"
+                          - destinations               = [
+                              - {
+                                  - namespace = "kyverno"
+                                  - server    = "https://kubernetes.default.svc"
+                                },
+                            ]
+                          - namespace                  = "argocd"
+                          - namespaceResourceBlacklist = [
+                              - {
+                                  - group = "*"
+                                  - kind  = "*"
+                                },
+                            ]
+                          - sourceRepos                = [
+                              - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git",
+                              - "https://github.com/Joe1172003/sa-p8-gitops.git",
+                            ]
+                        }
+                      - raiz       = {
+                          - description                = "App of apps que lee la carpeta apps del repo GitOps"
+                          - destinations               = [
+                              - {
+                                  - namespace = "argocd"
+                                  - server    = "https://kubernetes.default.svc"
+                                },
+                            ]
+                          - namespace                  = "argocd"
+                          - namespaceResourceWhitelist = [
+                              - {
+                                  - group = "argoproj.io"
+                                  - kind  = "Application"
+                                },
+                            ]
+                          - sourceRepos                = [
+                              - "https://github.com/Joe1172003/sa-p8-gitops.git",
+                            ]
+                        }
+                      - sa-p8      = {
+                          - description                = "Microservicios de la plataforma"
+                          - destinations               = [
+                              - {
+                                  - namespace = "sa-p8"
+                                  - server    = "https://kubernetes.default.svc"
+                                },
+                            ]
+                          - namespace                  = "argocd"
+                          - namespaceResourceBlacklist = [
+                              - {
+                                  - group = ""
+                                  - kind  = "ResourceQuota"
+                                },
+                              - {
+                                  - group = ""
+                                  - kind  = "LimitRange"
+                                },
+                              - {
+                                  - group = ""
+                                  - kind  = "ServiceAccount"
+                                },
+                              - {
+                                  - group = "rbac.authorization.k8s.io"
+                                  - kind  = "Role"
+                                },
+                              - {
+                                  - group = "rbac.authorization.k8s.io"
+                                  - kind  = "RoleBinding"
+                                },
+                            ]
+                          - sourceRepos                = [
+                              - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git",
+                              - "https://github.com/Joe1172003/sa-p8-gitops.git",
+                            ]
+                        }
+                    }
+                }
+            ) -> null
+          - version        = "2.0.5" -> null
+        } -> null
+      - name                       = "argocd-apps" -> null
+      - namespace                  = "argocd" -> null
+      - pass_credentials           = false -> null
+      - recreate_pods              = false -> null
+      - render_subchart_notes      = true -> null
+      - replace                    = false -> null
+      - repository                 = "https://argoproj.github.io/argo-helm" -> null
+      - reset_values               = false -> null
+      - reuse_values               = false -> null
+      - set_wo                     = (write-only attribute) -> null
+      - skip_crds                  = false -> null
+      - status                     = "deployed" -> null
+      - take_ownership             = false -> null
+      - timeout                    = 300 -> null
+      - upgrade_install            = false -> null
+      - values                     = [
+          - <<-EOT
+                "applications":
+                  "raiz":
+                    "destination":
+                      "namespace": "argocd"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "project": "raiz"
+                    "source":
+                      "directory":
+                        "recurse": true
+                      "path": "apps"
+                      "repoURL": "https://github.com/Joe1172003/sa-p8-gitops.git"
+                      "targetRevision": "main"
+                    "syncPolicy":
+                      "automated":
+                        "prune": true
+                        "selfHeal": true
+                "projects":
+                  "plataforma":
+                    "clusterResourceWhitelist":
+                    - "group": "*"
+                      "kind": "*"
+                    "description": "Herramientas de la plataforma instaladas por GitOps"
+                    "destinations":
+                    - "namespace": "*"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "sourceRepos":
+                    - "*"
+                  "politicas":
+                    "clusterResourceWhitelist":
+                    - "group": "kyverno.io"
+                      "kind": "ClusterPolicy"
+                    "description": "Politicas de admision de Kyverno"
+                    "destinations":
+                    - "namespace": "kyverno"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceBlacklist":
+                    - "group": "*"
+                      "kind": "*"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git"
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+                  "raiz":
+                    "description": "App of apps que lee la carpeta apps del repo GitOps"
+                    "destinations":
+                    - "namespace": "argocd"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceWhitelist":
+                    - "group": "argoproj.io"
+                      "kind": "Application"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+                  "sa-p8":
+                    "description": "Microservicios de la plataforma"
+                    "destinations":
+                    - "namespace": "sa-p8"
+                      "server": "https://kubernetes.default.svc"
+                    "namespace": "argocd"
+                    "namespaceResourceBlacklist":
+                    - "group": ""
+                      "kind": "ResourceQuota"
+                    - "group": ""
+                      "kind": "LimitRange"
+                    - "group": ""
+                      "kind": "ServiceAccount"
+                    - "group": "rbac.authorization.k8s.io"
+                      "kind": "Role"
+                    - "group": "rbac.authorization.k8s.io"
+                      "kind": "RoleBinding"
+                    "sourceRepos":
+                    - "https://github.com/Joe1172003/Practicas-SA-B-202200271.git"
+                    - "https://github.com/Joe1172003/sa-p8-gitops.git"
+            EOT,
+        ] -> null
+      - verify                     = false -> null
+      - version                    = "2.0.5" -> null
+      - wait                       = true -> null
+      - wait_for_jobs              = false -> null
+    }
+
+  # kubernetes_limit_range_v1.plataforma will be destroyed
+  - resource "kubernetes_limit_range_v1" "plataforma" {
+      - id = "sa-p8/limites" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "limites" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937667023006" -> null
+          - uid              = "f0c3cad3-d4fd-465c-b4e2-b0382e3e7f81" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - spec {
+          - limit {
+              - default                 = {
+                  - "cpu"    = "200m"
+                  - "memory" = "256Mi"
+                } -> null
+              - default_request         = {
+                  - "cpu"    = "25m"
+                  - "memory" = "64Mi"
+                } -> null
+              - max                     = {
+                  - "cpu"    = "1"
+                  - "memory" = "1Gi"
+                } -> null
+              - max_limit_request_ratio = {} -> null
+              - min                     = {
+                  - "cpu"    = "10m"
+                  - "memory" = "16Mi"
+                } -> null
+              - type                    = "Container" -> null
+            }
+        }
+    }
+
+  # kubernetes_namespace_v1.argocd will be destroyed
+  - resource "kubernetes_namespace_v1" "argocd" {
+      - id                               = "argocd" -> null
+      - wait_for_default_service_account = false -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "argocd" -> null
+          - resource_version = "1790098937346047000" -> null
+          - uid              = "2c00c144-4e01-4a9f-b9a4-009adca73891" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_namespace_v1.plataforma will be destroyed
+  - resource "kubernetes_namespace_v1" "plataforma" {
+      - id                               = "sa-p8" -> null
+      - wait_for_default_service_account = false -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+              - "entorno"                      = "prod"
+            } -> null
+          - name             = "sa-p8" -> null
+          - resource_version = "1790098937341711000" -> null
+          - uid              = "f218f7ab-a998-40d1-a5ba-0fcd6e4fb139" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_namespace_v1.sealed_secrets will be destroyed
+  - resource "kubernetes_namespace_v1" "sealed_secrets" {
+      - id                               = "sealed-secrets" -> null
+      - wait_for_default_service_account = false -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "sealed-secrets" -> null
+          - resource_version = "1790098937346271002" -> null
+          - uid              = "46558546-110b-4371-b3ca-7cebb4a3616d" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_network_policy_v1.denegar_todo will be destroyed
+  - resource "kubernetes_network_policy_v1" "denegar_todo" {
+      - id = "sa-p8/denegar-todo" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 1 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "denegar-todo" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937712991024" -> null
+          - uid              = "098ad3e1-f543-4a46-aaba-c51f8bc5de7a" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - spec {
+          - policy_types = [
+              - "Ingress",
+              - "Egress",
+            ] -> null
+
+          - pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.permitir_dns will be destroyed
+  - resource "kubernetes_network_policy_v1" "permitir_dns" {
+      - id = "sa-p8/permitir-dns" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 1 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "permitir-dns" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937718111003" -> null
+          - uid              = "8230e2a6-9ee3-47f7-aa98-e640b227b8b2" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - spec {
+          - policy_types = [
+              - "Egress",
+            ] -> null
+
+          - egress {
+              - ports {
+                  - end_port = 0 -> null
+                  - port     = "53" -> null
+                  - protocol = "UDP" -> null
+                }
+              - ports {
+                  - end_port = 0 -> null
+                  - port     = "53" -> null
+                  - protocol = "TCP" -> null
+                }
+              - to {
+                  - namespace_selector {
+                      - match_labels = {
+                          - "kubernetes.io/metadata.name" = "kube-system"
+                        } -> null
+                    }
+                }
+            }
+
+          - pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_network_policy_v1.salida_interna will be destroyed
+  - resource "kubernetes_network_policy_v1" "salida_interna" {
+      - id = "sa-p8/salida-interna" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 1 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "salida-interna" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937721615010" -> null
+          - uid              = "53189e99-9d69-47e3-b903-edf86898ca54" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - spec {
+          - policy_types = [
+              - "Egress",
+            ] -> null
+
+          - egress {
+              - to {
+                  - pod_selector {
+                    }
+                }
+            }
+
+          - pod_selector {
+            }
+        }
+    }
+
+  # kubernetes_resource_quota_v1.plataforma will be destroyed
+  - resource "kubernetes_resource_quota_v1" "plataforma" {
+      - id = "sa-p8/cuota" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "cuota" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790128444075007023" -> null
+          - uid              = "01b43db8-e763-4d79-935e-8447549790a2" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - spec {
+          - hard   = {
+              - "limits.cpu"             = "9"
+              - "limits.memory"          = "9Gi"
+              - "persistentvolumeclaims" = "6"
+              - "pods"                   = "30"
+              - "requests.cpu"           = "2"
+              - "requests.memory"        = "4Gi"
+            } -> null
+          - scopes = [] -> null
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["auth"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/auth" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "auth"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "auth" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938641231001" -> null
+          - uid              = "1854797a-5794-41ce-bf4a-d8c958177ff7" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "auth" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "auth" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["bitacora"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/bitacora" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "bitacora"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "bitacora" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938711727004" -> null
+          - uid              = "a28c828d-eb5c-4b85-84c9-09e7c0b9ceeb" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "bitacora" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "bitacora" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["gateway"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/gateway" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "gateway"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "gateway" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938681055001" -> null
+          - uid              = "7d160e86-f9ca-435e-b41d-e47ce44ffad5" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "gateway" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "gateway" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["notificaciones"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/notificaciones" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "notificaciones"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "notificaciones" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938647151017" -> null
+          - uid              = "10672110-d14f-4810-baff-27a5c905319c" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "notificaciones" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "notificaciones" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["ordenes"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/ordenes" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "ordenes"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "ordenes" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938713967008" -> null
+          - uid              = "d3574b0c-3714-4310-8d9d-9a1b195058c8" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "ordenes" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "ordenes" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["postgres"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/postgres" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "postgres"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "postgres" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938680127013" -> null
+          - uid              = "f96922a7-54e1-49e2-9c52-81b0a22e01a6" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "postgres" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "postgres" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["productos"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/productos" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "productos"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "productos" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938646927002" -> null
+          - uid              = "4af06710-5f1f-430c-99d9-02092cd2734b" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "productos" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "productos" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.componente["resumen"] will be destroyed
+  - resource "kubernetes_role_binding_v1" "componente" {
+      - id = "sa-p8/resumen" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "resumen"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "resumen" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938685775007" -> null
+          - uid              = "09ecf368-c4d2-4b34-a91a-6687b37d3c0e" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "resumen" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "resumen" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_binding_v1.rabbitmq will be destroyed
+  - resource "kubernetes_role_binding_v1" "rabbitmq" {
+      - id = "sa-p8/rabbitmq" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "rabbitmq"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "rabbitmq" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938388367018" -> null
+          - uid              = "6b15427a-1396-475b-8781-015eb2f9fa19" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - role_ref {
+          - api_group = "rbac.authorization.k8s.io" -> null
+          - kind      = "Role" -> null
+          - name      = "rabbitmq" -> null
+        }
+
+      - subject {
+          - kind      = "ServiceAccount" -> null
+          - name      = "rabbitmq" -> null
+          - namespace = "sa-p8" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_role_v1.componente["auth"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/auth" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "auth"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "auth" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938297215015" -> null
+          - uid              = "b2671e13-fa45-44b7-af95-559bc5dd4521" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "auth-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "auth-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["bitacora"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/bitacora" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "bitacora"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "bitacora" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938091791001" -> null
+          - uid              = "80b44482-00f7-4852-a637-c8f62cc78e75" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "bitacora-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["gateway"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/gateway" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "gateway"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "gateway" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938317679013" -> null
+          - uid              = "6f4b2d8f-60c5-47ac-83f7-0ea05792ba61" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "gateway-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["notificaciones"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/notificaciones" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "notificaciones"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "notificaciones" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938050191022" -> null
+          - uid              = "452e5484-eb12-4d3d-a406-9f2f72c1168f" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "notificaciones-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "notificaciones-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["ordenes"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/ordenes" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "ordenes"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "ordenes" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938321935008" -> null
+          - uid              = "f3697d44-c55d-455e-8f37-116e047c0997" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "ordenes-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "ordenes-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["postgres"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/postgres" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "postgres"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "postgres" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938060463004" -> null
+          - uid              = "f7affb32-df32-45f0-a064-4d243bd02634" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "postgres-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "postgres-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["productos"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/productos" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "productos"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "productos" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938045887002" -> null
+          - uid              = "ac9c1cab-70ba-42ad-9806-3ccc3482058d" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "productos-config",
+            ] -> null
+          - resources      = [
+              - "configmaps",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "productos-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.componente["resumen"] will be destroyed
+  - resource "kubernetes_role_v1" "componente" {
+      - id = "sa-p8/resumen" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "resumen"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "resumen" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937687567000" -> null
+          - uid              = "f72c10e3-76e5-43ad-aae9-88225e198ce0" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [
+              - "resumen-secreto",
+            ] -> null
+          - resources      = [
+              - "secrets",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+    }
+
+  # kubernetes_role_v1.rabbitmq will be destroyed
+  - resource "kubernetes_role_v1" "rabbitmq" {
+      - id = "sa-p8/rabbitmq" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "rabbitmq"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "rabbitmq" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938035151003" -> null
+          - uid              = "6f60a2d4-2543-4a2f-8c94-f67325f2642f" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [] -> null
+          - resources      = [
+              - "endpoints",
+            ] -> null
+          - verbs          = [
+              - "get",
+            ] -> null
+        }
+      - rule {
+          - api_groups     = [
+              - null,
+            ] -> null
+          - resource_names = [] -> null
+          - resources      = [
+              - "events",
+            ] -> null
+          - verbs          = [
+              - "create",
+            ] -> null
+        }
+    }
+
+  # kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"] will be destroyed
+  - resource "kubernetes_secret_v1" "llave_sealed_secrets" {
+      - binary_data_wo                 = (write-only attribute) -> null
+      - data                           = (sensitive value) -> null
+      - data_wo                        = (write-only attribute) -> null
+      - id                             = "sealed-secrets/sealed-secrets-keyn5h7g" -> null
+      - immutable                      = false -> null
+      - type                           = "kubernetes.io/tls" -> null
+      - wait_for_service_account_token = true -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "sealedsecrets.bitnami.com/sealed-secrets-key" = "active"
+            } -> null
+          - name             = "sealed-secrets-keyn5h7g" -> null
+          - namespace        = "sealed-secrets" -> null
+          - resource_version = "1790100698174543004" -> null
+          - uid              = "1f8a6a29-13c6-4e5c-80cf-64045b2d958e" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["auth"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/auth" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "auth"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "auth" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937999087000" -> null
+          - uid              = "7dfeac4a-a61a-46cc-bd0c-665a3b60108c" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["bitacora"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/bitacora" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "bitacora"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "bitacora" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938042623010" -> null
+          - uid              = "63feb44e-30bb-41b7-8181-ca4a37a9a483" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["gateway"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/gateway" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "gateway"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "gateway" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938017983004" -> null
+          - uid              = "f22e4b03-6928-45c5-acb4-72e8b1232ce7" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["notificaciones"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/notificaciones" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "notificaciones"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "notificaciones" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937948207007" -> null
+          - uid              = "1d561d1b-73a9-4563-b4a3-1d16d28e4758" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["ordenes"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/ordenes" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "ordenes"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "ordenes" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098938014863004" -> null
+          - uid              = "e58c510e-1e84-434c-9f3a-52bd161f3201" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["postgres"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/postgres" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "postgres"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "postgres" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937694463001" -> null
+          - uid              = "015beecb-d5fa-4146-b400-59a37160bd2d" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["productos"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/productos" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "productos"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "productos" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937661599000" -> null
+          - uid              = "16696d45-080e-4fb3-bb66-40fe28b44087" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.componente["resumen"] will be destroyed
+  - resource "kubernetes_service_account_v1" "componente" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/resumen" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "resumen"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "resumen" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937689455006" -> null
+          - uid              = "fcd218a8-6b4c-4b28-b56c-18dc670fcff0" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # kubernetes_service_account_v1.rabbitmq will be destroyed
+  - resource "kubernetes_service_account_v1" "rabbitmq" {
+      - automount_service_account_token = true -> null
+      - id                              = "sa-p8/rabbitmq" -> null
+        # (1 unchanged attribute hidden)
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {
+              - "app.kubernetes.io/managed-by" = "terraform"
+              - "app.kubernetes.io/name"       = "rabbitmq"
+              - "app.kubernetes.io/part-of"    = "sa-p9"
+            } -> null
+          - name             = "rabbitmq" -> null
+          - namespace        = "sa-p8" -> null
+          - resource_version = "1790098937648671013" -> null
+          - uid              = "653c17a5-4a97-4eef-831c-7caae15d6089" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+Plan: 0 to add, 0 to change, 46 to destroy.
+
+Changes to Outputs:
+  - cluster        = "sa-p9" -> null
+  - consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80" -> null
+  - credenciales   = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271" -> null
+  - host_gateway   = "136.113.9.71.nip.io" -> null
+  - version_gke    = "1.35.8-gke.1036000" -> null
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: 
+google_project_iam_member.nodos["roles/monitoring.viewer"]: Destroying... [id=sa-p6-202200271/roles/monitoring.viewer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_service_account_iam_member.velero_wi: Destroying... [id=projects/sa-p6-202200271/serviceAccounts/velero-sa-p9@sa-p6-202200271.iam.gserviceaccount.com/roles/iam.workloadIdentityUser/serviceAccount:sa-p6-202200271.svc.id.goog[velero/velero-server]]
+google_project_iam_member.nodos["roles/logging.logWriter"]: Destroying... [id=sa-p6-202200271/roles/logging.logWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"]: Destroying... [id=sa-p6-202200271/roles/stackdriver.resourceMetadata.writer/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_project_iam_member.nodos["roles/monitoring.metricWriter"]: Destroying... [id=sa-p6-202200271/roles/monitoring.metricWriter/serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+helm_release.argocd_apps: Destroying... [id=argocd-apps]
+kubernetes_role_binding_v1.rabbitmq: Destroying... [id=sa-p8/rabbitmq]
+kubernetes_role_binding_v1.componente["bitacora"]: Destroying... [id=sa-p8/bitacora]
+kubernetes_limit_range_v1.plataforma: Destroying... [id=sa-p8/limites]
+kubernetes_network_policy_v1.permitir_dns: Destroying... [id=sa-p8/permitir-dns]
+kubernetes_role_binding_v1.componente["bitacora"]: Destruction complete after 1s
+kubernetes_role_binding_v1.rabbitmq: Destruction complete after 1s
+kubernetes_limit_range_v1.plataforma: Destruction complete after 1s
+kubernetes_network_policy_v1.permitir_dns: Destruction complete after 1s
+kubernetes_role_binding_v1.componente["gateway"]: Destroying... [id=sa-p8/gateway]
+kubernetes_role_binding_v1.componente["postgres"]: Destroying... [id=sa-p8/postgres]
+kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"]: Destroying... [id=sealed-secrets/sealed-secrets-keyn5h7g]
+kubernetes_network_policy_v1.salida_interna: Destroying... [id=sa-p8/salida-interna]
+kubernetes_role_binding_v1.componente["postgres"]: Destruction complete after 0s
+kubernetes_network_policy_v1.salida_interna: Destruction complete after 0s
+kubernetes_secret_v1.llave_sealed_secrets["sealed-secrets-keyn5h7g"]: Destruction complete after 0s
+kubernetes_role_binding_v1.componente["gateway"]: Destruction complete after 0s
+kubernetes_resource_quota_v1.plataforma: Destroying... [id=sa-p8/cuota]
+kubernetes_role_binding_v1.componente["notificaciones"]: Destroying... [id=sa-p8/notificaciones]
+kubernetes_network_policy_v1.denegar_todo: Destroying... [id=sa-p8/denegar-todo]
+kubernetes_role_binding_v1.componente["productos"]: Destroying... [id=sa-p8/productos]
+kubernetes_role_binding_v1.componente["notificaciones"]: Destruction complete after 0s
+kubernetes_role_binding_v1.componente["resumen"]: Destroying... [id=sa-p8/resumen]
+kubernetes_resource_quota_v1.plataforma: Destruction complete after 1s
+kubernetes_role_binding_v1.componente["resumen"]: Destruction complete after 1s
+kubernetes_role_binding_v1.componente["productos"]: Destruction complete after 1s
+kubernetes_role_binding_v1.componente["auth"]: Destroying... [id=sa-p8/auth]
+kubernetes_role_binding_v1.componente["ordenes"]: Destroying... [id=sa-p8/ordenes]
+kubernetes_role_v1.rabbitmq: Destroying... [id=sa-p8/rabbitmq]
+kubernetes_network_policy_v1.denegar_todo: Destruction complete after 1s
+kubernetes_service_account_v1.rabbitmq: Destroying... [id=sa-p8/rabbitmq]
+kubernetes_role_binding_v1.componente["ordenes"]: Destruction complete after 0s
+kubernetes_role_v1.rabbitmq: Destruction complete after 0s
+kubernetes_role_binding_v1.componente["auth"]: Destruction complete after 0s
+kubernetes_service_account_v1.rabbitmq: Destruction complete after 0s
+kubernetes_namespace_v1.sealed_secrets: Destroying... [id=sealed-secrets]
+kubernetes_service_account_v1.componente["postgres"]: Destroying... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["notificaciones"]: Destroying... [id=sa-p8/notificaciones]
+kubernetes_role_v1.componente["postgres"]: Destroying... [id=sa-p8/postgres]
+kubernetes_role_v1.componente["notificaciones"]: Destruction complete after 1s
+kubernetes_role_v1.componente["bitacora"]: Destroying... [id=sa-p8/bitacora]
+kubernetes_service_account_v1.componente["postgres"]: Destruction complete after 1s
+kubernetes_role_v1.componente["resumen"]: Destroying... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["postgres"]: Destruction complete after 1s
+kubernetes_service_account_v1.componente["ordenes"]: Destroying... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["ordenes"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["auth"]: Destroying... [id=sa-p8/auth]
+kubernetes_role_v1.componente["bitacora"]: Destruction complete after 0s
+kubernetes_role_v1.componente["productos"]: Destroying... [id=sa-p8/productos]
+kubernetes_role_v1.componente["resumen"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["gateway"]: Destroying... [id=sa-p8/gateway]
+kubernetes_role_v1.componente["productos"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["gateway"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["auth"]: Destruction complete after 0s
+kubernetes_role_v1.componente["gateway"]: Destroying... [id=sa-p8/gateway]
+kubernetes_service_account_v1.componente["bitacora"]: Destroying... [id=sa-p8/bitacora]
+kubernetes_role_v1.componente["auth"]: Destroying... [id=sa-p8/auth]
+kubernetes_role_v1.componente["gateway"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["resumen"]: Destroying... [id=sa-p8/resumen]
+kubernetes_role_v1.componente["auth"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["productos"]: Destroying... [id=sa-p8/productos]
+kubernetes_service_account_v1.componente["bitacora"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["notificaciones"]: Destroying... [id=sa-p8/notificaciones]
+kubernetes_service_account_v1.componente["resumen"]: Destruction complete after 0s
+kubernetes_role_v1.componente["ordenes"]: Destroying... [id=sa-p8/ordenes]
+kubernetes_service_account_v1.componente["productos"]: Destruction complete after 0s
+kubernetes_service_account_v1.componente["notificaciones"]: Destruction complete after 0s
+kubernetes_role_v1.componente["ordenes"]: Destruction complete after 1s
+kubernetes_namespace_v1.plataforma: Destroying... [id=sa-p8]
+google_service_account_iam_member.velero_wi: Destruction complete after 7s
+helm_release.argocd_apps: Destruction complete after 7s
+helm_release.argocd: Destroying... [id=argocd]
+google_project_iam_member.nodos["roles/monitoring.viewer"]: Still destroying... [id=sa-p6-202200271/roles/monitoring.viewer...a-p6-202200271.iam.gserviceaccount.com, 00m10s elapsed]
+google_project_iam_member.nodos["roles/logging.logWriter"]: Still destroying... [id=sa-p6-202200271/roles/logging.logWriter...a-p6-202200271.iam.gserviceaccount.com, 00m10s elapsed]
+google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"]: Still destroying... [id=sa-p6-202200271/roles/stackdriver.resou...a-p6-202200271.iam.gserviceaccount.com, 00m10s elapsed]
+google_project_iam_member.nodos["roles/monitoring.metricWriter"]: Still destroying... [id=sa-p6-202200271/roles/monitoring.metric...a-p6-202200271.iam.gserviceaccount.com, 00m10s elapsed]
+google_project_iam_member.nodos["roles/monitoring.viewer"]: Destruction complete after 10s
+google_project_iam_member.nodos["roles/stackdriver.resourceMetadata.writer"]: Destruction complete after 11s
+kubernetes_namespace_v1.sealed_secrets: Still destroying... [id=sealed-secrets, 00m10s elapsed]
+google_project_iam_member.nodos["roles/monitoring.metricWriter"]: Destruction complete after 14s
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 00m10s elapsed]
+google_project_iam_member.nodos["roles/logging.logWriter"]: Destruction complete after 15s
+helm_release.argocd: Still destroying... [id=argocd, 00m10s elapsed]
+kubernetes_namespace_v1.sealed_secrets: Still destroying... [id=sealed-secrets, 00m20s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 00m20s elapsed]
+kubernetes_namespace_v1.sealed_secrets: Destruction complete after 25s
+helm_release.argocd: Still destroying... [id=argocd, 00m20s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 00m30s elapsed]
+helm_release.argocd: Still destroying... [id=argocd, 00m30s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 00m40s elapsed]
+helm_release.argocd: Still destroying... [id=argocd, 00m40s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 00m50s elapsed]
+helm_release.argocd: Still destroying... [id=argocd, 00m50s elapsed]
+helm_release.argocd: Destruction complete after 55s
+kubernetes_namespace_v1.argocd: Destroying... [id=argocd]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 01m00s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 00m10s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 01m10s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 00m20s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 01m20s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 00m30s elapsed]
+kubernetes_namespace_v1.plataforma: Still destroying... [id=sa-p8, 01m30s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 00m40s elapsed]
+kubernetes_namespace_v1.plataforma: Destruction complete after 1m40s
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 00m50s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m00s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m10s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m20s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m30s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m40s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 01m50s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m00s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m10s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m20s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m30s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m40s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 02m50s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m00s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m10s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m20s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m30s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m40s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 03m50s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m00s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m10s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m20s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m30s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m40s elapsed]
+kubernetes_namespace_v1.argocd: Still destroying... [id=argocd, 04m50s elapsed]
+
+Warning: Helm uninstall returned an information message
+
+These resources were kept due to the resource policy:
+[CustomResourceDefinition] applications.argoproj.io
+[CustomResourceDefinition] applicationsets.argoproj.io
+[CustomResourceDefinition] appprojects.argoproj.io
+
+
+Error: context deadline exceeded
+
+Releasing state lock. This may take a few moments...
+data.terraform_remote_state.permanente: Reading...
+data.terraform_remote_state.permanente: Read complete after 2s
+data.google_secret_manager_secret_version.llave_sealed_secrets: Reading...
+data.google_client_config.actual: Reading...
+google_service_account.nodos: Refreshing state... [id=projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_container_cluster.sa_p9: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9]
+data.google_client_config.actual: Read complete after 0s [id=projects/sa-p6-202200271/regions/us-central1/zones/]
+data.google_secret_manager_secret_version.llave_sealed_secrets: Read complete after 0s [id=projects/135223512781/secrets/sa-p9-sealed-secrets-llave/versions/1]
+google_container_node_pool.principal: Refreshing state... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal]
+kubernetes_namespace_v1.argocd: Refreshing state... [id=argocd]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # google_container_cluster.sa_p9 will be destroyed
+  - resource "google_container_cluster" "sa_p9" {
+      - autopilot_privileged_admission           = [] -> null
+      - cluster_ipv4_cidr                        = "10.16.0.0/14" -> null
+      - datapath_provider                        = "ADVANCED_DATAPATH" -> null
+      - default_max_pods_per_node                = 110 -> null
+      - deletion_policy                          = "DELETE" -> null
+      - deletion_protection                      = false -> null
+      - disable_l4_lb_firewall_reconciliation    = false -> null
+      - effective_labels                         = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+      - enable_autopilot                         = false -> null
+      - enable_cilium_clusterwide_network_policy = false -> null
+      - enable_fqdn_network_policy               = false -> null
+      - enable_intranode_visibility              = false -> null
+      - enable_kubernetes_alpha                  = false -> null
+      - enable_l4_ilb_subsetting                 = false -> null
+      - enable_legacy_abac                       = false -> null
+      - enable_multi_networking                  = false -> null
+      - enable_shielded_nodes                    = true -> null
+      - enable_tpu                               = false -> null
+      - endpoint                                 = "35.184.21.89" -> null
+      - id                                       = "projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9" -> null
+      - initial_node_count                       = 1 -> null
+      - label_fingerprint                        = "78cdf2f6" -> null
+      - location                                 = "us-central1-a" -> null
+      - logging_service                          = "logging.googleapis.com/kubernetes" -> null
+      - master_version                           = "1.35.8-gke.1036000" -> null
+      - monitoring_service                       = "monitoring.googleapis.com/kubernetes" -> null
+      - name                                     = "sa-p9" -> null
+      - network                                  = "projects/sa-p6-202200271/global/networks/default" -> null
+      - networking_mode                          = "VPC_NATIVE" -> null
+      - node_locations                           = [] -> null
+      - node_version                             = "1.35.8-gke.1036000" -> null
+      - project                                  = "sa-p6-202200271" -> null
+      - remove_default_node_pool                 = true -> null
+      - resource_labels                          = {} -> null
+      - self_link                                = "https://container.googleapis.com/v1/projects/sa-p6-202200271/zones/us-central1-a/clusters/sa-p9" -> null
+      - services_ipv4_cidr                       = "34.118.224.0/20" -> null
+      - subnetwork                               = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+      - terraform_labels                         = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+        # (5 unchanged attributes hidden)
+
+      - addons_config {
+          - dns_cache_config {
+              - enabled = true -> null
+            }
+          - gce_persistent_disk_csi_driver_config {
+              - enabled = true -> null
+            }
+          - network_policy_config {
+              - disabled = true -> null
+            }
+          - node_readiness_config {
+              - enabled = false -> null
+            }
+        }
+
+      - anonymous_authentication_config {
+          - mode = "LIMITED" -> null
+        }
+
+      - binary_authorization {
+          - enabled         = false -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - cluster_autoscaling {
+          - auto_provisioning_locations   = [] -> null
+          - autoscaling_profile           = "BALANCED" -> null
+          - default_compute_class_enabled = false -> null
+          - enabled                       = false -> null
+
+          - auto_provisioning_defaults {
+              - disk_size         = 0 -> null
+              - image_type        = "COS_CONTAINERD" -> null
+              - oauth_scopes      = [
+                  - "https://www.googleapis.com/auth/devstorage.read_only",
+                  - "https://www.googleapis.com/auth/logging.write",
+                  - "https://www.googleapis.com/auth/monitoring",
+                  - "https://www.googleapis.com/auth/service.management.readonly",
+                  - "https://www.googleapis.com/auth/servicecontrol",
+                  - "https://www.googleapis.com/auth/trace.append",
+                ] -> null
+              - service_account   = "default" -> null
+                # (3 unchanged attributes hidden)
+
+              - management {
+                  - auto_repair     = true -> null
+                  - auto_upgrade    = true -> null
+                  - upgrade_options = [] -> null
+                }
+            }
+        }
+
+      - control_plane_endpoints_config {
+          - dns_endpoint_config {
+              - allow_external_traffic    = false -> null
+              - enable_k8s_certs_via_dns  = false -> null
+              - enable_k8s_tokens_via_dns = false -> null
+              - endpoint                  = "gke-6fceda384baf4f02beb21911f4cf852cf4d7-135223512781.us-central1-a.gke.goog" -> null
+            }
+          - ip_endpoints_config {
+              - enabled = true -> null
+            }
+        }
+
+      - database_encryption {
+          - state    = "DECRYPTED" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - default_snat_status {
+          - disabled = false -> null
+        }
+
+      - enterprise_config {
+          - cluster_tier = "STANDARD" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - ip_allocation_policy {
+          - cluster_ipv4_cidr_block       = "10.16.0.0/14" -> null
+          - cluster_secondary_range_name  = "gke-sa-p9-pods-6fceda38" -> null
+          - services_ipv4_cidr_block      = "34.118.224.0/20" -> null
+          - stack_type                    = "IPV4" -> null
+            # (1 unchanged attribute hidden)
+
+          - network_tier_config {
+              - network_tier = "NETWORK_TIER_DEFAULT" -> null
+            }
+
+          - pod_cidr_overprovision_config {
+              - disabled = false -> null
+            }
+        }
+
+      - logging_config {
+          - enable_components = [
+              - "SYSTEM_COMPONENTS",
+              - "WORKLOADS",
+            ] -> null
+        }
+
+      - master_auth {
+          - cluster_ca_certificate = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVMVENDQXBXZ0F3SUJBZ0lSQUt3bjJ1dUdBbmF5RE8yUi9QQ04rS0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa05USmtZV1V4TmpjdE5HVTROeTAwWkdaaExUazNOV1l0TTJSak1XSTJaakppT1dSaQpNQ0FYRFRJMk1Ea3lNakUyTXpNeE0xb1lEekl3TlRZd09URTBNVGN6TXpFeldqQXZNUzB3S3dZRFZRUURFeVExCk1tUmhaVEUyTnkwMFpUZzNMVFJrWm1FdE9UYzFaaTB6WkdNeFlqWm1NbUk1WkdJd2dnR2lNQTBHQ1NxR1NJYjMKRFFFQkFRVUFBNElCandBd2dnR0tBb0lCZ1FET2FIRElQd0hRUG03ZzZoaThPMW5mYzViYmp1dDRQSHBzSXJCYQptQlJTdjVpOGlPemNaVzJ0NTJEeDZkMkU0ajRKaGEzbGJUQWpBaUZ5a2RTTXRVYksyT3FJSFBWRjFSTStJNGNDClhDVVdrd0M5d3JSYWN2aVJaTEZRbGl1VjlyRG1tcUNrWjExcjJWd0VLODQvSUVtb3l4TFI5THhoQ2QvOVZOUWsKK2dSeHJFYVZQcXRmay9aVTlSUmpGZjZxekE1T3QrSzIxOHU5Z0xjcHVtUW1SWmZKVE5GbFFnWW1jMGdKWUp5TQprMEFTbXRUcWFYVVoyeEd6S1owR0dvRTFLMGdXRW1lM3pMcG14a0kybXkzN3ZRYXNkYUE4L2U4c013OVhhRVN0CjhWd2UrbGFIZmZ3NWcwQU9uclhXZnhNTUxsSDhlNnpndE5HeFg0cEhockRMaTM0d3pEM2ROSUZFWFNnRHJscmQKdk5OMmJFV2dQK1pQUzZRM05DTVV4czNiaTVEZG5EYk9OVDc1cjJTTEwxNnVuV2dzWHlqdSt6d3pTVmVaYUNUUgpiWDZiNTlzZzB0SWR3SFhmQVB2WDZRZlFJbW1aUlRmV0dnLzVrMzVzZTVrTnRCWUplLzJ1bjdodlVzN3lKOXAxCmt2RGc4SStOY2YvTG8rQitxbGtQSWRCYVFuRUNBd0VBQWFOQ01FQXdEZ1lEVlIwUEFRSC9CQVFEQWdJRU1BOEcKQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGR2RUdFV1Y2MrTlRGTm1rMnFPakZ3S3F6S2hTTUEwRwpDU3FHU0liM0RRRUJDd1VBQTRJQmdRQk9VenZhTjhuSXVTeEM2aitGbHFpYngvRHJIb096RGZuQnl4eUxxR3Z2Ci9uMmFOcm0vd1VpT0FGVFk1a0NRclFBbkxsZUQ4V29waWNmd0Vuam0xaVZJeWpjOHM3VUVYYm9pZnViRVZMaE8KV0diRjdLdHd1TU5YanhSaWZqRUVSSjg2cDZYWXlBaHpMTkJZMDM4Y1cwZm5oZDF0MTh2WUNqSzUwZkdSUEVHRgpSSlEzT2s5TVp0ZUdDdTY1YVRZMlFOODVrOWJCZUQxWDcxU1B4R3Z4YnhEaWo4NFhIbkU3K1VDTWJFWXQreFF4CkowRmlEQTh6dEplb3JWU0pjM2VUa2xYN0ZQRTE1RkowUGl0MVVGRi9nKzZTMGtJTDhmbTBkZ1hHSGxYOUpGV1QKNVo4SjdUN0xUUGUwS05RRm42OUxyVlgxcGZBUzQxS0xucTFiaFR1b2RhcTlkQk9MQnBNTERIaWZOb3Y0Tm1QUgpISi81dFA2NUl4ekFZTVVlSUxaTXM0NWE2MlFNNnVPK3QySkZnSkJxMVdkRUdLWnE0NEk0QkFGVHZQeDQvSXJOCjFwNWYvNU0xOEpUdzJmVXI2aG5GS1NOSkVpZlRjZkdYTUdRQkFBcW9keGhTSHZGZzlHQmV4K2JrQ25pb0VSb0YKVVNnU0tTMHBsVml5SzhsUkpaUE9FMlU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K" -> null
+            # (2 unchanged attributes hidden)
+
+          - client_certificate_config {
+              - issue_client_certificate = false -> null
+            }
+        }
+
+      - monitoring_config {
+          - enable_components = [
+              - "CADVISOR",
+              - "DAEMONSET",
+              - "DCGM",
+              - "DEPLOYMENT",
+              - "HPA",
+              - "JOBSET",
+              - "KUBELET",
+              - "POD",
+              - "STATEFULSET",
+              - "STORAGE",
+              - "SYSTEM_COMPONENTS",
+            ] -> null
+
+          - advanced_datapath_observability_config {
+              - enable_metrics = false -> null
+              - enable_relay   = false -> null
+            }
+
+          - managed_prometheus {
+              - enabled = true -> null
+            }
+        }
+
+      - network_policy {
+          - enabled  = false -> null
+          - provider = "PROVIDER_UNSPECIFIED" -> null
+        }
+
+      - node_config {
+          - disk_size_gb                = 30 -> null
+          - disk_type                   = "pd-balanced" -> null
+          - effective_taints            = [] -> null
+          - enable_confidential_storage = false -> null
+          - flex_start                  = false -> null
+          - image_type                  = "COS_CONTAINERD" -> null
+          - labels                      = {
+              - "practica" = "p9"
+            } -> null
+          - local_ssd_count             = 0 -> null
+          - logging_variant             = "DEFAULT" -> null
+          - machine_type                = "e2-standard-2" -> null
+          - metadata                    = {
+              - "disable-legacy-endpoints" = "true"
+            } -> null
+          - oauth_scopes                = [
+              - "https://www.googleapis.com/auth/cloud-platform",
+            ] -> null
+          - preemptible                 = false -> null
+          - resource_labels             = {
+              - "goog-gke-node-pool-provisioning-model" = "on-demand"
+            } -> null
+          - resource_manager_tags       = {} -> null
+          - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+          - spot                        = false -> null
+          - storage_pools               = [] -> null
+          - tags                        = [] -> null
+            # (6 unchanged attributes hidden)
+
+          - boot_disk {
+              - disk_type              = "pd-balanced" -> null
+              - provisioned_iops       = 0 -> null
+              - provisioned_throughput = 0 -> null
+              - size_gb                = 30 -> null
+            }
+
+          - kubelet_config {
+              - allowed_unsafe_sysctls                      = [] -> null
+              - container_log_max_files                     = 0 -> null
+              - cpu_cfs_quota                               = false -> null
+              - eviction_max_pod_grace_period_seconds       = 0 -> null
+              - image_gc_high_threshold_percent             = 0 -> null
+              - image_gc_low_threshold_percent              = 0 -> null
+              - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+              - max_parallel_image_pulls                    = 3 -> null
+              - pod_pids_limit                              = 0 -> null
+              - shutdown_grace_period_critical_pods_seconds = 0 -> null
+              - shutdown_grace_period_seconds               = 0 -> null
+              - single_process_oom_kill                     = false -> null
+                # (5 unchanged attributes hidden)
+            }
+
+          - node_image_config {
+              - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+              - image_project = "gke-node-images" -> null
+            }
+
+          - shielded_instance_config {
+              - enable_integrity_monitoring = true -> null
+              - enable_secure_boot          = false -> null
+            }
+
+          - windows_node_config {
+                # (1 unchanged attribute hidden)
+            }
+
+          - workload_metadata_config {
+              - mode = "GKE_METADATA" -> null
+            }
+        }
+
+      - node_creation_config {
+          - node_creation_mode = "VIA_KUBELET" -> null
+        }
+
+      - node_pool {
+          - ignore_node_count_changes   = false -> null
+          - initial_node_count          = 3 -> null
+          - instance_group_urls         = [
+              - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroupManagers/gke-sa-p9-principal-eb18abb5-grp",
+            ] -> null
+          - managed_instance_group_urls = [
+              - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroups/gke-sa-p9-principal-eb18abb5-grp",
+            ] -> null
+          - max_pods_per_node           = 110 -> null
+          - name                        = "principal" -> null
+          - node_count                  = 3 -> null
+          - node_locations              = [
+              - "us-central1-a",
+            ] -> null
+          - version                     = "1.35.8-gke.1036000" -> null
+            # (1 unchanged attribute hidden)
+
+          - management {
+              - auto_repair  = true -> null
+              - auto_upgrade = true -> null
+            }
+
+          - network_config {
+              - create_pod_range            = false -> null
+              - enable_private_nodes        = false -> null
+              - pod_ipv4_cidr_block         = "10.16.0.0/14" -> null
+              - pod_range                   = "gke-sa-p9-pods-6fceda38" -> null
+              - subnetwork                  = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+                # (1 unchanged attribute hidden)
+            }
+
+          - node_config {
+              - disk_size_gb                = 30 -> null
+              - disk_type                   = "pd-balanced" -> null
+              - effective_taints            = [] -> null
+              - enable_confidential_storage = false -> null
+              - flex_start                  = false -> null
+              - image_type                  = "COS_CONTAINERD" -> null
+              - labels                      = {
+                  - "practica" = "p9"
+                } -> null
+              - local_ssd_count             = 0 -> null
+              - logging_variant             = "DEFAULT" -> null
+              - machine_type                = "e2-standard-2" -> null
+              - metadata                    = {
+                  - "disable-legacy-endpoints" = "true"
+                } -> null
+              - oauth_scopes                = [
+                  - "https://www.googleapis.com/auth/cloud-platform",
+                ] -> null
+              - preemptible                 = false -> null
+              - resource_labels             = {
+                  - "goog-gke-node-pool-provisioning-model" = "on-demand"
+                } -> null
+              - resource_manager_tags       = {} -> null
+              - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+              - spot                        = false -> null
+              - storage_pools               = [] -> null
+              - tags                        = [] -> null
+                # (6 unchanged attributes hidden)
+
+              - boot_disk {
+                  - disk_type              = "pd-balanced" -> null
+                  - provisioned_iops       = 0 -> null
+                  - provisioned_throughput = 0 -> null
+                  - size_gb                = 30 -> null
+                }
+
+              - kubelet_config {
+                  - allowed_unsafe_sysctls                      = [] -> null
+                  - container_log_max_files                     = 0 -> null
+                  - cpu_cfs_quota                               = false -> null
+                  - eviction_max_pod_grace_period_seconds       = 0 -> null
+                  - image_gc_high_threshold_percent             = 0 -> null
+                  - image_gc_low_threshold_percent              = 0 -> null
+                  - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+                  - max_parallel_image_pulls                    = 3 -> null
+                  - pod_pids_limit                              = 0 -> null
+                  - shutdown_grace_period_critical_pods_seconds = 0 -> null
+                  - shutdown_grace_period_seconds               = 0 -> null
+                  - single_process_oom_kill                     = false -> null
+                    # (5 unchanged attributes hidden)
+                }
+
+              - node_image_config {
+                  - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+                  - image_project = "gke-node-images" -> null
+                }
+
+              - shielded_instance_config {
+                  - enable_integrity_monitoring = true -> null
+                  - enable_secure_boot          = false -> null
+                }
+
+              - windows_node_config {
+                    # (1 unchanged attribute hidden)
+                }
+
+              - workload_metadata_config {
+                  - mode = "GKE_METADATA" -> null
+                }
+            }
+
+          - upgrade_settings {
+              - max_surge       = 1 -> null
+              - max_unavailable = 0 -> null
+              - strategy        = "SURGE" -> null
+            }
+        }
+
+      - node_pool_auto_config {
+          - resource_manager_tags = {} -> null
+
+          - node_kubelet_config {
+              - insecure_kubelet_readonly_port_enabled = "FALSE" -> null
+            }
+        }
+
+      - node_pool_defaults {
+          - node_config_defaults {
+              - insecure_kubelet_readonly_port_enabled = "FALSE" -> null
+              - logging_variant                        = "DEFAULT" -> null
+            }
+        }
+
+      - notification_config {
+          - pubsub {
+              - enabled = false -> null
+                # (1 unchanged attribute hidden)
+            }
+        }
+
+      - pod_autoscaling {
+          - hpa_profile = "PERFORMANCE" -> null
+        }
+
+      - private_cluster_config {
+          - enable_private_endpoint     = false -> null
+          - enable_private_nodes        = false -> null
+          - private_endpoint            = "10.128.0.11" -> null
+          - public_endpoint             = "35.184.21.89" -> null
+            # (3 unchanged attributes hidden)
+
+          - master_global_access_config {
+              - enabled = false -> null
+            }
+        }
+
+      - rbac_binding_config {
+          - enable_insecure_binding_system_authenticated   = true -> null
+          - enable_insecure_binding_system_unauthenticated = true -> null
+        }
+
+      - release_channel {
+          - channel = "REGULAR" -> null
+        }
+
+      - secret_manager_config {
+          - enabled = false -> null
+        }
+
+      - secret_sync_config {
+          - enabled = false -> null
+        }
+
+      - security_posture_config {
+          - mode               = "BASIC" -> null
+          - vulnerability_mode = "VULNERABILITY_MODE_UNSPECIFIED" -> null
+        }
+
+      - service_external_ips_config {
+          - enabled = false -> null
+        }
+
+      - workload_identity_config {
+          - workload_pool = "sa-p6-202200271.svc.id.goog" -> null
+        }
+    }
+
+  # google_container_node_pool.principal will be destroyed
+  - resource "google_container_node_pool" "principal" {
+      - cluster                     = "sa-p9" -> null
+      - deletion_policy             = "DELETE" -> null
+      - id                          = "projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal" -> null
+      - ignore_node_count_changes   = false -> null
+      - initial_node_count          = 3 -> null
+      - instance_group_urls         = [
+          - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroupManagers/gke-sa-p9-principal-eb18abb5-grp",
+        ] -> null
+      - location                    = "us-central1-a" -> null
+      - managed_instance_group_urls = [
+          - "https://www.googleapis.com/compute/v1/projects/sa-p6-202200271/zones/us-central1-a/instanceGroups/gke-sa-p9-principal-eb18abb5-grp",
+        ] -> null
+      - max_pods_per_node           = 110 -> null
+      - name                        = "principal" -> null
+      - node_count                  = 3 -> null
+      - node_locations              = [
+          - "us-central1-a",
+        ] -> null
+      - project                     = "sa-p6-202200271" -> null
+      - version                     = "1.35.8-gke.1036000" -> null
+        # (1 unchanged attribute hidden)
+
+      - management {
+          - auto_repair  = true -> null
+          - auto_upgrade = true -> null
+        }
+
+      - network_config {
+          - create_pod_range            = false -> null
+          - enable_private_nodes        = false -> null
+          - pod_ipv4_cidr_block         = "10.16.0.0/14" -> null
+          - pod_range                   = "gke-sa-p9-pods-6fceda38" -> null
+          - subnetwork                  = "projects/sa-p6-202200271/regions/us-central1/subnetworks/default" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - node_config {
+          - disk_size_gb                = 30 -> null
+          - disk_type                   = "pd-balanced" -> null
+          - effective_taints            = [] -> null
+          - enable_confidential_storage = false -> null
+          - flex_start                  = false -> null
+          - image_type                  = "COS_CONTAINERD" -> null
+          - labels                      = {
+              - "practica" = "p9"
+            } -> null
+          - local_ssd_count             = 0 -> null
+          - logging_variant             = "DEFAULT" -> null
+          - machine_type                = "e2-standard-2" -> null
+          - metadata                    = {
+              - "disable-legacy-endpoints" = "true"
+            } -> null
+          - oauth_scopes                = [
+              - "https://www.googleapis.com/auth/cloud-platform",
+            ] -> null
+          - preemptible                 = false -> null
+          - resource_labels             = {
+              - "goog-gke-node-pool-provisioning-model" = "on-demand"
+            } -> null
+          - resource_manager_tags       = {} -> null
+          - service_account             = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+          - spot                        = false -> null
+          - storage_pools               = [] -> null
+          - tags                        = [] -> null
+            # (6 unchanged attributes hidden)
+
+          - boot_disk {
+              - disk_type              = "pd-balanced" -> null
+              - provisioned_iops       = 0 -> null
+              - provisioned_throughput = 0 -> null
+              - size_gb                = 30 -> null
+            }
+
+          - kubelet_config {
+              - allowed_unsafe_sysctls                      = [] -> null
+              - container_log_max_files                     = 0 -> null
+              - cpu_cfs_quota                               = false -> null
+              - eviction_max_pod_grace_period_seconds       = 0 -> null
+              - image_gc_high_threshold_percent             = 0 -> null
+              - image_gc_low_threshold_percent              = 0 -> null
+              - insecure_kubelet_readonly_port_enabled      = "FALSE" -> null
+              - max_parallel_image_pulls                    = 3 -> null
+              - pod_pids_limit                              = 0 -> null
+              - shutdown_grace_period_critical_pods_seconds = 0 -> null
+              - shutdown_grace_period_seconds               = 0 -> null
+              - single_process_oom_kill                     = false -> null
+                # (5 unchanged attributes hidden)
+            }
+
+          - node_image_config {
+              - image         = "gke-1358-gke1036000-cos-125-19216-532-123-c-pre" -> null
+              - image_project = "gke-node-images" -> null
+            }
+
+          - shielded_instance_config {
+              - enable_integrity_monitoring = true -> null
+              - enable_secure_boot          = false -> null
+            }
+
+          - windows_node_config {
+                # (1 unchanged attribute hidden)
+            }
+
+          - workload_metadata_config {
+              - mode = "GKE_METADATA" -> null
+            }
+        }
+
+      - upgrade_settings {
+          - max_surge       = 1 -> null
+          - max_unavailable = 0 -> null
+          - strategy        = "SURGE" -> null
+        }
+    }
+
+  # google_service_account.nodos will be destroyed
+  - resource "google_service_account" "nodos" {
+      - account_id      = "nodos-sa-p9" -> null
+      - deletion_policy = "DELETE" -> null
+      - disabled        = false -> null
+      - display_name    = "Nodos del cluster sa-p9" -> null
+      - email           = "nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - id              = "projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - member          = "serviceAccount:nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - name            = "projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com" -> null
+      - project         = "sa-p6-202200271" -> null
+      - unique_id       = "111594469717201283240" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 3 to destroy.
+
+Changes to Outputs:
+  - cluster        = "sa-p9" -> null
+  - consola_argocd = "kubectl -n argocd port-forward svc/argocd-server 8080:80" -> null
+  - credenciales   = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271" -> null
+  - host_gateway   = "136.113.9.71.nip.io" -> null
+  - version_gke    = "1.35.8-gke.1036000" -> null
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: 
+google_container_node_pool.principal: Destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9/nodePools/principal]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 00m10s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 00m20s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 00m30s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 00m40s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 00m50s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m00s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m10s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m20s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m30s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m40s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 01m50s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m00s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m10s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m20s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m30s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m40s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 02m50s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m00s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m10s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m20s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m30s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m40s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 03m50s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 04m00s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 04m10s elapsed]
+google_container_node_pool.principal: Still destroying... [id=projects/sa-p6-202200271/locations/us-c...1-a/clusters/sa-p9/nodePools/principal, 04m20s elapsed]
+google_container_node_pool.principal: Destruction complete after 4m27s
+google_service_account.nodos: Destroying... [id=projects/sa-p6-202200271/serviceAccounts/nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com]
+google_container_cluster.sa_p9: Destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9]
+google_service_account.nodos: Destruction complete after 1s
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 00m10s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 00m20s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 00m30s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 00m40s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 00m50s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m00s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m10s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m20s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m30s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m40s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 01m50s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m00s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m10s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m20s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m30s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m40s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 02m50s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m00s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m10s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m20s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m30s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m40s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 03m50s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 04m00s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 04m10s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 04m20s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 04m30s elapsed]
+google_container_cluster.sa_p9: Still destroying... [id=projects/sa-p6-202200271/locations/us-central1-a/clusters/sa-p9, 04m40s elapsed]
+google_container_cluster.sa_p9: Destruction complete after 4m48s
+
+Destroy complete! Resources: 3 destroyed.

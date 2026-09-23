@@ -46,6 +46,9 @@ resource "google_project_iam_custom_role" "velero" {
     "compute.disks.get",
     "compute.disks.create",
     "compute.disks.createSnapshot",
+    # Al restaurar, Velero crea el disco y le pone etiquetas. Sin este permiso
+    # la restauracion queda PartiallyFailed y el PVC nunca se monta.
+    "compute.disks.setLabels",
     "compute.projects.get",
     "compute.snapshots.get",
     "compute.snapshots.create",
