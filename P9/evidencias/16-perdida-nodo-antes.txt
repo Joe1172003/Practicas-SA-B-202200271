@@ -1,0 +1,120 @@
+Prueba de perdida de nodo - 2026-09-23T00:10:24Z
+
+===== 2026-09-23T00:10:24Z  1. Reparto de Pods por nodo
+postgres-0                                                 gke-sa-p9-principal-eb18abb5-1nz6
+rabbitmq-0                                                 gke-sa-p9-principal-eb18abb5-1nz6
+auth-5c9845bb57-zcj4q                                      gke-sa-p9-principal-eb18abb5-0xth
+auth-5c9845bb57-7vdxm                                      gke-sa-p9-principal-eb18abb5-1nz6
+gateway-fbfff74cb-nkjv5                                    gke-sa-p9-principal-eb18abb5-0xth
+gateway-fbfff74cb-twdc5                                    gke-sa-p9-principal-eb18abb5-1nz6
+ordenes-6fc9fc7947-cd2tw                                   gke-sa-p9-principal-eb18abb5-0xth
+ordenes-6fc9fc7947-2djqm                                   gke-sa-p9-principal-eb18abb5-1nz6
+productos-54d7f48bf9-v99dg                                 gke-sa-p9-principal-eb18abb5-0xth
+productos-54d7f48bf9-522nb                                 gke-sa-p9-principal-eb18abb5-1nz6
+notificaciones-748c57cf6d-85jcg                            gke-sa-p9-principal-eb18abb5-0xth
+7926a482-ade2-4d55-ae55-94705881ea83.humo.1-mkpqb          gke-sa-p9-principal-eb18abb5-1nz6
+17bb5beb-9b0d-47c9-8450-912d12ef3765.carga.1-l4c2v         gke-sa-p9-principal-eb18abb5-1nz6
+3fa83cb9-743e-4906-bd0c-278e3c657562.carga.1-9gpll         gke-sa-p9-principal-eb18abb5-1nz6
+7926a482-ade2-4d55-ae55-94705881ea83.integracion.1-ctwdn   gke-sa-p9-principal-eb18abb5-0xth
+
+  Nodo elegido: gke-sa-p9-principal-eb18abb5-1nz6
+
+===== 2026-09-23T00:10:26Z  2. Arranco el trafico (1 vuelta por segundo)
+
+===== 2026-09-23T00:10:36Z  3. Drenaje del nodo gke-sa-p9-principal-eb18abb5-1nz6
+node/gke-sa-p9-principal-eb18abb5-1nz6 cordoned
+Warning: ignoring DaemonSet-managed Pods: gmp-system/collector-97zzs, kube-system/anetd-txgz6, kube-system/fluentbit-gke-wj8nx, kube-system/gke-metadata-server-jkslb, kube-system/gke-metrics-agent-vzhcs, kube-system/netd-fwlc5, kube-system/node-local-dns-w9ngn, kube-system/pdcsi-node-2zb4h
+evicting pod argo-rollouts/argo-rollouts-84b988c87d-d5bqv
+evicting pod sa-p8/3fa83cb9-743e-4906-bd0c-278e3c657562.carga.1-9gpll
+evicting pod sealed-secrets/sealed-secrets-controller-bd56d9f84-242zj
+evicting pod sa-p8/gateway-fbfff74cb-twdc5
+evicting pod argocd/argocd-redis-b6577584f-mkxm9
+evicting pod argocd/argocd-repo-server-6567754c94-4x6ms
+evicting pod argocd/argocd-server-84594c745b-t2wjt
+evicting pod argocd/argocd-application-controller-0
+evicting pod ingress-nginx/ingress-nginx-controller-54b997b767-nlj4k
+evicting pod sa-p8/7926a482-ade2-4d55-ae55-94705881ea83.humo.1-mkpqb
+evicting pod kube-system/konnectivity-agent-7dc98748bc-k9njw
+evicting pod sa-p8/auth-5c9845bb57-7vdxm
+evicting pod kyverno/kyverno-admission-controller-fc9db5c46-jktz4
+evicting pod kube-system/kube-dns-77f6ddb46f-xnwdv
+evicting pod sa-p8/bitacora-29835366-mqfcm
+evicting pod sa-p8/productos-54d7f48bf9-522nb
+evicting pod sa-p8/17bb5beb-9b0d-47c9-8450-912d12ef3765.carga.1-l4c2v
+evicting pod sa-p8/ordenes-6fc9fc7947-2djqm
+evicting pod sa-p8/bitacora-29835368-t85rq
+evicting pod sa-p8/postgres-0
+evicting pod sa-p8/rabbitmq-0
+evicting pod sa-p8/resumen-29835360-ph2m5
+pod/bitacora-29835368-t85rq evicted
+pod/bitacora-29835366-mqfcm evicted
+pod/3fa83cb9-743e-4906-bd0c-278e3c657562.carga.1-9gpll evicted
+pod/17bb5beb-9b0d-47c9-8450-912d12ef3765.carga.1-l4c2v evicted
+I0922 18:10:40.505211   45640 request.go:752] "Waited before sending request" delay="1.0004587s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/7926a482-ade2-4d55-ae55-94705881ea83.humo.1-mkpqb/eviction"
+pod/7926a482-ade2-4d55-ae55-94705881ea83.humo.1-mkpqb evicted
+pod/sealed-secrets-controller-bd56d9f84-242zj evicted
+pod/resumen-29835360-ph2m5 evicted
+pod/argocd-application-controller-0 evicted
+pod/kyverno-admission-controller-fc9db5c46-jktz4 evicted
+pod/argocd-server-84594c745b-t2wjt evicted
+pod/argocd-repo-server-6567754c94-4x6ms evicted
+pod/argocd-redis-b6577584f-mkxm9 evicted
+pod/argo-rollouts-84b988c87d-d5bqv evicted
+I0922 18:10:50.533329   45640 request.go:752] "Waited before sending request" delay="1.6794077s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/kube-system/pods/kube-dns-77f6ddb46f-xnwdv"
+pod/ingress-nginx-controller-54b997b767-nlj4k evicted
+I0922 18:11:00.533620   45640 request.go:752] "Waited before sending request" delay="1.4584289s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/rabbitmq-0"
+I0922 18:11:10.733323   45640 request.go:752] "Waited before sending request" delay="1.4791081s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/ordenes-6fc9fc7947-2djqm"
+pod/kube-dns-77f6ddb46f-xnwdv evicted
+pod/konnectivity-agent-7dc98748bc-k9njw evicted
+I0922 18:11:20.933631   45640 request.go:752] "Waited before sending request" delay="1.0524571s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/productos-54d7f48bf9-522nb"
+I0922 18:11:31.134526   45640 request.go:752] "Waited before sending request" delay="1.0394048s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/postgres-0"
+pod/postgres-0 evicted
+pod/auth-5c9845bb57-7vdxm evicted
+pod/rabbitmq-0 evicted
+pod/productos-54d7f48bf9-522nb evicted
+pod/ordenes-6fc9fc7947-2djqm evicted
+pod/gateway-fbfff74cb-twdc5 evicted
+node/gke-sa-p9-principal-eb18abb5-1nz6 drained
+
+===== 2026-09-23T00:11:33Z  4. Espero a que los Pods se reacomoden en los otros nodos
+pod/gateway-fbfff74cb-jtrtt condition met
+pod/gateway-fbfff74cb-nkjv5 condition met
+postgres-0                                                 gke-sa-p9-principal-eb18abb5-95zn   false
+rabbitmq-0                                                 gke-sa-p9-principal-eb18abb5-95zn   false
+auth-5c9845bb57-zcj4q                                      gke-sa-p9-principal-eb18abb5-0xth   true
+auth-5c9845bb57-8zl6k                                      gke-sa-p9-principal-eb18abb5-95zn   false
+gateway-fbfff74cb-nkjv5                                    gke-sa-p9-principal-eb18abb5-0xth   true
+gateway-fbfff74cb-jtrtt                                    gke-sa-p9-principal-eb18abb5-95zn   true
+ordenes-6fc9fc7947-cd2tw                                   gke-sa-p9-principal-eb18abb5-0xth   true
+ordenes-6fc9fc7947-njltd                                   gke-sa-p9-principal-eb18abb5-95zn   false
+productos-54d7f48bf9-v99dg                                 gke-sa-p9-principal-eb18abb5-0xth   true
+productos-54d7f48bf9-jktxn                                 gke-sa-p9-principal-eb18abb5-95zn   false
+notificaciones-748c57cf6d-85jcg                            gke-sa-p9-principal-eb18abb5-0xth   true
+7926a482-ade2-4d55-ae55-94705881ea83.integracion.1-ctwdn   gke-sa-p9-principal-eb18abb5-0xth   false
+
+===== 2026-09-23T00:11:44Z  5. Devuelvo el nodo al servicio
+node/gke-sa-p9-principal-eb18abb5-1nz6 uncordoned
+
+===== 2026-09-23T00:11:55Z  6. Resultado del trafico
+  Vueltas totales:            18
+  /health con 200:            15  (fallas: 3)
+  /graphql/productos con 200: 9  (fallas: 9)
+
+  Momentos con alguna falla:
+    2026-09-23T00:10:51Z salud=000 catalogo=000 5.011582s
+    2026-09-23T00:11:02Z salud=000 catalogo=000 5.010319s
+    2026-09-23T00:11:14Z salud=000 catalogo=000 5.005134s
+    2026-09-23T00:11:20Z salud=200 catalogo=000 5.015700s
+    2026-09-23T00:11:27Z salud=200 catalogo=000 5.003607s
+    2026-09-23T00:11:33Z salud=200 catalogo=000 5.005999s
+    2026-09-23T00:11:40Z salud=200 catalogo=000 5.005156s
+    2026-09-23T00:11:47Z salud=200 catalogo=000 5.006340s
+    2026-09-23T00:11:54Z salud=200 catalogo=000 5.010516s
+
+  Vuelta mas lenta: 5.02 s
+
+  Inicio del drenaje:  2026-09-23T00:10:36Z
+  Nodo vaciado:        2026-09-23T00:11:33Z
+  Nodo devuelto:       2026-09-23T00:11:45Z
+
+  Registro completo: peticiones-20260923-001024.txt

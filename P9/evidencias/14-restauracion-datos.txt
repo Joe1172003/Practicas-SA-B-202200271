@@ -1,0 +1,86 @@
+Prueba de restauracion de datos - 2026-09-22T22:48:08Z
+Respaldo: prueba-dr-20260922-224808   Namespace: sa-p8   Namespace temporal: sa-p8-restaurado
+
+===== 2026-09-22T22:48:08Z  1. Estado inicial del catalogo
+  productos: 3
+  - Celular Samsung A54 | Q2300.50
+  - Laptop Lenovo ThinkPad | Q8500.00
+  - Mouse Logitech M170 | Q120.00
+
+===== 2026-09-22T22:48:10Z  2. Escribo un producto que SI tiene que sobrevivir (entra antes del respaldo)
+  productos ahora: 4
+
+===== 2026-09-22T22:48:13Z  3. Respaldo con Velero, con los discos incluidos
+Backup request "prueba-dr-20260922-224808" submitted successfully.
+Waiting for backup to complete. You may safely press ctrl-c to stop waiting - your backup will continue in the background.
+.........
+Backup completed with status: Completed. You may check for more information using the commands `velero backup describe prueba-dr-20260922-224808` and `velero backup logs prueba-dr-20260922-224808`.
+  Phase:  [32mCompleted[0m
+  Started:    2026-09-22 16:48:14 -0600 CST
+  Completed:  2026-09-22 16:48:23 -0600 CST
+  Items backed up:              469
+
+===== 2026-09-22T22:48:26Z  4. Escribo un producto DESPUES del respaldo (este se pierde: es el RPO)
+  productos antes del desastre: 5
+
+===== 2026-09-22T22:48:28Z  5. Espero a que los snapshots queden READY en GCP
+  esperando 2 snapshot(s)...
+  esperando 2 snapshot(s)...
+  esperando 2 snapshot(s)...
+  esperando 1 snapshot(s)...
+  todos los snapshots estan READY
+
+===== 2026-09-22T22:49:25Z  6. Desastre: borro TODOS los productos
+  quedan: 0 productos
+
+===== 2026-09-22T22:49:27Z  7. Restauro el postgres del respaldo en sa-p8-restaurado
+Restore request "restaurar-20260922-224808" submitted successfully.
+Waiting for restore to complete. You may safely press ctrl-c to stop waiting - your restore will continue in the background.
+...
+Restore completed with status: Completed. You may check for more information using the commands `velero restore describe restaurar-20260922-224808` and `velero restore logs restaurar-20260922-224808`.
+  Phase:                       [32mCompleted[0m
+  Started:    2026-09-22 16:49:27 -0600 CST
+  Completed:  2026-09-22 16:49:32 -0600 CST
+
+===== 2026-09-22T22:49:33Z  8. Copio el Secret de postgres al namespace temporal
+
+===== 2026-09-22T22:49:37Z  9. Espero a que el postgres restaurado levante
+pod/postgres-0 condition met
+
+===== 2026-09-22T22:50:20Z  10. Verifico el CONTENIDO restaurado, no solo que el disco exista
+  productos en el respaldo: 4
+  - ANTES DEL RESPALDO 20260922-224808 | Q111.11
+  - Celular Samsung A54 | Q2300.50
+  - Laptop Lenovo ThinkPad | Q8500.00
+  - Mouse Logitech M170 | Q120.00
+
+===== 2026-09-22T22:50:22Z  11. Devuelvo los datos a produccion
+
+===== 2026-09-22T22:50:24Z  12. Estado final de produccion
+  productos: 4
+  - ANTES DEL RESPALDO 20260922-224808 | Q111.11
+  - Celular Samsung A54 | Q2300.50
+  - Laptop Lenovo ThinkPad | Q8500.00
+  - Mouse Logitech M170 | Q120.00
+
+===== 2026-09-22T22:50:26Z  13. Limpio el namespace temporal y su disco
+
+===== Resumen
+  Respaldo tomado:            2026-09-22T22:48:13Z
+  Dato escrito despues:       2026-09-22T22:48:26Z
+  Desastre (borrado):         2026-09-22T22:49:25Z
+  Inicio de la recuperacion:  2026-09-22T22:49:27Z
+  Fin de la recuperacion:     2026-09-22T22:50:24Z
+
+  RPO medido: se pierde lo escrito entre el respaldo y el desastre.
+              En esta prueba, el producto 'DESPUES DEL RESPALDO 20260922-224808'.
+  RTO de datos: del inicio al fin de la recuperacion.
+
+===== Analisis
+  Respaldo a las 22:48:13Z, dato nuevo a las 22:48:26Z, desastre a las 22:49:25Z.
+  RPO medido: 59 segundos de escrituras perdidas (el producto 'DESPUES DEL RESPALDO').
+  Con el calendario de cada 3 horas, el peor caso seria de 3 horas.
+  RTO de datos medido: 57 segundos (22:49:27Z a 22:50:24Z).
+
+  El respaldo devolvio 4 productos con su contenido real (nombre y precio),
+  no un disco vacio.

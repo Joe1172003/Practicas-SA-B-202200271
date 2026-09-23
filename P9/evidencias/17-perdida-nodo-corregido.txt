@@ -1,0 +1,128 @@
+Prueba de perdida de nodo - 2026-09-23T00:20:50Z
+
+===== 2026-09-23T00:20:50Z  1. Reparto de Pods por nodo
+postgres-0                                                 gke-sa-p9-principal-eb18abb5-95zn
+rabbitmq-0                                                 gke-sa-p9-principal-eb18abb5-95zn
+auth-5c9845bb57-zcj4q                                      gke-sa-p9-principal-eb18abb5-0xth
+auth-5c9845bb57-8zl6k                                      gke-sa-p9-principal-eb18abb5-95zn
+gateway-fbfff74cb-nkjv5                                    gke-sa-p9-principal-eb18abb5-0xth
+gateway-fbfff74cb-jtrtt                                    gke-sa-p9-principal-eb18abb5-95zn
+ordenes-6fc9fc7947-cd2tw                                   gke-sa-p9-principal-eb18abb5-0xth
+ordenes-6fc9fc7947-njltd                                   gke-sa-p9-principal-eb18abb5-95zn
+productos-54d7f48bf9-v99dg                                 gke-sa-p9-principal-eb18abb5-0xth
+productos-54d7f48bf9-jktxn                                 gke-sa-p9-principal-eb18abb5-95zn
+notificaciones-748c57cf6d-85jcg                            gke-sa-p9-principal-eb18abb5-0xth
+7926a482-ade2-4d55-ae55-94705881ea83.integracion.1-ctwdn   gke-sa-p9-principal-eb18abb5-0xth
+
+  Nodo elegido: gke-sa-p9-principal-eb18abb5-95zn
+
+===== 2026-09-23T00:20:52Z  2. Arranco el trafico (1 vuelta por segundo)
+
+===== 2026-09-23T00:21:02Z  3. Drenaje del nodo gke-sa-p9-principal-eb18abb5-95zn
+node/gke-sa-p9-principal-eb18abb5-95zn cordoned
+Warning: ignoring DaemonSet-managed Pods: gmp-system/collector-277p8, kube-system/anetd-9q6z7, kube-system/fluentbit-gke-6wdkd, kube-system/gke-metadata-server-qc84h, kube-system/gke-metrics-agent-dqh96, kube-system/netd-jq6pg, kube-system/node-local-dns-4rv5p, kube-system/pdcsi-node-jdcdm
+evicting pod argocd/argocd-application-controller-0
+evicting pod kube-system/konnectivity-agent-7dc98748bc-4bv67
+evicting pod sa-p8/productos-54d7f48bf9-jktxn
+evicting pod sa-p8/rabbitmq-0
+evicting pod kyverno/kyverno-admission-controller-fc9db5c46-5v2lb
+evicting pod sa-p8/resumen-29835370-ft7t9
+evicting pod sa-p8/ordenes-6fc9fc7947-njltd
+evicting pod kube-system/kube-dns-77f6ddb46f-ftbb8
+evicting pod sealed-secrets/sealed-secrets-controller-bd56d9f84-g7vns
+evicting pod sa-p8/auth-5c9845bb57-8zl6k
+evicting pod sa-p8/gateway-fbfff74cb-jtrtt
+evicting pod sa-p8/postgres-0
+evicting pod argocd/argocd-repo-server-6567754c94-5hjbh
+evicting pod argo-rollouts/argo-rollouts-84b988c87d-ffpq9
+evicting pod argocd/argocd-server-84594c745b-98lck
+evicting pod argocd/argocd-redis-b6577584f-dbcjb
+I0922 18:21:07.219967   19348 request.go:752] "Waited before sending request" delay="1.0006412s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://35.184.21.89/api/v1/namespaces/argocd/pods/argocd-redis-b6577584f-dbcjb/eviction"
+pod/resumen-29835370-ft7t9 evicted
+pod/kyverno-admission-controller-fc9db5c46-5v2lb evicted
+pod/argocd-repo-server-6567754c94-5hjbh evicted
+pod/argo-rollouts-84b988c87d-ffpq9 evicted
+pod/argocd-redis-b6577584f-dbcjb evicted
+pod/argocd-server-84594c745b-98lck evicted
+pod/sealed-secrets-controller-bd56d9f84-g7vns evicted
+pod/argocd-application-controller-0 evicted
+I0922 18:21:17.277086   19348 request.go:752] "Waited before sending request" delay="1.4287143s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/kube-system/pods/kube-dns-77f6ddb46f-ftbb8"
+I0922 18:21:27.476778   19348 request.go:752] "Waited before sending request" delay="1.4605323s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/productos-54d7f48bf9-jktxn"
+I0922 18:21:37.677123   19348 request.go:752] "Waited before sending request" delay="1.4573921s" reason="client-side throttling, not priority and fairness" verb="GET" URL="https://35.184.21.89/api/v1/namespaces/sa-p8/pods/postgres-0"
+pod/konnectivity-agent-7dc98748bc-4bv67 evicted
+pod/kube-dns-77f6ddb46f-ftbb8 evicted
+pod/productos-54d7f48bf9-jktxn evicted
+pod/gateway-fbfff74cb-jtrtt evicted
+pod/postgres-0 evicted
+pod/ordenes-6fc9fc7947-njltd evicted
+pod/rabbitmq-0 evicted
+pod/auth-5c9845bb57-8zl6k evicted
+node/gke-sa-p9-principal-eb18abb5-95zn drained
+
+===== 2026-09-23T00:21:47Z  4. Espero a que los Pods se reacomoden en los otros nodos
+pod/gateway-fbfff74cb-nkjv5 condition met
+pod/gateway-fbfff74cb-x2ttg condition met
+postgres-0                                                 gke-sa-p9-principal-eb18abb5-1nz6   false
+rabbitmq-0                                                 gke-sa-p9-principal-eb18abb5-1nz6   false
+auth-5c9845bb57-zcj4q                                      gke-sa-p9-principal-eb18abb5-0xth   true
+auth-5c9845bb57-drjnn                                      gke-sa-p9-principal-eb18abb5-1nz6   false
+gateway-fbfff74cb-nkjv5                                    gke-sa-p9-principal-eb18abb5-0xth   true
+gateway-fbfff74cb-x2ttg                                    gke-sa-p9-principal-eb18abb5-1nz6   true
+ordenes-6fc9fc7947-cd2tw                                   gke-sa-p9-principal-eb18abb5-0xth   true
+ordenes-6fc9fc7947-w8zpp                                   gke-sa-p9-principal-eb18abb5-1nz6   false
+productos-54d7f48bf9-v99dg                                 gke-sa-p9-principal-eb18abb5-0xth   true
+productos-54d7f48bf9-w6vkr                                 gke-sa-p9-principal-eb18abb5-1nz6   false
+notificaciones-748c57cf6d-85jcg                            gke-sa-p9-principal-eb18abb5-0xth   true
+7926a482-ade2-4d55-ae55-94705881ea83.integracion.1-ctwdn   gke-sa-p9-principal-eb18abb5-0xth   false
+
+===== 2026-09-23T00:21:49Z  5. Devuelvo el nodo al servicio
+node/gke-sa-p9-principal-eb18abb5-95zn uncordoned
+
+===== 2026-09-23T00:22:00Z  6. Resultado del trafico
+  Vueltas totales:            17
+  /health con 200:            17  (fallas: 0)
+  /graphql/productos con 200: 9  (fallas: 8)
+
+  Momentos con alguna falla:
+    2026-09-23T00:21:14Z salud=200 catalogo=000 5.009126s
+    2026-09-23T00:21:20Z salud=200 catalogo=000 5.014758s
+    2026-09-23T00:21:27Z salud=200 catalogo=000 5.012035s
+    2026-09-23T00:21:33Z salud=200 catalogo=000 5.012847s
+    2026-09-23T00:21:40Z salud=200 catalogo=000 5.000941s
+    2026-09-23T00:21:46Z salud=200 catalogo=000 5.014604s
+    2026-09-23T00:21:53Z salud=200 catalogo=000 5.001825s
+    2026-09-23T00:21:59Z salud=200 catalogo=000 5.002038s
+
+  Vuelta mas lenta: 5.01 s
+
+  Inicio del drenaje:  2026-09-23T00:21:02Z
+  Nodo vaciado:        2026-09-23T00:21:47Z
+  Nodo devuelto:       2026-09-23T00:21:50Z
+
+  Registro completo: peticiones-20260923-002050.txt
+
+===== Analisis de la prueba
+
+Comparacion con la corrida anterior (evidencia 16), antes de darle 2 replicas al ingress:
+
+                          antes      despues
+  /health con 200         15 de 18   17 de 17
+  catalogo con 200         9 de 18    9 de 17
+
+Que cambio: en la primera corrida el ingress-nginx tenia una sola replica y vivia
+en el nodo drenado. Mientras se movia, la puerta de entrada no existia y hasta
+/health daba timeout, aunque los 3 Pods del gateway seguian vivos en otros nodos.
+Con 2 replicas, PodDisruptionBudget y anti-afinidad, el drenaje ya no corta la
+entrada: 17 de 17 peticiones respondieron 200.
+
+Lo que sigue cortandose: el catalogo, porque postgres tiene una sola replica y su
+disco. Al drenar hay que apagarlo, soltar el disco, engancharlo en otro nodo y
+arrancarlo. En esta corrida:
+  nodo drenado a las         00:21:02Z
+  postgres arranco de nuevo  00:21:46Z
+  catalogo volvio a las      00:22:13Z
+  corte del catalogo         1 minuto 11 segundos
+
+Es un punto unico de fallo conocido y asumido: resolverlo pide una base replicada
+(primario y replica con failover), que es un trabajo aparte. El gateway y los demas
+servicios, con 2 replicas y anti-afinidad, siguieron respondiendo todo el tiempo.

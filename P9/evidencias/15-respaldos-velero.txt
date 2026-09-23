@@ -1,0 +1,61 @@
+Respaldos de Velero - 2026-09-22T22:50:44Z
+
+$ kubectl -n velero get schedule
+NOMBRE                CALENDARIO    RETENCION   NAMESPACES   VOLUMENES   ESTADO
+velero-cada-3-horas   0 */3 * * *   72h         [sa-p8]      true        Enabled
+
+$ velero backup get
+NAME                        STATUS      ERRORS   WARNINGS   CREATED                         EXPIRES   STORAGE LOCATION   QUEUE POSITION   SELECTOR
+manual-20260922-2232        Completed   0        2          2026-09-22 16:32:23 -0600 CST   2d        default                             <none>
+prueba-dr-20260922-223403   Completed   0        2          2026-09-22 16:34:08 -0600 CST   2d        default                             <none>
+prueba-dr-20260922-224808   Completed   0        2          2026-09-22 16:48:14 -0600 CST   2d        default                             <none>
+
+$ velero backup describe (el ultimo, resumido)
+  Name:         [1mmanual-20260922-2232[22m
+  Namespace:    velero
+  Phase:  [32mCompleted[0m
+  Namespaces:
+  Started:    2026-09-22 16:32:23 -0600 CST
+  Completed:  2026-09-22 16:32:35 -0600 CST
+  Items backed up:              461
+      - sa-p8/data-rabbitmq-0
+      - sa-p8/datos-postgres-0
+    Velero-Native Snapshots:
+        Snapshot ID:        pvc-2409da74-66e4-40eb-b45-d11e3fe0-9e30-415d-8942-8d2003f42da6
+        Snapshot ID:        pvc-dc88c3eb-d9bc-4b22-8f5-30546d1f-1842-474d-8ca7-33caf7811a97
+  Name:         [1mprueba-dr-20260922-223403[22m
+  Namespace:    velero
+  Phase:  [32mCompleted[0m
+  Namespaces:
+  Started:    2026-09-22 16:34:08 -0600 CST
+  Completed:  2026-09-22 16:34:19 -0600 CST
+  Items backed up:              469
+      - sa-p8/data-rabbitmq-0
+      - sa-p8/datos-postgres-0
+    Velero-Native Snapshots:
+        Snapshot ID:        pvc-2409da74-66e4-40eb-b45-30d21e14-ae74-4acb-8276-7daac80cfbe8
+        Snapshot ID:        pvc-dc88c3eb-d9bc-4b22-8f5-4d993115-0db2-4ee3-b746-e73e00f5085b
+  Name:         [1mprueba-dr-20260922-224808[22m
+  Namespace:    velero
+  Phase:  [32mCompleted[0m
+  Namespaces:
+  Started:    2026-09-22 16:48:14 -0600 CST
+  Completed:  2026-09-22 16:48:23 -0600 CST
+  Items backed up:              469
+      - sa-p8/data-rabbitmq-0
+      - sa-p8/datos-postgres-0
+    Velero-Native Snapshots:
+        Snapshot ID:        pvc-2409da74-66e4-40eb-b45-add564a6-7250-40e3-b1d5-fd17041b9512
+        Snapshot ID:        pvc-dc88c3eb-d9bc-4b22-8f5-b2505c4d-072a-463b-8f53-160877a4a1dc
+
+$ gcloud compute snapshots list
+NAME                                                             DISK_SIZE_GB  STATUS  CREATION_TIMESTAMP
+pvc-2409da74-66e4-40eb-b45-30d21e14-ae74-4acb-8276-7daac80cfbe8  1             READY   2026-09-22 15:34
+pvc-2409da74-66e4-40eb-b45-add564a6-7250-40e3-b1d5-fd17041b9512  1             READY   2026-09-22 15:48
+pvc-2409da74-66e4-40eb-b45-d11e3fe0-9e30-415d-8942-8d2003f42da6  1             READY   2026-09-22 15:32
+pvc-dc88c3eb-d9bc-4b22-8f5-30546d1f-1842-474d-8ca7-33caf7811a97  1             READY   2026-09-22 15:32
+pvc-dc88c3eb-d9bc-4b22-8f5-4d993115-0db2-4ee3-b746-e73e00f5085b  1             READY   2026-09-22 15:34
+pvc-dc88c3eb-d9bc-4b22-8f5-b2505c4d-072a-463b-8f53-160877a4a1dc  1             READY   2026-09-22 15:48
+
+$ gcloud storage du -s gs://sa-p9-velero-202200271
+575958       gs://sa-p9-velero-202200271
