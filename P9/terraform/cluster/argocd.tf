@@ -164,6 +164,14 @@ resource "helm_release" "argocd_apps" {
           server    = local.cluster_local
           namespace = "argocd"
         }
+        # ArgoCD le agrega finalizers propios a las apps cuyo chart trae tareas
+        # de limpieza, como Kyverno. En Git no estan escritos, asi que la raiz
+        # veia una diferencia imposible de cerrar y quedaba OutOfSync.
+        ignoreDifferences = [{
+          group        = "argoproj.io"
+          kind         = "Application"
+          jsonPointers = ["/metadata/finalizers"]
+        }]
         syncPolicy = {
           automated = { prune = true, selfHeal = true }
         }
