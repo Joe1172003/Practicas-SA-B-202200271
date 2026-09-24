@@ -156,8 +156,8 @@ RTO medido:     27 minutos (03:02:52 a 03:29:53)
 RPO declarado:  3 horas (respaldo cada 3 horas)
 RPO medido:     el producto "PERDIDO EN EL SIMULACRO", escrito despues del
                 respaldo, no volvio. Todo lo anterior si. La ventana real de
-                perdida fue de unos 7 minutos, que es lo que paso entre el
-                respaldo y la destruccion.
+                perdida fue de 30 minutos, del respaldo (01:48) a la destruccion
+                (02:18). En esa ventana solo se escribio ese producto.
 
 Entre el primer intento y el segundo pasaron 43 minutos mas, que no cuento en
 el RTO porque la causa fue mi conexion a internet, no el sistema. Igual queda
