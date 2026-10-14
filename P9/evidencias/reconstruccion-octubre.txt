@@ -1,0 +1,34 @@
+  proyecto sa-p6-202200271, cluster sa-p9, zona us-central1-a
+
+===== 2026-10-14T20:32:01Z  1. Herramientas
+  todo presente
+
+===== 2026-10-14T20:32:03Z  2. Bucket del estado de Terraform
+El bucket gs://sa-p9-tfstate-202200271 ya existe. No hago nada.
+
+===== 2026-10-14T20:32:07Z  3. Capa permanente (respaldos, IP fija, cuenta de Velero, llave)
+host_gateway = "136.113.9.71.nip.io"
+ip_ingress = "136.113.9.71"
+secreto_llave = "sa-p9-sealed-secrets-llave"
+
+===== 2026-10-14T20:32:20Z  4. Cluster, nodos y ArgoCD
+cluster = "sa-p9"
+credenciales = "gcloud container clusters get-credentials sa-p9 --zone us-central1-a --project sa-p6-202200271"
+version_gke = "1.36.4-gke.1391002"
+update'): open
+C:\Users\SERGIO~1\AppData\Local\Temp\helm\repository\bitnami-index.yaml: The
+system cannot find the file specified.
+
+===== 2026-10-14T20:44:31Z  5. Credenciales de kubectl
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for sa-p9.
+gke-sa-p9-principal-feef8e99-3f5p   Ready
+gke-sa-p9-principal-feef8e99-jrdn   Ready
+gke-sa-p9-principal-feef8e99-tjsc   Ready
+
+===== 2026-10-14T20:44:44Z  6. ArgoCD despliega la plataforma
+  esperando a que las 15 apps queden Synced y Healthy (hasta 20 minutos)
+error: the server doesn't have a resource type "app"
+  AVISO: solo 0 apps sanas, sigo igual
+
+===== 2026-10-14T21:04:58Z  7. Datos desde el ultimo respaldo de Velero
