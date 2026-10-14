@@ -1,0 +1,51 @@
+Fase 0 - capacidad del cluster antes de montar la observabilidad - 14/10/2026
+
+Lo medi recien reconstruido el cluster sa-p9, con las 15 apps sanas y antes de
+instalar nada de la P10. La idea era saber si el stack cabe sin agregar nodos.
+
+
+NODOS (3 x e2-standard-2)
+  allocatable por nodo   1930m de CPU, 5.9 GiB de memoria
+  total                  5.79 CPU, 17.6 GiB
+
+  $ kubectl describe nodes | grep -A8 "Allocated resources"
+  nodo 3f5p   cpu 939m (48%)   memoria 2.40 GiB (40%)
+  nodo jrdn   cpu 844m (43%)   memoria 2.57 GiB (43%)
+  nodo tjsc   cpu 851m (44%)   memoria 1.58 GiB (26%)
+
+
+REQUESTS POR NAMESPACE
+  kube-system      1.88 CPU   3630 Mi   (lo pone GKE, no lo controlo)
+  sa-p8            0.23       1504 Mi
+  argocd           0.11        512 Mi
+  gke-managed-cim  0.11        130 Mi
+  ingress-nginx    0.10        256 Mi
+  kyverno          0.08        192 Mi
+  velero           0.05        128 Mi
+  argo-rollouts    0.03         64 Mi
+  sealed-secrets   0.03         64 Mi
+  gmp-system       0.02        124 Mi
+  TOTAL            2.62 CPU   6.4 GiB   (45% del CPU, 37% de la memoria)
+
+
+CUOTAS DE GCP EN us-central1
+  CPUS              6 de 32
+  E2_CPUS           limite 8
+  IN_USE_ADDRESSES  3 de 4
+  SSD_TOTAL_GB      92 de 250
+
+  Con 3 de 4 direcciones en uso, un cuarto nodo es arriesgado. El stack tiene
+  que entrar en los 3 nodos que ya hay.
+
+
+CUENTA PARA EL STACK
+  Presupuesto que me pongo: 1 CPU y 3 GiB de requests para todo
+  (Prometheus, Alertmanager, Grafana, Loki, Tempo y el Collector).
+
+  Con los 3 nodos:      3.62 de 5.79 CPU    = 63%
+  Si se cae un nodo:    3.62 de 3.86 CPU    = 94%   entra, pero justo
+  Memoria con 2 nodos:  9.4 de 11.8 GiB     = 80%
+
+  La prueba de perdida de nodo de la P9 tiene que seguir pasando, asi que ese
+  94% es mi techo. Si algun componente pide mas, le bajo los requests o lo
+  dejo en una sola replica.

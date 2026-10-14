@@ -12,7 +12,8 @@ ZONA="${ZONA:-us-central1-a}"
 CLUSTER="${CLUSTER:-sa-p9}"
 NS="${NS:-sa-p8}"
 NS_TEMP="sa-p8-restaurado"
-APPS_ESPERADAS="${APPS_ESPERADAS:-15}"
+# 15 de la P9 mas las 4 de observabilidad de la P10.
+APPS_ESPERADAS="${APPS_ESPERADAS:-19}"
 RESTAURAR_DATOS=true
 [ "${1:-}" = "--sin-datos" ] && RESTAURAR_DATOS=false
 
