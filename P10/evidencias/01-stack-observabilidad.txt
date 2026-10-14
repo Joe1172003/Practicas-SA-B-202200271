@@ -84,3 +84,21 @@ LO QUE SALIO MAL
   PrometheusRule), y eso no lo quiero en manos de un prune automatico.
 
   Con esto el cluster queda en 20 apps y reconstruir.sh espera 20.
+
+  23:00  Al aplicar ese cambio (PR #18 del repo GitOps) la raiz se quedo en
+         "Running" y la app prometheus-crds no aparecia. El que fallaba era
+         ArgoCD mismo:
+           argocd-application-controller-0   CrashLoopBackOff
+           lastState: OOMKilled, exit 137, limite 768Mi
+
+         El controlador guarda en memoria cada objeto que maneja. Con el stack
+         de observabilidad son muchos mas, y los CRDs de Prometheus pesan varios
+         MB cada uno. Al adoptarlos se paso del limite.
+
+  23:13  Subi la memoria en P9/terraform/cluster/argocd.tf (requests 256Mi a
+         512Mi, limite 768Mi a 1536Mi) y lo aplique. El plan solo tocaba
+         helm_release.argocd.
+
+  23:17  20 de 20 apps Synced y Healthy. El controlador quedo usando 828Mi,
+         mas que el limite viejo. Los 10 CRDs llevan Prune=false y Prometheus
+         siguio corriendo sin reiniciarse.

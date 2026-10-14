@@ -1,0 +1,48 @@
+La cadena de suministro sigue frenando versiones vulnerables - 14/10/2026
+
+El enunciado pide que GitOps, las politicas y la cadena de suministro sigan
+operando sin degradarse. Esto lo comprobe sin buscarlo.
+
+
+QUE PASO
+  Abri el PR de p10-bases (solo evidencias y el script de bootstrap, nada de
+  codigo de los servicios). El workflow p8-gitops.yml fallo en 4 de 7 imagenes:
+
+    Imagen p4-auth        Puerta de Trivy (bloquea si hay CVE criticas)  FALLO
+    Imagen p4-gateway     Puerta de Trivy                                FALLO
+    Imagen p4-ordenes     Puerta de Trivy                                FALLO
+    Imagen p4-productos   Puerta de Trivy                                FALLO
+    p4-notificaciones, p5-cron-bitacora, p5-cron-resumen                 OK
+    Puerta de calidad                                                    FALLO
+    PR al repo GitOps                                                    no corrio
+
+  No toque codigo: lo que cambio fue el mundo. Desde la v2.2.1 se publico una
+  CVE critica en una dependencia que yo no instale directamente.
+
+
+LA CAUSA
+  $ trivy image --image-src remote --severity CRITICAL ghcr.io/joe1172003/p4-gateway:2.2.1
+    proxy-addr 2.0.7 -> 2.0.8  CVE-2026-90711
+    "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6"
+    app/node_modules/proxy-addr/package.json
+
+  Lo mismo en auth, ordenes y productos. proxy-addr lo trae express 5.2.1, que
+  a su vez viene con @nestjs/platform-express. Las imagenes de Python no lo
+  tienen y por eso pasaron.
+
+
+EL ARREGLO
+  express pide proxy-addr ^2.0.7, asi que la 2.0.8 entra en su rango. Bastaba
+  con actualizar el lockfile, sin tocar package.json:
+
+  $ npm update proxy-addr --package-lock-only     (en los 4 servicios)
+
+  Antes de subirlo lo verifique con Trivy en local:
+    gateway, auth, ordenes, productos (package-lock.json)   CRITICAL: ninguna
+    node:22-alpine (imagen base actual)                     CRITICAL: ninguna
+
+
+POR QUE LO ANOTO
+  Nadie me aviso de esta CVE. La puerta la encontro sola, en un PR que no tenia
+  nada que ver con dependencias, y no dejo salir ninguna imagen. Si no existiera
+  esa puerta, la v2.4.0 de la P10 habria llegado al cluster con la CVE adentro.
