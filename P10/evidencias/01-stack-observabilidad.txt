@@ -1,0 +1,104 @@
+Fase 1 - stack de observabilidad por GitOps - 14/10/2026 (horas en UTC)
+
+Agregue 4 apps en sa-p8-gitops/apps/observabilidad (PR #17 del repo GitOps) y
+active /metrics en ingress-nginx. Nada se instalo a mano: la app raiz las
+encontro sola porque lee apps/ de forma recursiva.
+
+
+APPS
+  $ kubectl -n argocd get app
+  19 de 19 Synced y Healthy (las 15 de la P9 mas kube-prometheus-stack, loki,
+  tempo y otel-collector)
+
+
+PODS EN observabilidad
+  alertmanager-kps-alertmanager-0      2/2 Running
+  grafana                              3/3 Running
+  kps-kube-state-metrics               1/1 Running
+  kps-operator                         1/1 Running
+  kps-prometheus-node-exporter x3      1/1 Running
+  prometheus-kps-prometheus-0          2/2 Running
+  loki-0                               1/1 Running
+  tempo-0                              1/1 Running
+  otel-collector-agent x3              1/1 Running   (uno por nodo)
+
+
+TARGETS DE PROMETHEUS (29, todos up)
+  up x3  podMonitor otel-collector-agent
+  up x2  serviceMonitor ingress-nginx
+  up x9  serviceMonitor kps-kubelet (kubelet, cAdvisor y probes de 3 nodos)
+  up x3  serviceMonitor kps-prometheus-node-exporter
+  up x1  kps-apiserver, kps-kube-state-metrics, kps-operator, grafana
+  up x2  kps-alertmanager, kps-prometheus
+
+  Las metricas del ingress ya estan: sum by (ingress,status)(nginx_ingress_controller_requests)
+  devolvio gateway 200 y grafana 200 despues de unas peticiones a /health.
+
+
+DATASOURCES DE GRAFANA (por http://grafana.136.113.9.71.nip.io/api/datasources/uid/<uid>/health)
+  prometheus  OK  "Successfully queried the Prometheus API."
+  loki        OK  "Data source successfully connected."
+  tempo       OK  "Data source is working"
+
+
+LOGS EN LOKI
+  service_name con logs en los ultimos 10 minutos:
+    resumen 321, ingress-nginx 16, notificaciones 5, bitacora 4, postgres 4, rabbitmq 3
+
+  gateway, auth, ordenes y productos todavia no aparecen. No es un error: hoy
+  solo escriben al arrancar y el Collector lee desde el final del archivo. Los
+  logs por peticion, en JSON y con trace_id, llegan en la Fase 3.
+
+  Etiquetas que arma Loki a partir de lo que manda el Collector:
+    service_name, k8s_namespace_name, k8s_pod_name, k8s_container_name,
+    k8s_deployment_name, k8s_replicaset_name, k8s_statefulset_name
+
+
+LO QUE SALIO MAL
+  22:27  kube-prometheus-stack se quedo en Progressing y no aparecia el Pod de
+         Prometheus. El objeto Prometheus no tenia ni status.
+
+         En el log del operador:
+           resource "prometheuses" (group: "monitoring.coreos.com/v1") not installed in the cluster
+
+         El CRD se creo a las 22:26:46 y el operador arranco a las 22:27:07,
+         pero cuando consulto la API (22:27:13) todavia no lo veia. El operador
+         solo revisa eso al arrancar: decidio que no habia Prometheus que
+         manejar y no volvio a mirar.
+
+  22:35  Lo resolvi reiniciando el operador:
+           kubectl -n observabilidad rollout restart deploy/kps-operator
+         A los 30 segundos el Pod de Prometheus estaba 2/2 y la app Healthy.
+
+  Es una carrera entre el CRD y el operador. En una reconstruccion desde cero
+  puede repetirse, asi que no lo doy por cerrado con el reinicio.
+
+  Arreglo de fondo: saque los CRDs de kube-prometheus-stack (crds.enabled:
+  false) y los instalo con su propia app, prometheus-crds (chart
+  prometheus-operator-crds 32.0.1, misma version v0.94.1 del operador), en la
+  ola -2. Cuando el operador arranca en la ola -1, los tipos ya llevan una ola
+  entera publicados.
+
+  Cada CRD lleva argocd.argoproj.io/sync-options: Prune=false. Borrar un CRD
+  borra todos los objetos de ese tipo (Prometheus, Alertmanager, mis
+  PrometheusRule), y eso no lo quiero en manos de un prune automatico.
+
+  Con esto el cluster queda en 20 apps y reconstruir.sh espera 20.
+
+  23:00  Al aplicar ese cambio (PR #18 del repo GitOps) la raiz se quedo en
+         "Running" y la app prometheus-crds no aparecia. El que fallaba era
+         ArgoCD mismo:
+           argocd-application-controller-0   CrashLoopBackOff
+           lastState: OOMKilled, exit 137, limite 768Mi
+
+         El controlador guarda en memoria cada objeto que maneja. Con el stack
+         de observabilidad son muchos mas, y los CRDs de Prometheus pesan varios
+         MB cada uno. Al adoptarlos se paso del limite.
+
+  23:13  Subi la memoria en P9/terraform/cluster/argocd.tf (requests 256Mi a
+         512Mi, limite 768Mi a 1536Mi) y lo aplique. El plan solo tocaba
+         helm_release.argocd.
+
+  23:17  20 de 20 apps Synced y Healthy. El controlador quedo usando 828Mi,
+         mas que el limite viejo. Los 10 CRDs llevan Prune=false y Prometheus
+         siguio corriendo sin reiniciarse.

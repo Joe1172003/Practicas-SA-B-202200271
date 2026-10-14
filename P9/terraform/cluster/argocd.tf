@@ -34,10 +34,13 @@ resource "helm_release" "argocd" {
       }
     }
 
+    # El controlador guarda en memoria cada objeto de cada app. Con el stack de
+    # observabilidad de la P10 (CRDs de Prometheus de varios MB) paso los 768Mi
+    # y quedo en OOMKilled en bucle.
     controller = {
       resources = {
-        requests = { cpu = "50m", memory = "256Mi" }
-        limits   = { cpu = "500m", memory = "768Mi" }
+        requests = { cpu = "50m", memory = "512Mi" }
+        limits   = { cpu = "500m", memory = "1536Mi" }
       }
     }
     repoServer = {
