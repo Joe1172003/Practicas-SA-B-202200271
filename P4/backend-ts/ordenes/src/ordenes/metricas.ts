@@ -28,3 +28,13 @@ export const ordenesRechazadas = medidor.createCounter('ordenes.rechazadas', {
 export const ventasQuetzales = medidor.createCounter('ventas.quetzales', {
   description: 'Monto en quetzales de las ordenes pagadas',
 });
+
+// Arrancan en 0. Un contador de OpenTelemetry no existe hasta su primer add(),
+// asi que la primera venta aparecia en Prometheus ya valiendo 2300.5 y
+// increase() no veia ninguna subida: el tablero decia "0 ventas" despues de
+// una venta. Con el 0 registrado al arrancar, la primera venta sube de 0 a X.
+export const ESTADOS = ['creada', 'pagada', 'cancelada'] as const;
+export const CAUSAS_DE_RECHAZO = ['sin_stock', 'productos_no_responde'] as const;
+for (const estado of ESTADOS) ordenesPorEstado.add(0, { estado });
+for (const causa of CAUSAS_DE_RECHAZO) ordenesRechazadas.add(0, { causa });
+ventasQuetzales.add(0);
