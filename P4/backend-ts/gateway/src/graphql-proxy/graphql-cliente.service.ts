@@ -25,9 +25,12 @@ export class GraphqlClienteService {
           'Content-Type': 'application/json',
           ...opciones.headersDeIdentidad,
         },
-        // El timeout del gateway TIENE que ser mayor que el peor caso del
-        // 20s le da a la saga espacio de sobra para terminar y responder.
-        timeout: 20000,
+        // FALLO INDUCIDO P10 (rama fallo-inducido-p10, version 2.5.0): el
+        // error humano tipico de creer que el timeout va en segundos. Axios lo
+        // lee en milisegundos: 20 ms. Productos responde en 15-30 ms, asi que
+        // buena parte del catalogo y todas las ordenes se cortan con 503. El
+        // canary tiene que verlo en tasa-de-error y revertir solo.
+        timeout: 20,
 
         // Igual que con Auth: un error de GraphQL es una respuesta válida que
         // hay que reenviar, no una excepción que el gateway deba tragarse.
