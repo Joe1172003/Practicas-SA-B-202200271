@@ -1,0 +1,104 @@
+Fase 6 - tablero de operacion - 15/10/2026
+
+Tablero:   Operacion SA P10 (uid operacion-sa-p10)
+JSON:      P10/tableros/operacion-sa-p10.json (exportado desde Grafana con la API)
+Como llega a Grafana: sa-p8-gitops/tableros/ -> ConfigMap con la etiqueta
+           grafana_dashboard=1 (app tableros) -> el sidecar de Grafana lo carga
+           solo. Grafana lo marca como provisionado: no se armo a mano.
+
+
+ORGANIZACION
+
+  Arriba lo que entiende cualquiera, abajo el detalle. Cada fila es una pregunta.
+
+  0. ¿Estamos cumpliendo lo que prometimos? (7 dias)
+       Disponibilidad esta semana | Catalogo rapido esta semana |
+       Presupuesto de error | Alertas sonando ahora
+  1. Trafico: ¿cuanta gente esta usando la tienda?
+       Trafico por servicio | Ordenes por minuto | Ventas ultimas 24 h
+  2. Errores: ¿que esta fallando y donde?
+       Errores por servicio | Respuestas del gateway por codigo
+  3. Latencia: ¿que tan rapido responde?
+       Latencia p95 por servicio | Catalogo bajo 500 ms |
+       Latencia p95 del gateway por version
+  4. Saturacion: ¿nos estamos quedando sin recursos?
+       CPU estrangulada por pod | Memoria contra el limite |
+       Atraso del event loop (p99) | Reinicios ultima hora
+
+  Los nombres de los paneles son los que citan los runbooks de P10/runbooks.
+  "Errores por servicio" y "Latencia p95 por servicio" tienen un enlace de
+  datos: clic en una linea abre Tempo con las trazas con error (o lentas) de
+  ese servicio en el rango del tablero. Es el primer salto del recorrido
+  alerta -> traza -> log.
+
+  Lo que deje afuera a proposito: las metricas de nodo, de Kubernetes y del
+  propio stack de observabilidad. Existen en Prometheus, pero no responden
+  ninguna de estas cinco preguntas sobre la tienda.
+
+
+VALIDACION
+
+  Antes de subirlo, importe una copia temporal en Grafana y corri las 18
+  consultas de los paneles por /api/ds/query: las 18 con datos, ninguna en
+  "No data". Despues borre la copia.
+
+  Despues del merge: Grafana lo cargo solo (provisioned: true), 16 paneles en
+  5 filas. 23 de 23 apps Synced y Healthy.
+
+
+EL PRIMER INCIDENTE REAL: EL TABLERO TUMBO A GRAFANA
+
+  ~20:35  Abri el tablero y todos los paneles salieron "No data" con la marca
+          roja de error. Prometheus estaba bien (2/2, sin reinicios).
+          El problema era Grafana: contenedor grafana en listo=false,
+            Liveness probe failed: Get ".../api/health": context deadline exceeded
+          y peticiones de 18 a 30 s que terminaban en 500.
+          Memoria: 383Mi de un limite de 384Mi. Pegado al limite se pasaba el
+          tiempo liberando memoria y no respondia. El tablero nuevo (16 paneles
+          cada 30 s) lo termino de llenar.
+  20:38:54  ObservabilidadDegradada en pending para grafana-648b7cf5b8-bzw5v.
+  20:44     firing. Correo [FIRING] ObservabilidadDegradada (advertencia)
+            enviado: alertmanager_notifications_total{integration="email"} paso
+            de 2 a 3, sin fallas.
+  20:44:43  kubectl delete pod (alivio temporal: arranca vacio).
+  20:45:47  grafana 3/3; el tablero responde en 0.45 s.
+  Arreglo de fondo: limite de memoria de Grafana 384Mi -> 768Mi (requests
+  160Mi -> 256Mi) en apps/observabilidad/kube-prometheus-stack.yaml.
+
+  Es la alerta que agregue en la fase 5 despues de que Tempo estuviera 40
+  minutos caido sin que nadie supiera. Esta vez el stack aviso solo, a los
+  5 minutos de confirmar, con el runbook en el correo.
+
+
+UNA VENTA QUE EL TABLERO NO CONTO
+
+  ~21:03  Pague una orden por la tienda (un Celular, Q2300.50). El panel
+          "Ventas ultimas 24 h" siguio en 0.00.
+          En Prometheus la venta si estaba:
+            ventas_quetzales_total{k8s_pod_name="ordenes-754d9dd698-nnlr2"} = 2300.5
+          pero la serie aparecio por primera vez a las 21:03 ya valiendo 2300.5.
+          increase() mide cuanto subio entre la primera y la ultima muestra:
+          2300.5 - 2300.5 = 0. A la orden de juan-p10 (01:07, Q120) le paso lo
+          mismo.
+
+  Causa: un contador de OpenTelemetry no existe hasta su primer add(). Si el
+  primer evento es tambien la primera muestra, increase() no lo ve. Afectaba a
+  las ventas, a las ordenes pagadas y a las rechazadas; las creadas y
+  canceladas se veian bien solo porque el generador las produce cada pocos
+  segundos.
+
+  Arreglo (P4/backend-ts/ordenes/src/ordenes/metricas.ts, v2.4.3): add(0) al
+  arrancar para cada estado, cada causa y las ventas. Lo probe con un
+  exportador en memoria sobre el codigo compilado:
+    al arrancar:            ventas.quetzales 0, ordenes{pagada} 0, ...
+    despues de una venta:   ventas.quetzales 2300.5, ordenes{pagada} 1
+  Ahora la primera venta es una subida de 0 a 2300.5.
+
+
+LO QUE YA MOSTRO
+
+  Al probar las consultas aparecio algo que nadie habia visto: notificaciones
+  pasa el 77 % del tiempo con la CPU estrangulada. Es el unico servicio en
+  Python y el unico sin instrumentar. No afecta a los SLO porque su trabajo
+  (mandar el aviso de la orden) va por RabbitMQ, fuera del camino del cliente,
+  pero es saturacion real.
