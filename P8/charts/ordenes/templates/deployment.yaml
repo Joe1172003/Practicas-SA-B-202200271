@@ -50,6 +50,7 @@ spec:
           env:
             - name: PORT
               value: {{ .Values.puerto | quote }}
+            {{- include "sa.telemetria" . | nindent 12 }}
           securityContext:
             {{- include "sa.seguridadContenedor" . | nindent 12 }}
           {{- include "sa.probesHttp" (dict "puerto" .Values.puerto) | nindent 10 }}

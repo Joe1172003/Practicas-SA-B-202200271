@@ -19,6 +19,11 @@ recursos:
     cpu: 300m
     memoria: 320Mi
 
+# OpenTelemetry (P10). Apagado por defecto: en kind no hay Collector.
+telemetria:
+  habilitada: false
+  collector: http://otel-collector.observabilidad.svc:4318
+
 hpa:
   habilitado: false
   minimo: 2

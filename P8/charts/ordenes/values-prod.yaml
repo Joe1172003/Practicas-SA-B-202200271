@@ -8,3 +8,7 @@ pdb:
 
 configuracion:
   NODE_ENV: production
+
+# En GKE si: manda trazas y metricas al Collector del namespace observabilidad.
+telemetria:
+  habilitada: true
