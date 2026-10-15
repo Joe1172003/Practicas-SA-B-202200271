@@ -1,12 +1,19 @@
+// Primero que todo: OpenTelemetry tiene que envolver las librerias antes de
+// que Nest las cargue (ver telemetria.ts).
+import './telemetria';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { appConfig } from './config/app.config';
 import type { AppConfig } from './config/app.config';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // bufferLogs: lo que Nest escriba al arrancar espera a que exista el logger JSON.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const logger = app.get(Logger);
+  app.useLogger(logger);
 
   const config = app.get<AppConfig>(appConfig.KEY);
 
@@ -35,8 +42,8 @@ async function bootstrap() {
   // ahora la app escucha en todas las interfaces de red, y el gateway puede alcanzarla
   await app.listen(config.port, '0.0.0.0');
 
-  console.log(`Microservicio de autenticación escuchando en el puerto ${config.port}`);
-  console.log(`Origenes autorizados por cors: ${config.corsOrigins.join(', ')}`);
+  logger.log(`Microservicio de autenticación escuchando en el puerto ${config.port}`);
+  logger.log(`Origenes autorizados por cors: ${config.corsOrigins.join(', ')}`);
 }
 
 void bootstrap();

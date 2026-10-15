@@ -24,6 +24,9 @@ export type ResultadoDeApartado =
   | { ok: true; lineas: LineaApartada[] }
   | { ok: false; motivo: string };
 
+/** El motivo cuando Productos ni siquiera respondio (caido, timeout). */
+export const MOTIVO_PRODUCTOS_NO_RESPONDE = 'No se pudo reservar el inventario en este momento';
+
 /**
  * Todas las llamadas de Órdenes hacia Productos.
  *
@@ -67,7 +70,7 @@ export class ProductosCliente {
 
       return {
         ok: false,
-        motivo: 'No se pudo reservar el inventario en este momento',
+        motivo: MOTIVO_PRODUCTOS_NO_RESPONDE,
       };
     }
   }

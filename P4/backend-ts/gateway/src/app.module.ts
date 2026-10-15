@@ -6,6 +6,8 @@ import { envValidationSchema } from './config/env.validation';
 import { serviciosConfig } from './config/servicios.config';
 import { GraphqlProxyModule } from './graphql-proxy/graphql-proxy.module';
 import { HealthModule } from './health/health.module';
+import { LoggerModule } from 'nestjs-pino';
+import { configRegistros } from './registros';
 
 /**
  * El gateway no tiene base de datos ni entidades: no es dueño de ningún dato.
@@ -14,6 +16,9 @@ import { HealthModule } from './health/health.module';
  */
 @Module({
   imports: [
+    // Logs en JSON con el trace_id de cada peticion (registros.ts).
+    LoggerModule.forRoot(configRegistros),
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, serviciosConfig],

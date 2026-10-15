@@ -6,6 +6,7 @@ import { ProductosCliente } from '../clientes/productos.cliente';
 import { EstadoOrden } from './estado-orden.enum';
 import { Orden } from './orden.entity';
 import { OrdenesService } from './ordenes.service';
+import { ordenesPorEstado, ventasQuetzales } from './metricas';
 
 /**
  * LOS PASOS FINALES DE LA SAGA: pagar y cancelar.
@@ -84,6 +85,8 @@ export class SagaService {
     });
 
     this.logger.log(`Orden ${pagada.id} PAGADA por Q${pagada.total}`);
+    ordenesPorEstado.add(1, { estado: 'pagada' });
+    ventasQuetzales.add(Number(pagada.total));
 
     return pagada;
   }
@@ -132,6 +135,7 @@ export class SagaService {
     });
 
     this.logger.log(`Orden ${cancelada.id} CANCELADA: ${motivo}`);
+    ordenesPorEstado.add(1, { estado: 'cancelada' });
 
     return cancelada;
   }
