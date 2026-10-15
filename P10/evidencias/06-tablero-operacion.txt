@@ -94,6 +94,18 @@ UNA VENTA QUE EL TABLERO NO CONTO
     despues de una venta:   ventas.quetzales 2300.5, ordenes{pagada} 1
   Ahora la primera venta es una subida de 0 a 2300.5.
 
+  v2.4.3 desplegada (canary por metricas: AnalysisRun gateway-c588cd44f-6
+  Successful, 13 lecturas, 0 fallas en las 4 metricas). Los 3 Pods de
+  ordenes aparecen en Prometheus con ventas_quetzales_total = 0 desde que
+  arrancan.
+  21:32  Pague otra orden (Q2300.50): ordenes-...-xg9q9 paso de 0 a 2300.5 y
+         el panel "Ventas ultimas 24 h" mostro 2426.68, que dos minutos
+         despues era 2376.71. increase() extrapola: con una serie de 3 minutos
+         de vida estima un poco de mas, y se acerca a 2300.5 a medida que
+         junta muestras. Es una estimacion, no un conteo exacto.
+  Capturas: assets/20, 20b y 20c (tablero), 21 y 21b (correos reales de
+  ObservabilidadDegradada, con mi correo y mi foto tapados).
+
 
 LO QUE YA MOSTRO
 
