@@ -12,9 +12,13 @@ import { jwtConfig } from './config/jwt.config';
 import { serviciosConfig } from './config/servicios.config';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
+import { LoggerModule } from 'nestjs-pino';
+import { configRegistros } from './registros';
 
 @Module({
   imports: [
+    // Logs en JSON con el trace_id de cada peticion (registros.ts).
+    LoggerModule.forRoot(configRegistros),
 
     ConfigModule.forRoot({
       isGlobal: true,

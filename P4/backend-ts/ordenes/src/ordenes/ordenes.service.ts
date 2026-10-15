@@ -1,11 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
-import { ProductosCliente } from '../clientes/productos.cliente';
+import { MOTIVO_PRODUCTOS_NO_RESPONDE, ProductosCliente } from '../clientes/productos.cliente';
 import { CrearOrdenInput } from './dto/crear-orden.input';
 import { EstadoOrden } from './estado-orden.enum';
 import { LineaOrden } from './linea-orden.entity';
 import { Orden } from './orden.entity';
+import { ordenesPorEstado, ordenesRechazadas } from './metricas';
 
 const VIOLACION_UNIQUE = '23505';
 
@@ -120,6 +121,11 @@ export class OrdenesService {
 
       this.logger.warn(`Orden ${orden.id} RECHAZADA: ${resultado.motivo}`);
 
+      // El motivo es texto libre de Productos: como etiqueta, cada mensaje
+      // distinto seria una serie nueva en Prometheus. Lo reduzco a dos causas.
+      const causa = resultado.motivo === MOTIVO_PRODUCTOS_NO_RESPONDE ? 'productos_no_responde' : 'sin_stock';
+      ordenesRechazadas.add(1, { causa });
+
       return this.ordenes.save(orden);
     }
 
@@ -144,7 +150,9 @@ export class OrdenesService {
       `Orden ${orden.id} PENDIENTE con ${orden.lineas.length} línea(s), total Q${orden.total}`,
     );
 
-    return this.ordenes.save(orden);
+    const guardada = await this.ordenes.save(orden);
+    ordenesPorEstado.add(1, { estado: 'creada' });
+    return guardada;
   }
 
   private esClaveRepetida(error: unknown): boolean {

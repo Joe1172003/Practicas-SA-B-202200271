@@ -86,3 +86,25 @@ podAntiAffinity:
           matchLabels:
             {{- include "sa.selector" . | nindent 12 }}
 {{- end -}}
+
+{{/*
+Variables de OpenTelemetry (P10). El SDK del servicio las lee al arrancar.
+La version es la etiqueta de la imagen: en el canary, Prometheus separa la
+version estable de la candidata por service.version.
+*/}}
+{{- define "sa.telemetria" -}}
+- name: OTEL_SERVICE_NAME
+  value: {{ .Chart.Name | quote }}
+- name: OTEL_RESOURCE_ATTRIBUTES
+  value: "service.version={{ .Values.imagen.etiqueta }}"
+{{- if .Values.telemetria.habilitada }}
+- name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: {{ .Values.telemetria.collector | quote }}
+# Metricas HTTP con los nombres estables: http.server.request.duration, en segundos.
+- name: OTEL_SEMCONV_STABILITY_OPT_IN
+  value: http
+{{- else }}
+- name: OTEL_SDK_DISABLED
+  value: "true"
+{{- end }}
+{{- end -}}

@@ -16,3 +16,7 @@ ingress:
 # En GKE esta Argo Rollouts: cada version nueva pasa por el canary.
 canary:
   habilitado: true
+
+# En GKE si: manda trazas y metricas al Collector del namespace observabilidad.
+telemetria:
+  habilitada: true

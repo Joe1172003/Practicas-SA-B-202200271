@@ -31,6 +31,7 @@ spec:
         # /health la muestra: la prueba de humo del canary la compara.
         - name: VERSION_APP
           value: {{ .Values.imagen.etiqueta | quote }}
+        {{- include "sa.telemetria" . | nindent 8 }}
       securityContext:
         {{- include "sa.seguridadContenedor" . | nindent 8 }}
       {{- include "sa.probesHttp" (dict "puerto" .Values.puerto) | nindent 6 }}

@@ -11,9 +11,14 @@ import { databaseConfig } from './config/database.config';
 import type { DatabaseConfig } from './config/database.config';
 import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { LoggerModule } from 'nestjs-pino';
+import { configRegistros } from './registros';
 
 @Module({
   imports: [
+    // Logs en JSON con el trace_id de cada peticion (registros.ts).
+    LoggerModule.forRoot(configRegistros),
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig],

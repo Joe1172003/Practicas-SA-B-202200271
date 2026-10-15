@@ -1,3 +1,6 @@
+// Primero que todo: OpenTelemetry tiene que envolver las librerias antes de
+// que Nest las cargue (ver telemetria.ts).
+import './telemetria';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
@@ -5,6 +8,7 @@ import { AppModule } from './app.module';
 import { marcarVersion } from './common/version.middleware';
 import { appConfig } from './config/app.config';
 import type { AppConfig } from './config/app.config';
+import { Logger } from 'nestjs-pino';
 
 /**
  * Arranque del API Gateway.
@@ -14,7 +18,10 @@ import type { AppConfig } from './config/app.config';
  * validación de los DTOs y la política de CORS.
  */
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // bufferLogs: lo que Nest escriba al arrancar espera a que exista el logger JSON.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const logger = app.get(Logger);
+  app.useLogger(logger);
 
   const config = app.get<AppConfig>(appConfig.KEY);
 
@@ -44,7 +51,7 @@ async function bootstrap() {
   // 0.0.0.0 para aceptar tráfico que viene de fuera del contenedor.
   await app.listen(config.port, '0.0.0.0');
 
-  console.log(`API GATEWAY escuchando en el puerto ${config.port}`);
+  logger.log(`API GATEWAY escuchando en el puerto ${config.port}`);
 }
 
 void bootstrap();
