@@ -157,3 +157,65 @@ el cluster estaba ocupado en ese momento.
     productos   14 ms     71 ms
 
     pg.connect: aparece en 157 de 200 trazas de muestra, 59 ms de media.
+
+
+8. v2.4.2: EL PRIMER CANARY POR METRICAS QUE PASA
+
+  03:40  merge del PR "Version 2.4.2" en GitOps (antes, PR #23: el ajuste
+         del analisis).
+  03:46:37  Rollout Healthy. gateway 2.4.2 stable (ReplicaSet 5895b955b9).
+            20 % 3 min -> 50 % 3 min -> 100 %, sin intervencion.
+
+  AnalysisRun gateway-5895b955b9-5: Successful
+  (candidata 5895b955b9, estable 7d9457d5b9)
+
+    metrica                  lecturas  fallas  valores medidos
+    tasa-de-error            13        0       0.00 en todas
+    trafico-candidata        13        0       71 65 66 84 111 146 187 221 219 214
+    latencia-p95-relativa    12        0       1.72 0.99 1.10 0.15 0.12 0.95 1.21 1.02 1.03 1.57
+    latencia-p95-maxima      12        0       0.16 0.18 0.21 0.26 0.22 0.17 0.18 0.18 0.10 0.15 s
+
+  El trafico de la candidata sube cuando el peso pasa de 20 % a 50 % (de ~70
+  a ~215 peticiones en 2 min): es el reparto del Ingress canary sobre el
+  trafico real, medido por Prometheus.
+
+  Los AnalysisTemplate de k6 desaparecieron solos con el chart 1.3.0:
+    $ kubectl -n sa-p8 get analysistemplate
+    gateway-metricas
+
+  La ruta volvio a estar bien: http_route de la 2.4.2 = /graphql/productos y
+  /graphql/ordenes.
+
+
+9. EFECTO DEL POOL DE POSTGRES (03:47, ultimos 10 min, ya con la 2.4.2)
+
+    servicio    p50 antes -> despues     p95 antes -> despues
+    gateway     25 -> 25 ms              259 -> 220 ms
+    auth        24 -> 18 ms              204 -> 121 ms
+    ordenes     164 -> 102 ms            748 -> 450 ms
+    productos   14 -> 16 ms              71 -> 79 ms
+
+  Conexiones abiertas en postgres: 9 -> 15 (se quedan vivas, como queria).
+  Ordenes, el servicio que mas consulta la base por peticion, bajo 40 % su
+  p95. La ventana de 10 min todavia incluye parte del canary; lo vuelvo a
+  medir en reposo.
+
+
+10. LO QUE SE ROMPIO CON EL TRAFICO CONTINUO: TEMPO
+
+  03:47  tempo-0 en CrashLoopBackOff, 9 reinicios, OOMKilled (limite 768Mi).
+         Memoria de Tempo: 190Mi estable hasta las 02:57, cuando arranco el
+         generador de trafico; 331Mi a las 03:17; despues OOM. Al reiniciar
+         recupera el WAL, se pasa otra vez y vuelve a caer.
+  Arreglo (apps/observabilidad/tempo.yaml): bloques de 5 min en vez de 30,
+  trazas cerradas a los 10 s sin tramos nuevos, limite 1536Mi.
+  03:59  La raiz aplico el cambio (PR #25) y el StatefulSet quedo con 1536Mi,
+         pero tempo-0 siguio en CrashLoopBackOff con el limite viejo. Un
+         StatefulSet no reemplaza un Pod roto de la revision anterior: espera
+         a que se recupere, y este no se iba a recuperar nunca.
+  04:06  kubectl -n observabilidad delete pod tempo-0 (los datos estan en su
+         PVC). 04:07 listo con 1536Mi y 0 reinicios; vuelve a guardar trazas.
+         Despues de recuperar el WAL quedo en ~1 GiB.
+  Mientras Tempo estuvo caido (03:2x a 04:07) no se guardaron trazas: es un hueco en la
+  observabilidad que vale para el informe (nadie me aviso; lo vi de casualidad
+  revisando ArgoCD). Falta una alerta sobre el propio stack.
