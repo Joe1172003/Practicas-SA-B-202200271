@@ -1,0 +1,41 @@
+# Configuracion de Alertmanager (P10). Esta es la version legible: los tres
+# datos privados van como __MARCADOR__. sellar-correo.sh los reemplaza y sella
+# el resultado en el repo GitOps (secretos/alertmanager-correo.yaml), asi que
+# ni los correos ni la clave quedan legibles en ningun repo.
+
+global:
+  # Gmail con contrasena de aplicacion, desde una cuenta creada solo para esto.
+  smtp_smarthost: smtp.gmail.com:587
+  smtp_from: "Alertas SA P10 <__ENVIA__>"
+  smtp_auth_username: "__ENVIA__"
+  smtp_auth_password: "__CLAVE__"
+  smtp_require_tls: true
+
+route:
+  receiver: correo
+  # Una alerta por SLO y tipo, no un correo por cada repeticion.
+  group_by: [alertname, slo]
+  # Espera 30 s por si llegan alertas hermanas y las manda juntas.
+  group_wait: 30s
+  group_interval: 5m
+  # Si sigue sonando, recordar cada 4 h. Cada 5 min seria ruido.
+  repeat_interval: 4h
+
+receivers:
+  - name: correo
+    email_configs:
+      - to: "__RECIBE__"
+        # Avisar tambien cuando se resuelve: asi se sabe que ya no hay que hacer nada.
+        send_resolved: true
+        headers:
+          Subject: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})'
+        html: |
+          {{ range .Alerts }}
+          <h3>{{ .Labels.alertname }} - {{ .Status }}</h3>
+          <p><b>{{ .Annotations.summary }}</b></p>
+          <p>{{ .Annotations.description }}</p>
+          <p><b>Por que amerita intervencion:</b> {{ .Annotations.intervencion }}</p>
+          <p><b>Runbook:</b> <a href="{{ .Annotations.runbook_url }}">{{ .Annotations.runbook_url }}</a></p>
+          <p>Desde: {{ .StartsAt.Format "2006-01-02 15:04:05 MST" }}</p>
+          <hr>
+          {{ end }}

@@ -209,6 +209,13 @@ el cluster estaba ocupado en ese momento.
          recupera el WAL, se pasa otra vez y vuelve a caer.
   Arreglo (apps/observabilidad/tempo.yaml): bloques de 5 min en vez de 30,
   trazas cerradas a los 10 s sin tramos nuevos, limite 1536Mi.
-  Mientras Tempo estuvo caido no se guardaron trazas: es un hueco en la
+  03:59  La raiz aplico el cambio (PR #25) y el StatefulSet quedo con 1536Mi,
+         pero tempo-0 siguio en CrashLoopBackOff con el limite viejo. Un
+         StatefulSet no reemplaza un Pod roto de la revision anterior: espera
+         a que se recupere, y este no se iba a recuperar nunca.
+  04:06  kubectl -n observabilidad delete pod tempo-0 (los datos estan en su
+         PVC). 04:07 listo con 1536Mi y 0 reinicios; vuelve a guardar trazas.
+         Despues de recuperar el WAL quedo en ~1 GiB.
+  Mientras Tempo estuvo caido (03:2x a 04:07) no se guardaron trazas: es un hueco en la
   observabilidad que vale para el informe (nadie me aviso; lo vi de casualidad
   revisando ArgoCD). Falta una alerta sobre el propio stack.
