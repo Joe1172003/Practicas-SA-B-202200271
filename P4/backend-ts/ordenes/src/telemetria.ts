@@ -1,9 +1,28 @@
 import type { IncomingMessage } from 'node:http';
+import { SpanKind } from '@opentelemetry/api';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { ExpressLayerType } from '@opentelemetry/instrumentation-express';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { NodeSDK } from '@opentelemetry/sdk-node';
+import { NodeSDK, tracing } from '@opentelemetry/sdk-node';
+
+/**
+ * Solo empieza una traza nueva lo que llega desde afuera: una peticion HTTP
+ * (SERVER) o un mensaje de la cola (CONSUMER). Lo que Nest hace al arrancar
+ * ("Create Nest App", conectar a postgres, armar el esquema GraphQL) no es una
+ * peticion de nadie y ensuciaba la busqueda en Tempo. Los tramos hijos siguen
+ * la decision de su padre (ParentBased).
+ */
+const soloPeticiones: tracing.Sampler = {
+  shouldSample: (_contexto, _trazaId, _nombre, tipo) => ({
+    decision:
+      tipo === SpanKind.SERVER || tipo === SpanKind.CONSUMER
+        ? tracing.SamplingDecision.RECORD_AND_SAMPLED
+        : tracing.SamplingDecision.NOT_RECORD,
+  }),
+  toString: () => 'soloPeticiones',
+};
 
 /**
  * OpenTelemetry: trazas y metricas de este servicio.
@@ -19,6 +38,7 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
  */
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
+  sampler: new tracing.ParentBasedSampler({ root: soloPeticiones }),
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
     // Cada 15 s, al ritmo de Prometheus: el canary decide en pocos minutos.
@@ -30,6 +50,11 @@ const sdk = new NodeSDK({
       '@opentelemetry/instrumentation-fs': { enabled: false },
       '@opentelemetry/instrumentation-dns': { enabled: false },
       '@opentelemetry/instrumentation-net': { enabled: false },
+      // Un tramo por cada middleware de Express eran ~40 por peticion. Lo util
+      // (el controlador de Nest, las llamadas y las consultas) sigue saliendo.
+      '@opentelemetry/instrumentation-express': {
+        ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
+      },
       '@opentelemetry/instrumentation-http': {
         // Las sondas de Kubernetes piden /health cada pocos segundos. No son
         // usuarios: no cuentan para la latencia ni para los errores.

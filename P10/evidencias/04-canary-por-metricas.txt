@@ -1,0 +1,89 @@
+Fase 4 - canary gobernado por metricas - 15/10/2026 (UTC)
+
+Lo que cambio, y por que. La v2.4.0 sana fallo dos veces en el canary de la
+P8 y paso a la tercera (ver 03-instrumentacion-v2.4.0.txt). Ese canary corria
+Jobs de k6 de 30 o 45 segundos y comparaba contra un umbral fijo, sin saber si
+el cluster estaba ocupado en ese momento.
+
+
+1. EL ANALYSISTEMPLATE
+
+  Nombre:  gateway-metricas
+  Ruta:    sa-p8-gitops/analisis/gateway-metricas.yaml
+  Tipo:    provider prometheus (ningun Job)
+  Lo carga la app gateway como una tercera fuente del repo GitOps.
+
+  Cuatro metricas, cada 30 s, desde el primer porcentaje de trafico:
+
+    trafico-candidata       >= 20 peticiones en 2 min, si no "no concluyente"
+    tasa-de-error           5xx / total de la candidata < 5 %
+    latencia-p95-relativa   p95 candidata / p95 estable <= 2
+    latencia-p95-maxima     p95 candidata < 1 s
+
+  Candidata y estable se separan por el hash de su ReplicaSet, que Argo
+  Rollouts pasa como argumento (podTemplateHashValue Latest y Stable) y que
+  Prometheus tiene en k8s_pod_name. Ejemplo de la consulta de errores:
+
+    (sum(rate(http_server_request_duration_seconds_count{job="gateway",
+        k8s_pod_name=~"gateway-{{args.hash-candidata}}-.*",
+        http_response_status_code=~"5.."}[2m])) or vector(0))
+    /
+    clamp_min(sum(rate(http_server_request_duration_seconds_count{job="gateway",
+        k8s_pod_name=~"gateway-{{args.hash-candidata}}-.*"}[2m])) or vector(0), 0.0001)
+
+  Antes de subirlo:
+    - corri las 4 consultas contra el Prometheus real con el hash de la
+      estable (7d9457d5b9): las 4 responden un valor (0 o NaN) aunque no haya
+      trafico, asi el analisis nunca se cae por "sin resultados".
+    - kubectl apply --dry-run=server: el CRD de Argo Rollouts lo acepta.
+
+
+2. EL ROLLOUT DEL GATEWAY (chart 1.3.0)
+
+    antes (P8)                                despues (P10)
+    10%  Jobs humo + integracion              20%  3 min
+    30%  Job carga 5 usuarios                 50%  3 min
+    60%  Job carga 15 usuarios                100%
+                                              analisis de fondo todo el tiempo
+
+  Saque los 3 AnalysisTemplate de k6, el ConfigMap con sus scripts, el
+  helper del Job y la regla de red que dejaba entrar a esos Jobs. Los scripts
+  de P8/charts/gateway/pruebas quedan en el repo como historia de la P8.
+
+
+3. EL TRAFICO QUE SE MIDE
+
+  Hasta ahora el gateway tenia 0 peticiones por segundo fuera de mis pruebas.
+  Sin trafico no hay nada que medir, asi que agregue la app trafico-usuarios
+  (namespace trafico): un Pod de k6 siempre encendido.
+
+    3 por segundo   miran el catalogo
+    6 por minuto    inician sesion, crean una orden y la cancelan (la
+                    compensacion devuelve el stock, el inventario no se agota)
+
+  Entra por ingress-nginx con el Host publico, asi que el reparto entre
+  estable y candidata lo hace el mismo Ingress canary que con un cliente.
+  Este k6 no tiene umbrales y nadie lee su resultado: no decide nada.
+
+  Lo probe 60 s en un Pod temporal antes de subirlo:
+    checks 194 de 194, 3.37 peticiones/s, p95 192.83 ms
+    1 peticion fallida de 204: el registro del usuario, que ya existia.
+
+  En la primera prueba hubo dos 401. Con los logs encontre la causa en un
+  minuto: el gateway respondio 401 sin llamar a auth, o sea que la peticion
+  llego sin cookie. k6 borra las cookies al empezar cada iteracion; con
+  noCookiesReset: true el usuario simulado conserva su sesion como un cliente
+  de verdad.
+
+
+4. LIMPIEZA QUE VIAJA EN LA MISMA VERSION (v2.4.1)
+
+  - Sin tramos de middleware de Express (eran ~40 por peticion).
+  - Muestreo que solo empieza trazas con peticiones (SERVER) o mensajes
+    (CONSUMER): fuera "Create Nest App" y el resto del arranque.
+  - Logs con originalUrl: "POST /graphql 200" en vez de "POST / 200".
+
+
+5. RESULTADO DEL PRIMER CANARY POR METRICAS
+
+  (se completa cuando salga la v2.4.1)
