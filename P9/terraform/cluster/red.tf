@@ -66,3 +66,32 @@ resource "kubernetes_network_policy_v1" "salida_interna" {
     }
   }
 }
+
+# P10: salida hacia el OpenTelemetry Collector. Sin esta regla, denegar-todo
+# corta las trazas y metricas de los servicios y se pierden en silencio: el SDK
+# no tumba la app cuando no puede exportar. Solo el puerto OTLP/HTTP y solo
+# hacia el namespace observabilidad.
+resource "kubernetes_network_policy_v1" "salida_telemetria" {
+  metadata {
+    name      = "salida-telemetria"
+    namespace = kubernetes_namespace_v1.plataforma.metadata[0].name
+    labels    = local.etiquetas
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Egress"]
+
+    egress {
+      to {
+        namespace_selector {
+          match_labels = { "kubernetes.io/metadata.name" = "observabilidad" }
+        }
+      }
+      ports {
+        protocol = "TCP"
+        port     = "4318"
+      }
+    }
+  }
+}
