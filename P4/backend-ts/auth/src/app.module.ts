@@ -46,6 +46,17 @@ import { configRegistros } from './registros';
         synchronize: config.synchronize,
 
         ssl: false,
+
+        // P10: el pool de pg cerraba las conexiones ociosas a los 10 s. Con poco
+        // trafico por Pod, casi cada peticion abria una conexion nueva y pagaba
+        // ~100 ms de handshake y autenticacion SCRAM, contra 20-40 ms de la
+        // consulta (lo mostro Tempo en el canary de la v2.4.1). Ahora la
+        // conexion sobrevive 5 min entre peticiones. max 5: con 3 servicios y
+        // hasta 3 Pods cada uno son 45 como mucho, lejos del limite de 100.
+        extra: {
+          max: 5,
+          idleTimeoutMillis: 300000,
+        },
       }),
     }),
 

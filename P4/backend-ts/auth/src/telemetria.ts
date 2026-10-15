@@ -3,7 +3,6 @@ import { SpanKind } from '@opentelemetry/api';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { ExpressLayerType } from '@opentelemetry/instrumentation-express';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { NodeSDK, tracing } from '@opentelemetry/sdk-node';
 
@@ -50,11 +49,11 @@ const sdk = new NodeSDK({
       '@opentelemetry/instrumentation-fs': { enabled: false },
       '@opentelemetry/instrumentation-dns': { enabled: false },
       '@opentelemetry/instrumentation-net': { enabled: false },
-      // Un tramo por cada middleware de Express eran ~40 por peticion. Lo util
-      // (el controlador de Nest, las llamadas y las consultas) sigue saliendo.
-      '@opentelemetry/instrumentation-express': {
-        ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
-      },
+      // Express queda completo a proposito. En la v2.4.1 le quite los tramos de
+      // middleware (ignoreLayersType) y no solo no los quito: rompio la ruta de
+      // las metricas, que paso de "/graphql/productos" a
+      // "{/*splat}{/*splat}/graphql/productos". Prefiero trazas con mas tramos
+      // y una etiqueta http_route correcta, que es la que usan los SLO.
       '@opentelemetry/instrumentation-http': {
         // Las sondas de Kubernetes piden /health cada pocos segundos. No son
         // usuarios: no cuentan para la latencia ni para los errores.
