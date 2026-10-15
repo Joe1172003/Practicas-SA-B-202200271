@@ -1,0 +1,73 @@
+Fase 5 - SLO, presupuesto de error y alertas - 15/10/2026 (UTC)
+
+Definicion y justificacion: P10/slo/definicion-slo.md
+Reglas: sa-p8-gitops/slo/ (app slo-alertas, la 22 de ArgoCD)
+Runbooks: P10/runbooks/
+
+
+1. LAS REGLAS CALCULANDO
+
+  Prometheus -> Status -> Rule health, 18:44:
+    slo-disponibilidad-indicador     4 reglas, 4 sanas
+    slo-disponibilidad-presupuesto   4 reglas, 4 sanas
+    slo-disponibilidad-alertas       2 reglas, 2 sanas
+    slo-catalogo-indicador           4 reglas, 4 sanas
+    slo-catalogo-presupuesto         4 reglas, 4 sanas
+    slo-catalogo-alertas             2 reglas, 2 sanas
+    observabilidad-alertas           1 regla,  1 sana
+
+  Valores en ese momento:
+    slo:disponibilidad_sli:ratio_rate7d             1.0       (100 %)
+    slo:disponibilidad_presupuesto_consumido:ratio  0.0       (nada gastado)
+    slo:catalogo_sli:ratio_rate7d                   0.99918   (99.918 % rapidas)
+    slo:catalogo_presupuesto_consumido:ratio        0.08158   (8.2 % del presupuesto)
+
+  El 8.2 % del catalogo se fue casi todo en los canary de hoy: los picos de
+  los Pods recien arrancados de la v2.4.1 y la v2.4.2. Es el costo de
+  desplegar, y ya esta dentro de lo que el SLO permite.
+
+  Retencion de Prometheus: 8d or 9GiB (era 3d; la ventana del SLO es 7d).
+
+
+2. LAS ALERTAS
+
+  Las 5 en estado inactive:
+    SloDisponibilidadConsumoRapido     critica      ritmo 14.4, 1h y 5m
+    SloDisponibilidadConsumoLento      advertencia  ritmo 6, 6h y 30m
+    SloCatalogoLatenciaConsumoRapido   critica      ritmo 14.4, 1h y 5m
+    SloCatalogoLatenciaConsumoLento    advertencia  ritmo 6, 6h y 30m
+    ObservabilidadDegradada            advertencia  Pod del stack no listo o en bucle
+
+  Cada una lleva runbook_url y una anotacion "intervencion" con el motivo.
+  Las alertas por defecto de kube-prometheus-stack siguen apagadas.
+
+  ObservabilidadDegradada contra la caida de Tempo de la madrugada (consulta
+  hacia atras, query_range de 03:15 a 04:10 cada 5 min):
+    tempo-0 activa en: 03:25 03:30 03:35 ... 04:10
+  Con "for: 5m" habria avisado a las 03:30. Yo lo vi a las ~04:05.
+
+
+3. EL CAMINO HASTA UNA PERSONA
+
+  Alertmanager carga la configuracion del SealedSecret alertmanager-correo:
+    smarthost smtp.gmail.com:587, clave cargada (<secret>), receptor correo,
+    group_by [alertname, slo], repeat_interval 4h
+
+  18:45:27  Alerta de prueba con amtool desde el Pod de Alertmanager:
+              amtool alert add PruebaCorreoP10 severity=prueba ... --end=+5min
+  Metricas de Alertmanager despues del envio:
+    alertmanager_notifications_total{integration="email"}                         1
+    alertmanager_notifications_failed_total{integration="email",reason="authError"} 0
+    (0 en todas las razones de falla)
+
+  Gmail acepto el correo. Llegan dos: [FIRING] al enviarla y [RESOLVED] a los
+  5 minutos, cuando vence.
+
+
+4. LO QUE QUEDA FUERA, A PROPOSITO
+
+  - Si Prometheus se cae, ninguna alerta suena: falta un vigilante externo.
+  - El SLO de latencia no mira las ordenes, solo el catalogo (90 % del trafico).
+  - Un GraphQL que responde 200 con "errors" adentro cuenta como exito.
+  El disparo real de una alerta de SLO queda para la fase 7, con el fallo
+  inducido.
