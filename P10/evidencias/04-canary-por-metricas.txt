@@ -84,6 +84,76 @@ el cluster estaba ocupado en ese momento.
   - Logs con originalUrl: "POST /graphql 200" en vez de "POST / 200".
 
 
-5. RESULTADO DEL PRIMER CANARY POR METRICAS
+5. PRIMER CANARY POR METRICAS: v2.4.1 REVERTIDA
 
-  (se completa cuando salga la v2.4.1)
+  03:10:14  Pod canary gateway-7ccfb97b8f-h5h5k. 03:11:34 recibe el 20 %.
+  03:13:29  RolloutAborted: Background analysis ... Metric
+            "latencia-p95-relativa" assessed Failed due to failed (2) > failureLimit (1)
+
+  AnalysisRun gateway-7ccfb97b8f-4 (candidata 7ccfb97b8f, estable 7d9457d5b9):
+
+    hora      trafico  error  p95 relativa  p95 candidata
+    03:12:21  37.9     0      1.08  OK      0.43 s
+    03:12:51  57.8     0      2.54  FALLA   1.15 s  FALLA
+    03:13:21  76.8     0      2.27  FALLA   0.94 s
+
+  Cero errores. Lo unico malo fue la latencia, y no de forma pareja. El p95
+  del catalogo con ventana de 1 minuto, cada 15 s:
+
+    candidata  12:00=0.49 12:15=0.46 12:30=0.37 12:45=1.94 13:00=1.98 13:15=2.20 13:30=0.44
+    estable    12:00=0.33 12:15=0.25 12:30=0.24 12:45=0.37 13:00=0.38 13:15=0.32 13:30=0.21
+
+  Un pico de unos 30 s en el unico Pod de la candidata. Con ventana de 2 min
+  ese pico queda adentro de varias mediciones seguidas, y failureLimit 1
+  basta con dos. El analisis hizo lo que le pedi; el que le pidio mal fui yo.
+
+  Que habia dentro del pico (Tempo, pod gateway-7ccfb97b8f-h5h5k, duration > 900ms):
+  5 trazas lentas. En la de 900 ms el gateway casi no gasta tiempo propio; el
+  tiempo se va en los servicios de abajo, y en cada uno lo mismo:
+
+    auth       pg-pool.connect  87 ms   (la consulta: 20 ms)
+    ordenes    pg-pool.connect 105 ms   (la consulta: 22 ms)
+    productos  pg-pool.connect 100 ms   (el UPDATE:   44 ms)
+
+  Cada servicio abre una conexion nueva a postgres en casi cada peticion. Con
+  poco trafico por Pod, el pool cierra las conexiones ociosas a los 10 s
+  (valor por defecto de pg) y la siguiente peticion paga el handshake y la
+  autenticacion SCRAM otra vez. La v2.4.0 tiene el mismo problema: es de la
+  base, no de la version candidata.
+
+  Dos cosas mas que encontre en la v2.4.1:
+  - ignoreLayersType de Express no quito los tramos de middleware y ademas
+    rompio la etiqueta de ruta: http_route paso de "/graphql/productos" a
+    "{/*splat}{/*splat}/graphql/productos". Error mio, hay que revertirlo.
+  - Las trazas del arranque si desaparecieron (el muestreo funciona).
+
+
+6. LO QUE CAMBIE DESPUES DE LA REVERSION
+
+  En el AnalysisTemplate (solo repo GitOps, sin version nueva):
+    latencia-p95-relativa y latencia-p95-maxima
+      ventana        2m  ->  1m
+      initialDelay   60s ->  90s   (el Pod nuevo calienta antes de juzgarlo)
+      failureLimit   1   ->  3     (4 lecturas malas seguidas, ~2 min sostenidos)
+    tasa-de-error se queda igual: una version que falla, falla en masa.
+
+  Con los numeros de la v2.4.1, el pico de 30 s habria dado 2 o 3 lecturas
+  malas con ventana de 1 min: no alcanza para revertir. Una version lenta de
+  verdad falla todas.
+
+  En la v2.4.2:
+    - Express completo otra vez (vuelve http_route="/graphql/productos").
+    - Pool de postgres en auth, ordenes y productos: idleTimeoutMillis 5 min
+      (antes 10 s, el valor de pg) y max 5 conexiones por Pod. Postgres
+      acepta 100; hoy hay 9 abiertas; el peor caso nuevo es 45.
+
+
+7. LINEA BASE ANTES DEL ARREGLO DEL POOL (03:20 UTC, ultimos 15 min)
+
+    servicio    p50       p95
+    gateway     25 ms     259 ms
+    auth        24 ms     204 ms
+    ordenes     164 ms    748 ms
+    productos   14 ms     71 ms
+
+    pg.connect: aparece en 157 de 200 trazas de muestra, 59 ms de media.
