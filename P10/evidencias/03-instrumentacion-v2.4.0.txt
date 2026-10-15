@@ -1,0 +1,117 @@
+Fases 2 y 3 - instrumentacion con OpenTelemetry y logs JSON - v2.4.0 - 15/10/2026 (UTC)
+
+Saque gateway, auth, ordenes y productos instrumentados en una sola version,
+la 2.4.0, por el mismo flujo de la P8: tag, pipeline (pruebas, Trivy, firma
+Cosign), PR automatico al repo GitOps, merge, ArgoCD y canary del gateway.
+
+
+1. EL CANARY DE LA P8 RECHAZO LA VERSION... Y NO ERA CULPA DE LA VERSION
+
+  00:44  AnalysisRun gateway-7d9457d5b9-3-3 (carga) Failed -> RolloutAborted
+           Latencia p95 : 337.27 ms   (umbral 300)
+           Tasa de error: 0.00 %      Checks: 100 %
+
+  Con la telemetria nueva vi por que. La prueba de carga corrio (00:44:05 a
+  00:44:35) justo cuando arrancaban los Pods nuevos de auth, ordenes y
+  productos, y el HPA los escalo a 3 por el pico de CPU del arranque:
+
+    estrangulamiento de CPU durante la prueba (container_cpu_cfs_throttled)
+      productos-74466bb65f-782rn   91 %   (arranco a las 00:44:13)
+      ordenes-5c898c7d4d-844jp     89 %
+      auth-64d66875dd-kw2jg        89 %
+
+  El gateway nuevo no era lento: se midio contra un productos que todavia
+  estaba arrancando.
+
+  Hubo tres intentos con la misma imagen, sin cambiar una linea:
+
+    intento  inicio   carga 5 usuarios (30%)       carga 15 usuarios (60%)      resultado
+    1        00:44    3-3   Failed  p95 337 ms     no llego                     revertido
+    2        00:54    3-3.1 OK      p95 278 ms     3-5   Failed  p95 366 ms     revertido
+    3        01:00    3-3.2 OK                     3-5.1 OK      p95 289 ms     promovido
+
+    Las tres con 0.00 % de errores y 100 % de checks.
+
+  gateway 2.4.0 quedo stable a las 01:03. 20 de 20 apps Synced y Healthy.
+  Capturas: assets/12-canary-antes-jobs-k6.png (los tres AnalysisTemplate son
+  Jobs de k6) y assets/13-canary-antes-falso-negativo.png (el arbol con los
+  AnalysisRun fallidos y exitosos de la misma revision).
+
+  Es justo la critica del enunciado al canary de la P8: decide con una prueba
+  sintetica de 30 o 45 segundos que mide un instante, no con el trafico real.
+  La misma version fallo dos veces y paso a la tercera, la ultima vez a 11 ms
+  del umbral. Si hubiera sido una version rota de verdad, este canary tampoco
+  me habria dado confianza para decir que la reversion fue por la version y no
+  por el momento. La fase 4 cambia eso.
+
+
+2. UNA PETICION, UNA TRAZA, CUATRO SERVICIOS
+
+  Cree y pague una orden como cliente, por el gateway publico, con el usuario
+  de prueba juan-p10@gmai.com (Mouse Logitech M170, Q120):
+    01:07:19  crearOrden     -> 1bea99c5-1dd4-4d14-a8e1-96eabe1cf802 PENDIENTE
+    01:07:22  confirmarPago  -> PAGADA
+
+  Traza b5ae83f35d109ff3dde4f06ae85baed1 (crearOrden, 588 ms):
+    gateway    POST /graphql/ordenes                        588 ms
+    auth         GET /auth/me (validar la sesion)            22 ms
+    auth           pg.query SELECT db_auth                    5 ms
+    ordenes      POST /graphql -> mutation                  534 ms
+    ordenes        pg-pool.connect                           88 ms
+    ordenes        pg.query INSERT db_ordenes                 6 ms
+    productos      POST /interno/apartar-stock               80 ms
+    productos        pg.query UPDATE db_productos             6 ms
+
+  Traza ded183285513550f1c90c32e8243c997 (confirmarPago, 615 ms):
+    gateway -> auth -> ordenes -> productos /interno/confirmar-venta
+    y al final ordenes "publish <default>" (12 ms): el mensaje a RabbitMQ
+    para notificaciones.
+
+  Captura: assets/06-tempo-traza-4-servicios.png (encabezado "Services 4",
+  POST 200, mismo Trace ID).
+
+  El trace_id viaja en el header traceparent que la autoinstrumentacion agrega
+  a cada llamada de axios. No escribi ni una linea de propagacion a mano.
+
+  Lo que ya responde: de los 588 ms, 88 ms fueron solo para conseguir una
+  conexion a postgres en ordenes, y la consulta en si tardo 6 ms.
+
+
+3. LOGS JSON DE ESA MISMA TRAZA, DESDE LOKI
+
+  {k8s_namespace_name="sa-p8"} | trace_id="b5ae83f35d109ff3dde4f06ae85baed1"
+
+    auth       info  GET /auth/me 200
+    productos  info  Stock apartado para la orden 1bea99c5-...: 1 linea(s)
+    productos  info  POST /interno/apartar-stock 200
+    ordenes    info  Orden 1bea99c5-... PENDIENTE con 1 linea(s), total Q120
+    ordenes    info  POST / 200
+    gateway    info  POST /graphql/ordenes 200
+
+  Cuatro servicios, una sola consulta por trace_id. Sin entrar a cada Pod.
+
+  Cada linea es JSON en el stdout del contenedor, por ejemplo:
+    {"level":"info","time":"2026-10-15T00:44:40.075Z","hostname":"productos-74466bb65f-782rn",
+     "req":{"method":"POST","url":"/graphql"},"trace_id":"524da75cd3d52cd2d00faea3c1b29384",
+     "span_id":"4a17bdd2195f40b0", ... }
+
+
+4. METRICAS DE NEGOCIO
+
+  sum by (estado) (ordenes_total)              creada 1, pagada 1
+  sum(ventas_quetzales_total)                  120
+  sum by (causa) (ordenes_rechazadas_total)    (sin datos: nadie fue rechazado)
+
+  Y las tecnicas, con la version como etiqueta:
+    http_server_request_duration_seconds{job="productos", service_version="2.4.0"}
+
+
+5. LO QUE TODAVIA NO ME GUSTA (lo arreglo en la proxima version)
+
+  - Cada middleware de Express sale como un tramo: unos 40 por peticion. La
+    cascada se lee mal.
+  - Aparecen trazas del arranque de Nest ("Create Nest App",
+    "graphql.parseSchema") que no son peticiones de nadie.
+  - En ordenes y productos el log dice "POST / 200" en vez de "POST /graphql":
+    Apollo monta GraphQL como subruta y Express le recorta la URL. Hay que
+    usar originalUrl.

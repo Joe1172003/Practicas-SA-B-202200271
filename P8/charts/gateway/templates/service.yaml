@@ -19,7 +19,7 @@ spec:
 {{- if .Values.canary.habilitado }}
 ---
 # Apunta solo a la version nueva mientras dura el canary. Recibe el porcentaje
-# del Ingress canary y las pruebas de k6.
+# de trafico real que le asigna el Ingress canary.
 apiVersion: v1
 kind: Service
 metadata:
