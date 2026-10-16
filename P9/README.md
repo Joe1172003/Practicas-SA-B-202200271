@@ -25,6 +25,7 @@ Todo lo que hay que revisar de esta práctica está acá.
 | Repositorio GitOps | https://github.com/Joe1172003/sa-p8-gitops |
 | Aplicación raíz en ArgoCD | `raiz`, en el namespace `argocd` |
 | Comando que reconstruye todo | [P9/bootstrap/reconstruir.sh](bootstrap/reconstruir.sh) |
+| Runbook de recuperación | [P9/runbook.md](runbook.md) |
 | Dónde vive el registro de Terraform | Bucket de Google Cloud Storage `sa-p9-tfstate-202200271`, en us-central1, con bloqueo y versionado |
 | Respaldos programados | Calendario `velero-cada-3-horas`, guarda en el bucket `sa-p9-velero-202200271` |
 | Reconstrucción cronometrada | [evidencias/22-simulacro-linea-de-tiempo.txt](evidencias/22-simulacro-linea-de-tiempo.txt) |
@@ -121,179 +122,10 @@ ___
 
 # Runbook de recuperación
 
-Esto es lo que hay que hacer si el clúster desaparece. Lo escribí para que lo
-pueda ejecutar alguien que nunca vio este sistema.
-
-El resumen es corto: **hay un solo comando que reconstruye todo**. Los pasos de
-abajo son para llegar hasta ese comando y para comprobar que quedó bien.
-
-Tiempo estimado: **30 minutos**, de los cuales 25 son esperar.
-
-## Antes de empezar
-
-Necesitás dos cosas.
-
-**Acceso al proyecto de Google Cloud** `sa-p6-202200271`, con permiso de editor.
-
-**Cinco programas instalados:** `gcloud`, `terraform`, `kubectl`, `helm` y `velero`.
-Si no querés instalar nada, abrí **Cloud Shell** desde la consola de Google: trae
-los primeros cuatro y solo hay que agregarle velero.
-
-```bash
-curl -sSL -o velero.tar.gz https://github.com/vmware-tanzu/velero/releases/download/v1.18.2/velero-v1.18.2-linux-amd64.tar.gz
-tar -xzf velero.tar.gz && sudo mv velero-v1.18.2-linux-amd64/velero /usr/local/bin/
-```
-
-Trabajar desde Cloud Shell es lo que recomiendo: cuando hice el simulacro se me
-cayó internet a mitad de la reconstrucción y tuve que destrabar el estado a mano.
-
-## Paso 1: conseguir el código
-
-```bash
-git clone https://github.com/Joe1172003/Practicas-SA-B-202200271.git
-cd Practicas-SA-B-202200271/P9
-```
-
-## Paso 2: identificarse en Google Cloud
-
-```bash
-gcloud auth login
-gcloud auth application-default login
-gcloud config set project sa-p6-202200271
-```
-
-El segundo comando es el que usa Terraform. Si lo saltas, el paso 4 falla con un
-error de credenciales.
-
-Comprobalo así:
-```bash
-gcloud auth application-default print-access-token
-```
-Si imprime un texto largo, estás listo.
-
-## Paso 3: reconstruir
-
-```bash
-bash bootstrap/reconstruir.sh
-```
-
-Eso es todo. El script hace nueve cosas en orden y va imprimiendo la hora de cada
-una:
-
-1. Revisa que tengas las herramientas y la sesión.
-2. Crea el bucket donde Terraform guarda su registro, si no existe.
-3. Levanta lo que sobrevive a un desastre: el bucket de respaldos, la IP pública y
-   la copia de la llave de los secretos.
-4. Crea el clúster, los 3 nodos y ArgoCD. Es el paso largo, unos 14 minutos.
-5. Conecta `kubectl` al clúster nuevo.
-6. Espera a que ArgoCD despliegue las 15 aplicaciones. Unos 9 minutos.
-7. Busca el último respaldo de Velero y devuelve los datos a la base.
-8. Prueba que el sistema responda.
-9. Imprime los tiempos.
-
-Mientras corre no hace falta tocar nada. Si te preocupa que se haya colgado,
-mirá el contador de `Still creating...`: GKE tarda entre 10 y 12 minutos en
-entregar los nodos y no hay forma de apurarlo.
-
-Para dejar la base vacía en lugar de restaurar los datos:
-```bash
-bash bootstrap/reconstruir.sh --sin-datos
-```
-
-## Paso 4: comprobar que quedó bien
-
-Los comandos de abajo son para una terminal de Linux, Cloud Shell o Git Bash. Si
-estás en PowerShell de Windows, escribí `curl.exe` en lugar de `curl`: ahí `curl`
-es otro programa y rechaza estas opciones.
-
-Tres revisiones. Si las tres pasan, se restauro correctamente.
-
-**Las aplicaciones:**
-```bash
-kubectl -n argocd get app
-```
-Tienen que ser 15, todas en `Synced` y `Healthy`.
-
-**El sistema desde afuera.** La dirección `136.113.9.71.nip.io` apunta sola a la
-IP del sistema, sin configurar nada.
-```bash
-curl http://136.113.9.71.nip.io/health
-```
-Responde `{"estado":"ok","servicio":"api-gateway","version":"2.2.1"}`.
-
-**Los datos:**
-```bash
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"query":"{ productos { nombre precio } }"}' \
-  http://136.113.9.71.nip.io/graphql/productos
-```
-Devuelve el catálogo con sus productos y precios. Si contesta una lista vacía, la
-restauración no trajo los datos: mirá el paso 7 del script.
-
-En PowerShell de Windows, `curl` es otro programa y rechaza esas opciones. Usá
-estos dos en su lugar:
-```powershell
-curl.exe http://136.113.9.71.nip.io/health
-
-Invoke-RestMethod -Uri "http://136.113.9.71.nip.io/graphql/productos" -Method Post -ContentType "application/json" -Body '{"query":"{ productos { nombre precio } }"}' | ConvertTo-Json -Depth 5
-```
-
-## Si algo sale mal
-
-Estos cuatro problemas me pasaron de verdad durante el simulacro. Los dejo con su
-solución para que nadie los tenga que averiguar de nuevo.
-
-**El clúster no se deja destruir y el mensaje dice `context deadline exceeded`.**
-Las aplicaciones de ArgoCD piden que alguien las limpie antes de borrarse, pero
-ArgoCD ya no existe. Quitales esa condición:
-```bash
-kubectl -n argocd get applications -o name | while read a; do
-  kubectl -n argocd patch "$a" --type merge -p '{"metadata":{"finalizers":null}}'
-done
-```
-
-**Terraform dice `Error acquiring the state lock`.**
-Alguien quedó a mitad de camino, casi siempre por una caída de red. El propio
-mensaje trae el número en la línea `ID:`. Con eso:
-```bash
-cd terraform/cluster
-terraform force-unlock EL_NUMERO_DEL_MENSAJE
-```
-Usalo solo si estás seguro de que nadie más está aplicando cambios.
-
-**Terraform dice `Error 409: Already exists`.**
-Quedaron recursos creados en Google que Terraform no alcanzó a registrar. Lo más
-simple es borrarlos y volver a empezar:
-```bash
-gcloud container clusters delete sa-p9 --zone us-central1-a --quiet
-gcloud iam service-accounts delete nodos-sa-p9@sa-p6-202200271.iam.gserviceaccount.com --quiet
-```
-Después repetí el paso 3.
-
-**La restauración queda en `PartiallyFailed`.**
-Casi siempre es porque la copia del disco todavía se está subiendo a Google. El
-script reintenta solo una vez; si vuelve a fallar, esperá un par de minutos,
-revisá que todas digan `READY` y volvé a correrlo:
-```bash
-gcloud compute snapshots list
-```
-
-## Para mirar por dentro
-
-La consola de ArgoCD se abre así:
-```bash
-kubectl -n argocd port-forward svc/argocd-server 8080:80
-```
-Entrás en `http://localhost:8080` con el usuario `admin`. La contraseña cambia en
-cada reconstrucción y se consulta con esto en gitbash o cloud shell de gcp:
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-Los respaldos disponibles:
-```bash
-velero backup get
-```
+Lo que hay que hacer si el clúster desaparece, paso a paso, está en
+[runbook.md](runbook.md). Lo escribí para que lo pueda seguir alguien que nunca
+vio este sistema: un solo comando reconstruye todo y el resto es comprobar que
+quedó bien.
 
 
 
@@ -388,7 +220,7 @@ cosas por hacer, y las ordeno por lo que más duele.
 
 | Qué encontré | Qué voy a hacer |
 |---|---|
-| Depende de mi máquina y mi internet | Ejecutar la reconstrucción desde Cloud Shell, que corre en la nube de Google. Ya lo dejé escrito en el runbook |
+| Depende de mi máquina y mi internet | Ejecutar la reconstrucción desde Cloud Shell, que corre en la nube de Google. Ya lo dejé escrito en el [runbook](runbook.md) |
 | La destrucción se traba | Agregar al procedimiento un paso previo que libere las aplicaciones antes de borrar, para no improvisarlo con el sistema caído |
 | Un permiso faltante que nadie vio en un mes | Repetir este simulacro cada cierto tiempo. Un respaldo que nunca se restauró es una promesa, no un respaldo. Ya corregí el permiso |
 | La base sin réplica | Pasar postgres a primario con réplica y cambio automático. Es el trabajo más grande de los cuatro y hoy queda como deuda declarada |
