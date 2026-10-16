@@ -1,0 +1,117 @@
+Simulacro 2 - la alarma y el recorrido del sintoma a la causa - 15/10/2026 (UTC)
+
+El simulacro 1 mostro que el canary protege al gateway. Este muestra que pasa
+donde no hay canary, y el camino alerta -> traza -> log con tiempos medidos.
+
+
+QUE ROMPI Y COMO
+
+  PR #32 en sa-p8-gitops, "chore(productos): estandarizar el puerto del
+  servicio a 3005": una linea en valores/productos.yaml, puerto: 3005.
+
+  El chart de productos mueve todo junto (Service, contenedor, sondas,
+  NetworkPolicy), asi que los Pods quedaron sanos y Kubernetes no vio nada
+  raro. Pero gateway y ordenes tienen URL_PRODUCTOS=http://productos:3002 en
+  SU configuracion, y nadie la cambio. Productos no tiene canary: el cambio
+  entro directo.
+
+  Elegi un error de configuracion y no uno de recursos a proposito: si los
+  Pods nuevos se rompen (OOMKilled, CPU minima), el Deployment se frena y los
+  viejos siguen atendiendo, y no hay caida. Aca la caida es real y los Pods
+  estan "sanos".
+
+
+LINEA DE TIEMPO (Rollout/Service, Prometheus, Alertmanager, Tempo y Loki)
+
+  23:40:30  merge del PR #32
+  ~23:41:00 el Service de productos pasa a 3005 (entre 23:40:53 y 23:41:06).
+            Empieza la caida del catalogo.
+  23:43:42  error 5 min 23.4 %, error 1 h 1.52 %
+  23:52:59  SloDisponibilidadConsumoRapido -> pending
+            (error 5 min 100 %, error 1 h 7.51 %; el umbral es 7.2 %)
+  23:54:56  -> firing
+  23:55:22  Alertmanager manda el correo [FIRING]
+            (alertmanager_notifications_total{integration="email"} 4 -> 5)
+
+  Recorrido (las horas son de los logs de Tempo y Loki: registran cada
+  busqueda que hice desde Grafana):
+  23:55:22  llega el correo, con el resumen y el enlace al runbook
+  23:56:16  tablero -> "Errores por servicio": falla solo el gateway y el
+            trafico de productos esta en 0 -> clic en la linea del gateway ->
+            Tempo busca { resource.service.name = "gateway" && status = error }
+  23:56:18  abro la traza 88a64eec...: el tramo POST del gateway a productos
+            esta en rojo con "timeout of 20000ms exceeded"
+  23:56:28  "Logs for this span" -> Loki, mismo trace_id:
+              "No se pudo contactar a http://productos:3002/graphql:
+               timeout of 20000ms exceeded"
+              (context GraphqlClienteService, hostname gateway-c588cd44f-8tkgh)
+
+  RECORRIDO MEDIDO: 1 min 6 s desde el correo (1 min 32 s desde firing).
+  Objetivo: menos de 3 min.
+
+  Confirmacion de la hipotesis: kubectl -n sa-p8 get svc productos -> 3005.
+  23:58:56  merge del PR #33, Revert del #32
+  23:59:24  el Service vuelve a 3002
+  23:59:48  el catalogo responde 200
+  00:05:02  la alerta se resuelve (la ventana de 5 min olvida los errores)
+  00:05:28  correo [RESOLVED]
+
+
+TIEMPOS PARA EL INFORME
+
+  Deteccion (inicio de la caida -> firing):        13 min 56 s
+  Deteccion (inicio de la caida -> correo):        14 min 22 s
+  Recorrido (correo -> log de la causa):           1 min 6 s
+  Recuperacion (correo -> catalogo de vuelta):     4 min 26 s
+  Caida total para los clientes:                   ~18 min 48 s
+  Quien lo resolvio: yo, con un revert del PR en GitOps.
+
+
+LO QUE NO ESPERABA
+
+  1. No era ECONNREFUSED sino timeout. La red del cluster (Dataplane V2)
+     descarta en silencio las conexiones a un puerto que el Service ya no
+     tiene, asi que cada consulta al catalogo quedo colgada 20 s (el timeout
+     del gateway) antes de responder 503. Para el cliente es peor que un
+     error rapido.
+
+  2. La deteccion tardo 14 min, no los ~7 que calcule. Con las peticiones
+     colgadas 20 s, los usuarios simulados se quedaron esperando y llegaron
+     menos peticiones por segundo (el gateway paso de 3.3 a ~1 req/s). Menos
+     peticiones, menos errores por minuto, y la ventana de 1 h tardo mas en
+     pasar el 7.2 %. El timeout largo escondio el tamano de la caida.
+
+  3. El presupuesto de la semana se gasto entero: consumido 101 %,
+     disponibilidad de 7 dias 99.49 % (prometido 99.5 %). 1 237 de los 1 269
+     errores de la "semana" son de este simulacro. La ventana de 7 dias solo
+     tiene 23 h de datos (el gateway instrumentado mide desde el 15/10 00:50),
+     asi que el presupuesto era de ~1 250 errores. Con una semana completa
+     (~2 millones de peticiones) seria de ~10 000 y este mismo fallo habria
+     gastado ~12 %. Un SLO recien creado tiene poco presupuesto absoluto.
+
+
+ALERTA FALTANTE
+
+  La alerta de consumo rapido esta pensada para degradaciones: exige 7.2 % de
+  errores sostenido en una hora. Ante una caida total del catalogo tardo 14
+  min, y eso es mucho para algo que se ve en el tablero al minuto (productos
+  sin trafico, gateway al 100 % de errores).
+  Lo que habria acortado la deteccion:
+    - una alerta de sintoma para caidas totales: errores del gateway > 50 % en
+      5 min durante 2 min -> habria sonado ~23:44, unos 11 min antes;
+    - o una que vigile el trafico de cada servicio: productos con 0
+      peticiones/s mientras el gateway recibe trafico.
+  Y en el codigo: bajar el timeout del gateway de 20 s a ~3 s. Fallaria mas
+  rapido, el cliente no esperaria 20 s y las metricas verian la caida
+  completa.
+
+
+CAPTURAS
+
+  assets/24-simulacro2-tablero-caida.png   trafico de productos a 0, ordenes desplomadas,
+                                            presupuesto de disponibilidad en 32 %
+  assets/24b-simulacro2-loki-causa.png     Loki desde la traza, con el log de la causa
+  assets/24c-simulacro2-log-causa.png      el log: "No se pudo contactar a http://productos:3002 ..."
+  assets/25-correo-simulacro2-firing.png   [FIRING] SloDisponibilidadConsumoRapido (critica), 5:55 p.m.:
+                                            "8.535 % de errores en la ultima hora", con el runbook
+  assets/25b-correo-simulacro2-resolved.png  [RESOLVED], 6:05 p.m. (mi correo y mi foto tapados en las dos)
