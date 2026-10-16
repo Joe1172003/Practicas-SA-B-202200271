@@ -1,0 +1,105 @@
+Simulacro 1 - el canary revierte una version rota por metricas - 15/10/2026 (UTC)
+
+El fallo de la P8 fue de latencia (v2.3.0, p95 de 1 s). Este es de errores.
+
+
+QUE ROMPI Y COMO
+
+  v2.5.0, rama fallo-inducido-p10 (no llego a main), commit con un solo cambio
+  en P4/backend-ts/gateway/src/graphql-proxy/graphql-cliente.service.ts:
+
+    timeout: 20000   ->   timeout: 20
+
+  El error humano de creer que el timeout de axios va en segundos. Va en
+  milisegundos: el gateway le daba 20 ms a productos y a ordenes para
+  responder. Antes de soltarlo medi lo que iba a pasar con las llamadas reales
+  del gateway (http_client_request_duration_seconds, ultimos 30 min):
+    productos  50 % responde en 10 ms o menos, 91 % en 25 ms o menos
+    ordenes    0 % responde en 25 ms o menos
+  O sea: parte del catalogo y todas las compras se iban a cortar con 503.
+
+  Las 12 pruebas unitarias del gateway pasaron. El pipeline la construyo, la
+  escaneo, la firmo y abrio el PR "Version 2.5.0". Nada antes de produccion
+  lo noto.
+
+
+LINEA DE TIEMPO (sacada del Rollout y del AnalysisRun, cada 5 s)
+
+  22:49:35  merge del PR #30 "Version 2.5.0" en sa-p8-gitops
+  22:50:40  Argo Rollouts empieza a crear el Pod de la 2.5.0
+  22:51:51  la 2.5.0 recibe el 20 % del trafico real (CanaryPauseStep)
+  22:52:47  1ra lectura de gateway-7f68876b45-7:
+              trafico-candidata 37.96 peticiones en 2 min    OK
+              tasa-de-error     0.618 (61.8 %)               FALLA (limite 5 %)
+  22:53:16  2da lectura:
+              tasa-de-error     0.534 (53.4 %)               FALLA
+              latencia-p95-maxima 0.462 s, latencia-p95-relativa 1.894   OK
+  22:53:23  RolloutAborted: Background analysis phase error/failed: Metric
+            "tasa-de-error" assessed Failed due to failed (2) > failureLimit (1)
+            El trafico vuelve entero a la 2.4.3 (ReplicaSet c588cd44f).
+
+  Del primer trafico a la reversion: 92 s. Nadie toco nada.
+
+  La latencia no fallo: los timeouts cortan a los 20 ms, asi que la version
+  rota se veia hasta "rapida". Si el canary solo mirara latencia, la habria
+  aprobado. Por eso decide con las dos senales.
+
+
+CUANTO LE COSTO A LOS CLIENTES
+
+  slo:disponibilidad_errores:ratio_rate5m     maximo 3.8 %
+  slo:disponibilidad_presupuesto_consumido    1.94 % del presupuesto de la semana
+  Panel "Respuestas del gateway por codigo": aparecen los 503 a las 22:52 y
+  desaparecen a las 22:54.
+
+  Ninguna alerta sono, y esta bien: la de consumo rapido pide mas de 7.2 %
+  de errores en 1 h y en 5 min. El canary contuvo el fallo antes de que
+  gastara presupuesto en serio. El 80 % de los clientes nunca vio la 2.5.0.
+
+  Con el mismo bug, el canary de la P8 (Jobs de k6 contra el catalogo y
+  /health) solo habria visto la parte del catalogo; las compras, que fallaban
+  al 100 %, no estaban en sus pruebas.
+
+
+RECUPERACION Y ESTADO FINAL
+
+  El gateway quedo bien a las 22:53:23, pero GitOps seguia diciendo 2.5.0: el
+  gateway en Degraded y los demas servicios (sin canary) en 2.5.0, que en ellos
+  no tenia el bug porque el cambio era solo del gateway.
+  23:02:36  merge del PR #31 Revert "Version 2.5.0": GitOps vuelve a 2.4.3.
+  23:06:28  23 de 23 apps Synced y Healthy, todos los servicios en 2.4.3,
+            errores en 0.
+
+
+LO QUE ENCONTRE AL ENSAYAR EL RECORRIDO
+
+  Practicando el recorrido tablero -> Tempo -> Loki (sin grabar) aparecio un
+  error que no era del simulacro: a las 23:05:47, durante el revert, mientras
+  se reemplazaban los Pods de productos.
+
+  Traza 6d974f17ba2e6dd13680edc258a8ffa8 (363 ms, 503):
+    gateway  POST /graphql/productos                 ERROR
+    gateway    ProductosProxyController.consultar    "El microservicio no esta disponible en este momento"
+    gateway      POST (llamada a productos)          read ECONNRESET
+  Loki, mismo trace_id:
+    "No se pudo contactar a http://productos:3002/graphql: read ECONNRESET"
+
+  Cada vez que productos se redespliega, un Pod que se apaga corta las
+  peticiones que tenia a medias y el gateway responde 503: no reintenta, y
+  productos no espera a terminar lo que tiene en curso antes de morir.
+  Mejora propuesta: un reintento en el gateway para errores de conexion en
+  consultas (no en mutaciones, que podrian duplicar una orden) y un
+  preStop/terminationGracePeriod en productos para drenar las conexiones.
+  Capturas: assets/23-ensayo-traza-econnreset.png y 23b-ensayo-log-econnreset.png
+
+
+CAPTURAS
+
+  assets/22-canary-2.5.0-analysisrun.png     tasa-de-error 0.62 y 0.53, 2 Failures, la consulta PromQL
+  assets/22b-canary-historia-de-revisiones.png  el arbol del Rollout: k6 (rev 3), primer analisis
+                                                por metricas (rev 4), exitos (5 y 6), la 2.5.0 rechazada (7)
+  assets/22c-tablero-pico-errores-canary.png  el pico de 503 y la vuelta a 200
+
+  Nombres para la tabla del README:
+    AnalysisRun fallido: gateway-7f68876b45-7
+    Rollout:             gateway (namespace sa-p8)
